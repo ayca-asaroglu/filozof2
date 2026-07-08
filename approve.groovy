@@ -472,8 +472,12 @@ fibarprIdeaApprove(
           }
 
           if (childVal) {
-            def childOpt = options?.find { opt ->
-              opt?.parentOption?.optionId == parentOpt.optionId && normalizeKey(opt?.value) == normalizeKey(childVal)
+            // Child options can be exposed under parentOpt.childOptions depending on Jira option manager behavior.
+            def childPool = parentOpt?.childOptions ?: options?.findAll { opt ->
+              opt?.parentOption?.optionId == parentOpt.optionId
+            }
+            def childOpt = childPool?.find { opt ->
+              normalizeKey(opt?.value) == normalizeKey(childVal)
             }
 
             if (!childOpt) {
