@@ -485,7 +485,8 @@ fibarprIdeaApprove(
               return
             }
 
-            inputParams.addCustomFieldValue(cf.idAsLong, parentOpt.optionId.toString(), childOpt.optionId.toString())
+            inputParams.addCustomFieldValue(cf.idAsLong, parentOpt.optionId.toString())
+            inputParams.addCustomFieldValue("${cf.id}:1", childOpt.optionId.toString())
           } else {
             inputParams.addCustomFieldValue(cf.idAsLong, parentOpt.optionId.toString())
           }
