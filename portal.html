@@ -3965,6 +3965,57 @@
     // Cascade select list parent değerlerini sakla
     const BS_PARENT_VALUES = {};
 
+    function decodeCascadeByteList(numbers){
+      if(!Array.isArray(numbers) || !numbers.length) return '';
+      try {
+        const bytes = new Uint8Array(numbers.map(n => (Number(n) & 0xFF)));
+        let zeroAtOdd = 0;
+        for(let i = 1; i < bytes.length; i += 2){
+          if(bytes[i] === 0) zeroAtOdd++;
+        }
+        const looksUtf16Le = (bytes.length % 2 === 0) && zeroAtOdd > 0 && zeroAtOdd >= Math.floor(bytes.length / 4);
+        if(looksUtf16Le){
+          const utf16 = new TextDecoder('utf-16le').decode(bytes).replace(/\u0000/g, '').trim();
+          if(utf16 && !utf16.includes('\uFFFD')) return utf16;
+        }
+        const utf8 = new TextDecoder('utf-8').decode(bytes).replace(/\u0000/g, '').trim();
+        if(utf8 && !utf8.includes('\uFFFD')) return utf8;
+        return new TextDecoder('windows-1254').decode(bytes).replace(/\u0000/g, '').trim();
+      } catch(_e){
+        return '';
+      }
+    }
+
+    function normalizeCascadeText(raw){
+      if(raw == null) return '';
+      let candidate = raw;
+      if(typeof candidate === 'object' && !Array.isArray(candidate)){
+        candidate = candidate.value ?? candidate.name ?? candidate.label ?? candidate;
+      }
+
+      if(Array.isArray(candidate)){
+        const allNumbers = candidate.length > 0 && candidate.every(v => Number.isFinite(Number(v)));
+        if(allNumbers){
+          const decoded = decodeCascadeByteList(candidate.map(v => Number(v)));
+          if(decoded) return decoded;
+        }
+        return candidate.map(v => String(v ?? '').trim()).filter(Boolean).join(', ');
+      }
+
+      let str = String(candidate).trim();
+      if(!str) return '';
+      let numericCsv = str;
+      if(numericCsv.startsWith('[') && numericCsv.endsWith(']')){
+        numericCsv = numericCsv.slice(1, -1).trim();
+      }
+      if(/^-?\d+(\s*,\s*-?\d+)+$/.test(numericCsv)){
+        const nums = numericCsv.split(/\s*,\s*/).map(n => Number(n));
+        const decoded = decodeCascadeByteList(nums);
+        if(decoded) return decoded;
+      }
+      return str;
+    }
+
     async function loadBusinessScoreOptions(issueKey){
       if(!issueKey) return;
       try {
@@ -3973,7 +4024,7 @@
         const url = `/jira/rest/scriptrunner/latest/custom/getCascadingChildOptionsForFields?issueKey=${encodeURIComponent(issueKey)}&customFieldIds=${customFieldIds}`;
         const response = await fetch(url);
         const data = await response.json();
-        const globalParentValue = (data?.source_value || '').toString().trim();
+        const globalParentValue = normalizeCascadeText(data?.source_value);
         
         if(data.fields && Array.isArray(data.fields)){
           // Reverse mapping: customfield_ID -> selectId
@@ -3990,7 +4041,7 @@
             if(!select) return;
             
             // Parent değerini endpoint'teki öncelik sırasına göre kaydet.
-            const parentCandidate = (field?.matched_parent_option || field?.source_value || globalParentValue || '').toString().trim();
+            const parentCandidate = normalizeCascadeText(field?.matched_parent_option || field?.source_value || globalParentValue || '');
             if(parentCandidate){
               BS_PARENT_VALUES[selectId] = parentCandidate;
             }
@@ -4000,9 +4051,11 @@
             
             if(Array.isArray(field.child_options)){
               field.child_options.forEach(opt => {
+                const normalizedOpt = normalizeCascadeText(opt);
+                if(!normalizedOpt) return;
                 const optEl = document.createElement('option');
-                optEl.value = opt;
-                optEl.textContent = opt;
+                optEl.value = normalizedOpt;
+                optEl.textContent = normalizedOpt;
                 select.appendChild(optEl);
               });
             }
@@ -4052,9 +4105,9 @@
 
     function buildApproveForm(){
       const buildCascadeValue = (selectId) => {
-        const childValue = document.getElementById(selectId)?.value || '';
+        const childValue = normalizeCascadeText(document.getElementById(selectId)?.value || '');
         if(!childValue) return '';
-        const parentValue = BS_PARENT_VALUES[selectId] || '';
+        const parentValue = normalizeCascadeText(BS_PARENT_VALUES[selectId] || '');
         return { parent: parentValue, child: childValue };
       };
       
