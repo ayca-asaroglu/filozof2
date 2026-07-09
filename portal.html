@@ -1145,6 +1145,7 @@
       box-shadow:0 0 0 2px var(--focus-ring);
     }
     .q-input.error{ border-color:#DE350B; box-shadow:0 0 0 2px rgba(222,53,11,.15); }
+    .q-input:disabled{ background:var(--border-light); color:var(--text-subtle); cursor:not-allowed; opacity:.7; }
     .q-select{ resize:none; min-height:unset; height:36px; }
     .q-select[multiple]{ height:auto; min-height:120px; }
     .q-detail{ display:none; margin-top:6px; }
@@ -2292,7 +2293,7 @@
               <div class="question-grid">
                 <div class="business-group-title">1) Etkilenen Kitle</div>
 
-                <div class="q-item required" id="bs1aItem">
+                <div class="q-item" id="bs1aItem">
                   <label>1A) Gelir Artışı Bireysel Müşteri</label>
                   <select class="q-input q-select" id="bs1aSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2302,7 +2303,7 @@
                   </select>
                 </div>
 
-                <div class="q-item required" id="bs1bItem">
+                <div class="q-item" id="bs1bItem">
                   <label>1B) Gelir Artışı Tüzel Müşteri</label>
                   <select class="q-input q-select" id="bs1bSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2314,7 +2315,7 @@
 
                 <div class="business-subgroup-title">1C) Operasyonel Verimlilik</div>
 
-                <div class="q-item required" id="bs1cCountItem">
+                <div class="q-item" id="bs1cCountItem">
                   <label>İşlem Adedi</label>
                   <select class="q-input q-select" id="bs1cCountSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2324,7 +2325,7 @@
                   </select>
                 </div>
 
-                <div class="q-item required" id="bs1cDurationItem">
+                <div class="q-item" id="bs1cDurationItem">
                   <label>İşlem Süresi</label>
                   <select class="q-input q-select" id="bs1cDurationSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2334,9 +2335,11 @@
                   </select>
                 </div>
 
+                <div class="q-warn" id="bs1GroupWarn">Bu başlık altında yalnızca bir seçenek işaretlenebilir (1A, 1B veya 1C). Diğer alan(lar) otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
+
                 <div class="business-group-title">2) Finansal Etki</div>
 
-                <div class="q-item required" id="bs2aItem">
+                <div class="q-item" id="bs2aItem">
                   <label>2A) Gelir Artışı Bireysel Müşteri</label>
                   <select class="q-input q-select" id="bs2aSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2346,7 +2349,7 @@
                   </select>
                 </div>
 
-                <div class="q-item required" id="bs2bItem">
+                <div class="q-item" id="bs2bItem">
                   <label>2B) Gelir Artışı Tüzel Müşteri</label>
                   <select class="q-input q-select" id="bs2bSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2356,7 +2359,7 @@
                   </select>
                 </div>
 
-                <div class="q-item required" id="bs2cItem">
+                <div class="q-item" id="bs2cItem">
                   <label>2C) Gider Azaltımı</label>
                   <select class="q-input q-select" id="bs2cSelect">
                     <option value="" selected>Seçiniz</option>
@@ -2366,9 +2369,11 @@
                   </select>
                 </div>
 
+                <div class="q-warn" id="bs2GroupWarn">Bu başlık altında yalnızca bir soru seçilebilir. Diğer alanlar otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
+
                 <div class="business-group-title">3) Müşteri Etkisi</div>
 
-                <div class="q-item required" id="bs3Item">
+                <div class="q-item" id="bs3Item">
                   <label>3) Müşteri Etkisi</label>
                   <select class="q-input q-select" id="bs3Select">
                     <option value="" selected>Seçiniz</option>
@@ -2380,7 +2385,7 @@
 
                 <div class="business-group-title">4) Operasyonel ve Finansal Risk</div>
 
-                <div class="q-item required" id="bs4Item">
+                <div class="q-item" id="bs4Item">
                   <label>4) Operasyonel ve Finansal Risk</label>
                   <select class="q-input q-select" id="bs4Select">
                     <option value="" selected>Seçiniz</option>
@@ -3690,6 +3695,51 @@
       setQuestion7Visibility(selectedChannels);
     }
 
+    // Business Score başlıkları altında en fazla bir seçenek işaretlenebilir.
+    // "1C) Operasyonel Verimlilik" iki alanı (İşlem Adedi + İşlem Süresi) birlikte tek bir seçenek sayılır.
+    const BUSINESS_SCORE_GROUPS = [
+      {
+        warnId: 'bs1GroupWarn',
+        options: [['bs1aSelect'], ['bs1bSelect'], ['bs1cCountSelect', 'bs1cDurationSelect']]
+      },
+      {
+        warnId: 'bs2GroupWarn',
+        options: [['bs2aSelect'], ['bs2bSelect'], ['bs2cSelect']]
+      }
+    ];
+
+    function syncBusinessScoreGroup(group){
+      const optionEls = group.options.map(ids => ids.map(id => document.getElementById(id)));
+      const activeIndex = optionEls.findIndex(els => els.some(el => el && el.value));
+      optionEls.forEach((els, idx) => {
+        const disable = activeIndex !== -1 && idx !== activeIndex;
+        els.forEach(el => {
+          if(!el) return;
+          el.disabled = disable;
+          if(disable && el.value) el.value = '';
+        });
+      });
+      const warnEl = document.getElementById(group.warnId);
+      if(warnEl) warnEl.classList.toggle('open', activeIndex !== -1);
+    }
+
+    function syncAllBusinessScoreGroups(){
+      BUSINESS_SCORE_GROUPS.forEach(syncBusinessScoreGroup);
+    }
+    window.syncAllBusinessScoreGroups = syncAllBusinessScoreGroups;
+
+    function bindBusinessScoreExclusivity(){
+      BUSINESS_SCORE_GROUPS.forEach(group => {
+        group.options.forEach(ids => {
+          ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('change', () => syncBusinessScoreGroup(group));
+          });
+        });
+      });
+      syncAllBusinessScoreGroups();
+    }
+
     function setQuestion4Visibility(channelValue){
       const q4Item = document.getElementById('q4Item');
       if(!q4Item) return;
@@ -3776,6 +3826,7 @@
       syncChannelDrivenVisibility();
       updateNpsWarning();
       if(typeof window.syncYesNoDetails === 'function') window.syncYesNoDetails();
+      if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
       return true;
     }
 
@@ -3800,6 +3851,7 @@
       const q7 = document.getElementById('q7Code'); if(q7) q7.value = '';
       if(typeof window.resetStakeholdersSelection === 'function') window.resetStakeholdersSelection();
       updateNpsWarning();
+      if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
     }
 
     function normalizeCustomFieldValue(raw){
@@ -3870,6 +3922,7 @@
       });
       if(typeof window.syncYesNoDetails === 'function') window.syncYesNoDetails();
       updateNpsWarning();
+      if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
     }
 
     function openMatureModal(item, options = {}){
@@ -4261,17 +4314,6 @@
       requireAttachment('q8Select','q8Attachment');
       requireDetail('q10Select','q10Detail');
       requireText('q7Code');
-      if(stage === 'all' || stage === 'business'){
-        requireSelect('bs1aSelect');
-        requireSelect('bs1bSelect');
-        requireSelect('bs1cCountSelect');
-        requireSelect('bs1cDurationSelect');
-        requireSelect('bs2aSelect');
-        requireSelect('bs2bSelect');
-        requireSelect('bs2cSelect');
-        requireSelect('bs3Select');
-        requireSelect('bs4Select');
-      }
       if(!ok) alert('Lütfen tüm zorunlu alanları doldurun.');
       return ok;
     }
@@ -5678,6 +5720,7 @@
     if(q2Select && q2Warn){ q2Select.addEventListener('change', updateNpsWarning); updateNpsWarning(); }
     const qChannelsSelect = document.getElementById('qChannelsSelect');
     if(qChannelsSelect){ qChannelsSelect.addEventListener('change', syncChannelDrivenVisibility); syncChannelDrivenVisibility(); }
+    bindBusinessScoreExclusivity();
 
     searchInput.addEventListener('input', () => {
       const q = searchInput.value; if(q === lastSearch) return; lastSearch = q; performSearch(q);
