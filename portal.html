@@ -1079,12 +1079,6 @@
     .mature-stage{ display:none; }
     .mature-stage.active{ display:block; }
     .question-grid{ display:grid; gap:12px; }
-    .business-group-title{
-      margin:4px 0 2px;
-      font-size:13px;
-      font-weight:700;
-      color:var(--text);
-    }
     .business-subgroup-title{
       margin:2px 0 0;
       font-size:12px;
@@ -1093,6 +1087,80 @@
       text-transform:uppercase;
       letter-spacing:0.3px;
     }
+
+    .business-accordion{ gap:10px; }
+    .business-group{
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:var(--surface);
+      transition:border-color .15s;
+    }
+    .business-group.has-error{ border-color:#DE350B; }
+    .business-group-header{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      background:var(--input-bg);
+      border:none;
+      cursor:pointer;
+      font:inherit;
+      text-align:left;
+      color:var(--text);
+      transition:background .15s;
+    }
+    .business-group-header:hover{ background:var(--border-light); }
+    .business-group-header:focus-visible{
+      outline:none;
+      box-shadow:inset 0 0 0 2px var(--focus-ring);
+    }
+    .business-group-header-title{
+      flex:1;
+      font-size:13px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .business-group-status{
+      font-size:11px;
+      font-weight:600;
+      padding:3px 8px;
+      border-radius:999px;
+      color:var(--text-subtle);
+      background:transparent;
+      white-space:nowrap;
+    }
+    .business-group-status.filled{
+      color:#00875A;
+      background:rgba(0,135,90,.1);
+    }
+    .business-group-status.incomplete{
+      color:#FF8B00;
+      background:rgba(255,139,0,.1);
+    }
+    .business-group-chevron{
+      display:inline-block;
+      font-size:11px;
+      color:var(--text-muted);
+      transition:transform .2s ease;
+      transform:rotate(-90deg);
+    }
+    .business-group.open .business-group-chevron{ transform:rotate(0deg); }
+    .business-group-body{
+      display:grid;
+      grid-template-rows:0fr;
+      transition:grid-template-rows .22s ease;
+    }
+    .business-group.open .business-group-body{ grid-template-rows:1fr; }
+    .business-group-body-inner{
+      min-height:0;
+      overflow:hidden;
+      display:grid;
+      gap:12px;
+      padding:0 14px;
+    }
+    .business-group.open .business-group-body-inner{ padding:2px 14px 14px; }
 
     .q-item label{
       font-size:12px;
@@ -2290,109 +2358,145 @@
 
             <div class="mature-stage" id="businessScoreStage">
               <div class="question-title">Business Score Soruları</div>
-              <div class="question-grid">
-                <div class="business-group-title">1) Etkilenen Kitle</div>
+              <div class="question-grid business-accordion" id="businessAccordion">
+                <div class="business-group" id="bsGroup1">
+                  <button type="button" class="business-group-header" data-group="bsGroup1" aria-expanded="false">
+                    <span class="business-group-header-title">1) Etkilenen Kitle</span>
+                    <span class="business-group-status" id="bsGroup1Status"></span>
+                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                  </button>
+                  <div class="business-group-body">
+                    <div class="business-group-body-inner">
+                      <div class="q-item" id="bs1aItem">
+                        <label>1A) Gelir Artışı Bireysel Müşteri</label>
+                        <select class="q-input q-select" id="bs1aSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
 
-                <div class="q-item" id="bs1aItem">
-                  <label>1A) Gelir Artışı Bireysel Müşteri</label>
-                  <select class="q-input q-select" id="bs1aSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
+                      <div class="q-item" id="bs1bItem">
+                        <label>1B) Gelir Artışı Tüzel Müşteri</label>
+                        <select class="q-input q-select" id="bs1bSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+
+                      <div class="business-subgroup-title">1C) Operasyonel Verimlilik</div>
+
+                      <div class="q-item" id="bs1cCountItem">
+                        <label>İşlem Adedi</label>
+                        <select class="q-input q-select" id="bs1cCountSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Azalacak">Azalacak</option>
+                          <option value="Değişmeyecek">Değişmeyecek</option>
+                          <option value="Artacak">Artacak</option>
+                        </select>
+                      </div>
+
+                      <div class="q-item" id="bs1cDurationItem">
+                        <label>İşlem Süresi</label>
+                        <select class="q-input q-select" id="bs1cDurationSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Kısalacak">Kısalacak</option>
+                          <option value="Değişmeyecek">Değişmeyecek</option>
+                          <option value="Uzayacak">Uzayacak</option>
+                        </select>
+                      </div>
+
+                      <div class="q-warn" id="bs1GroupWarn">Bu başlık altında yalnızca bir seçenek işaretlenebilir (1A, 1B veya 1C). Diğer alan(lar) otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="q-item" id="bs1bItem">
-                  <label>1B) Gelir Artışı Tüzel Müşteri</label>
-                  <select class="q-input q-select" id="bs1bSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
+                <div class="business-group" id="bsGroup2">
+                  <button type="button" class="business-group-header" data-group="bsGroup2" aria-expanded="false">
+                    <span class="business-group-header-title">2) Finansal Etki</span>
+                    <span class="business-group-status" id="bsGroup2Status"></span>
+                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                  </button>
+                  <div class="business-group-body">
+                    <div class="business-group-body-inner">
+                      <div class="q-item" id="bs2aItem">
+                        <label>2A) Gelir Artışı Bireysel Müşteri</label>
+                        <select class="q-input q-select" id="bs2aSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+
+                      <div class="q-item" id="bs2bItem">
+                        <label>2B) Gelir Artışı Tüzel Müşteri</label>
+                        <select class="q-input q-select" id="bs2bSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+
+                      <div class="q-item" id="bs2cItem">
+                        <label>2C) Gider Azaltımı</label>
+                        <select class="q-input q-select" id="bs2cSelect">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+
+                      <div class="q-warn" id="bs2GroupWarn">Bu başlık altında yalnızca bir soru seçilebilir. Diğer alanlar otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="business-subgroup-title">1C) Operasyonel Verimlilik</div>
-
-                <div class="q-item" id="bs1cCountItem">
-                  <label>İşlem Adedi</label>
-                  <select class="q-input q-select" id="bs1cCountSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Azalacak">Azalacak</option>
-                    <option value="Değişmeyecek">Değişmeyecek</option>
-                    <option value="Artacak">Artacak</option>
-                  </select>
+                <div class="business-group" id="bsGroup3">
+                  <button type="button" class="business-group-header" data-group="bsGroup3" aria-expanded="false">
+                    <span class="business-group-header-title">3) Müşteri Etkisi</span>
+                    <span class="business-group-status" id="bsGroup3Status"></span>
+                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                  </button>
+                  <div class="business-group-body">
+                    <div class="business-group-body-inner">
+                      <div class="q-item" id="bs3Item">
+                        <label>3) Müşteri Etkisi</label>
+                        <select class="q-input q-select" id="bs3Select">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="q-item" id="bs1cDurationItem">
-                  <label>İşlem Süresi</label>
-                  <select class="q-input q-select" id="bs1cDurationSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Kısalacak">Kısalacak</option>
-                    <option value="Değişmeyecek">Değişmeyecek</option>
-                    <option value="Uzayacak">Uzayacak</option>
-                  </select>
-                </div>
-
-                <div class="q-warn" id="bs1GroupWarn">Bu başlık altında yalnızca bir seçenek işaretlenebilir (1A, 1B veya 1C). Diğer alan(lar) otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
-
-                <div class="business-group-title">2) Finansal Etki</div>
-
-                <div class="q-item" id="bs2aItem">
-                  <label>2A) Gelir Artışı Bireysel Müşteri</label>
-                  <select class="q-input q-select" id="bs2aSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
-                </div>
-
-                <div class="q-item" id="bs2bItem">
-                  <label>2B) Gelir Artışı Tüzel Müşteri</label>
-                  <select class="q-input q-select" id="bs2bSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
-                </div>
-
-                <div class="q-item" id="bs2cItem">
-                  <label>2C) Gider Azaltımı</label>
-                  <select class="q-input q-select" id="bs2cSelect">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
-                </div>
-
-                <div class="q-warn" id="bs2GroupWarn">Bu başlık altında yalnızca bir soru seçilebilir. Diğer alanlar otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
-
-                <div class="business-group-title">3) Müşteri Etkisi</div>
-
-                <div class="q-item" id="bs3Item">
-                  <label>3) Müşteri Etkisi</label>
-                  <select class="q-input q-select" id="bs3Select">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
-                </div>
-
-                <div class="business-group-title">4) Operasyonel ve Finansal Risk</div>
-
-                <div class="q-item" id="bs4Item">
-                  <label>4) Operasyonel ve Finansal Risk</label>
-                  <select class="q-input q-select" id="bs4Select">
-                    <option value="" selected>Seçiniz</option>
-                    <option value="Düşük">Düşük</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Yüksek">Yüksek</option>
-                  </select>
+                <div class="business-group" id="bsGroup4">
+                  <button type="button" class="business-group-header" data-group="bsGroup4" aria-expanded="false">
+                    <span class="business-group-header-title">4) Operasyonel ve Finansal Risk</span>
+                    <span class="business-group-status" id="bsGroup4Status"></span>
+                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                  </button>
+                  <div class="business-group-body">
+                    <div class="business-group-body-inner">
+                      <div class="q-item" id="bs4Item">
+                        <label>4) Operasyonel ve Finansal Risk</label>
+                        <select class="q-input q-select" id="bs4Select">
+                          <option value="" selected>Seçiniz</option>
+                          <option value="Düşük">Düşük</option>
+                          <option value="Orta">Orta</option>
+                          <option value="Yüksek">Yüksek</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -3699,14 +3803,24 @@
     // "1C) Operasyonel Verimlilik" iki alanı (İşlem Adedi + İşlem Süresi) birlikte tek bir seçenek sayılır.
     const BUSINESS_SCORE_GROUPS = [
       {
+        groupId: 'bsGroup1',
         warnId: 'bs1GroupWarn',
         options: [['bs1aSelect'], ['bs1bSelect'], ['bs1cCountSelect', 'bs1cDurationSelect']]
       },
       {
+        groupId: 'bsGroup2',
         warnId: 'bs2GroupWarn',
         options: [['bs2aSelect'], ['bs2bSelect'], ['bs2cSelect']]
       }
     ];
+
+    // Tekil alanlı başlıklar (3 ve 4) exclusivity gerektirmez, sadece durum rozeti için izlenir.
+    const BUSINESS_GROUP_FIELDS = {
+      bsGroup1: ['bs1aSelect', 'bs1bSelect', 'bs1cCountSelect', 'bs1cDurationSelect'],
+      bsGroup2: ['bs2aSelect', 'bs2bSelect', 'bs2cSelect'],
+      bsGroup3: ['bs3Select'],
+      bsGroup4: ['bs4Select']
+    };
 
     function syncBusinessScoreGroup(group){
       const optionEls = group.options.map(ids => ids.map(id => document.getElementById(id)));
@@ -3723,20 +3837,76 @@
       if(warnEl) warnEl.classList.toggle('open', activeIndex !== -1);
     }
 
+    function getBusinessGroupState(groupId){
+      const val = id => document.getElementById(id)?.value || '';
+      if(groupId === 'bsGroup1'){
+        const a = val('bs1aSelect'), b = val('bs1bSelect');
+        const c1 = val('bs1cCountSelect'), c2 = val('bs1cDurationSelect');
+        if(a || b) return 'filled';
+        if(c1 || c2) return (c1 && c2) ? 'filled' : 'incomplete';
+        return 'empty';
+      }
+      const ids = BUSINESS_GROUP_FIELDS[groupId] || [];
+      return ids.some(id => val(id)) ? 'filled' : 'empty';
+    }
+
+    function updateBusinessGroupStatusBadge(groupId){
+      const badge = document.getElementById(`${groupId}Status`);
+      if(!badge) return;
+      const state = getBusinessGroupState(groupId);
+      badge.classList.remove('filled', 'incomplete');
+      if(state === 'filled'){ badge.textContent = '✓ Seçildi'; badge.classList.add('filled'); }
+      else if(state === 'incomplete'){ badge.textContent = 'Eksik'; badge.classList.add('incomplete'); }
+      else { badge.textContent = ''; }
+    }
+
+    function updateAllBusinessGroupStatuses(){
+      Object.keys(BUSINESS_GROUP_FIELDS).forEach(updateBusinessGroupStatusBadge);
+    }
+    window.updateAllBusinessGroupStatuses = updateAllBusinessGroupStatuses;
+
     function syncAllBusinessScoreGroups(){
       BUSINESS_SCORE_GROUPS.forEach(syncBusinessScoreGroup);
+      updateAllBusinessGroupStatuses();
     }
     window.syncAllBusinessScoreGroups = syncAllBusinessScoreGroups;
+
+    function toggleBusinessGroup(groupId, forceOpen){
+      const groupEl = document.getElementById(groupId);
+      if(!groupEl) return;
+      const nowOpen = forceOpen != null ? forceOpen : !groupEl.classList.contains('open');
+      groupEl.classList.toggle('open', nowOpen);
+      const header = groupEl.querySelector('.business-group-header');
+      if(header) header.setAttribute('aria-expanded', String(nowOpen));
+    }
+
+    function openBusinessGroup(groupId, options = {}){
+      toggleBusinessGroup(groupId, true);
+      const groupEl = document.getElementById(groupId);
+      if(groupEl) groupEl.classList.toggle('has-error', !!options.markErrorState);
+    }
+    window.openBusinessGroup = openBusinessGroup;
+
+    function bindBusinessGroupAccordion(){
+      document.querySelectorAll('.business-group-header').forEach(btn => {
+        btn.addEventListener('click', () => toggleBusinessGroup(btn.dataset.group));
+      });
+    }
 
     function bindBusinessScoreExclusivity(){
       BUSINESS_SCORE_GROUPS.forEach(group => {
         group.options.forEach(ids => {
           ids.forEach(id => {
             const el = document.getElementById(id);
-            if(el) el.addEventListener('change', () => syncBusinessScoreGroup(group));
+            if(el) el.addEventListener('change', () => { syncBusinessScoreGroup(group); updateAllBusinessGroupStatuses(); });
           });
         });
       });
+      ['bs3Select', 'bs4Select'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('change', updateAllBusinessGroupStatuses);
+      });
+      bindBusinessGroupAccordion();
       syncAllBusinessScoreGroups();
     }
 
@@ -4247,6 +4417,7 @@
     function clearFieldErrors(){
       document.querySelectorAll('.q-input.error, .ms-control.error, .op-text.error')
         .forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.business-group.has-error').forEach(el => el.classList.remove('has-error'));
       clearAiWarnings();
     }
 
@@ -4287,7 +4458,6 @@
       const qChannelsSelect = document.getElementById('qChannelsSelect');
       if(qChannelsSelect && getSelectedValues('qChannelsSelect').length === 0) markError(qChannelsSelect);
 
-      function requireSelect(id){ const el = document.getElementById(id); if(isHidden(el)) return; if(el && !el.value) markError(el); }
       function requireDetail(selectId, detailId){
         const sel = document.getElementById(selectId), detail = document.getElementById(detailId);
         if(!sel || !detail || isHidden(sel) || isHidden(detail)) return;
@@ -4314,6 +4484,23 @@
       requireAttachment('q8Select','q8Attachment');
       requireDetail('q10Select','q10Detail');
       requireText('q7Code');
+      if(stage === 'all' || stage === 'business'){
+        BUSINESS_SCORE_GROUPS.forEach(group => {
+          const optionEls = group.options.map(ids => ids.map(id => document.getElementById(id)));
+          const activeIdx = optionEls.findIndex(els => els.some(el => el && el.value));
+          let groupInvalid = false;
+          if(activeIdx === -1){
+            optionEls.forEach(els => els.forEach(el => { if(el){ markError(el); groupInvalid = true; } }));
+          } else {
+            optionEls[activeIdx].forEach(el => { if(el && !el.value){ markError(el); groupInvalid = true; } });
+          }
+          if(groupInvalid) openBusinessGroup(group.groupId, { markErrorState: true });
+        });
+        [['bs3Select','bsGroup3'], ['bs4Select','bsGroup4']].forEach(([fieldId, groupId]) => {
+          const el = document.getElementById(fieldId);
+          if(el && !isHidden(el) && !el.value){ markError(el); openBusinessGroup(groupId, { markErrorState: true }); }
+        });
+      }
       if(!ok) alert('Lütfen tüm zorunlu alanları doldurun.');
       return ok;
     }
