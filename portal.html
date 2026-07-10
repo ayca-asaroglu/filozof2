@@ -4268,7 +4268,7 @@
       clearFieldErrors();
       if(typeof window.setMatureStage === 'function') window.setMatureStage(options?.stage === 'business' ? 'business' : 'form');
       const issueKey = item?.issueKey || item?.key;
-      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey);
+      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey, item);
     }
 
     function closeMatureModal(){
@@ -4381,7 +4381,7 @@
       return str;
     }
 
-    async function loadBusinessScoreOptions(issueKey){
+    async function loadBusinessScoreOptions(issueKey, item){
       if(!issueKey) return;
       try {
         Object.keys(BS_PARENT_VALUES).forEach(key => delete BS_PARENT_VALUES[key]);
@@ -4390,30 +4390,44 @@
         const response = await fetch(url);
         const data = await response.json();
         const globalParentValue = normalizeCascadeText(data?.source_value);
-        
+
+        // Bu select'lerin seçenekleri bu fetch tamamlanana kadar boştur, bu yüzden
+        // prefillMatureFormFromCustomFields'ın erken atadığı değer sessizce kaybolmuş olabilir
+        // (eşleşen <option> henüz yoktu). Jira'daki gerçek kayıtlı değeri burada
+        // item.customFields'tan tekrar okuyup select.value yerine bunu esas alıyoruz.
+        const desiredValues = {};
+        const cfs = Array.isArray(item?.customFields) ? item.customFields : [];
+        Object.entries(BS_FIELD_MAPPING).forEach(([selectId, fieldId]) => {
+          const cf = cfs.find(f => f && f.id === fieldId);
+          if(!cf) return;
+          const raw = normalizeCustomFieldValue(cf.value != null ? cf.value : cf.values);
+          if(!raw) return;
+          desiredValues[selectId] = (typeof raw === 'object' && raw.child) ? raw.child : raw;
+        });
+
         if(data.fields && Array.isArray(data.fields)){
           // Reverse mapping: customfield_ID -> selectId
           const cfIdToSelectId = {};
           for(const [selectId, fieldId] of Object.entries(BS_FIELD_MAPPING)){
             cfIdToSelectId[fieldId] = selectId;
           }
-          
+
           data.fields.forEach(field => {
             const selectId = cfIdToSelectId[field.customfield_id];
             if(!selectId) return;
-            
+
             const select = document.getElementById(selectId);
             if(!select) return;
-            
+
             // Parent değerini endpoint'teki öncelik sırasına göre kaydet.
             const parentCandidate = normalizeCascadeText(field?.matched_parent_option || field?.source_value || globalParentValue || '');
             if(parentCandidate){
               BS_PARENT_VALUES[selectId] = parentCandidate;
             }
-            
-            const currentValue = select.value;
+
+            const currentValue = desiredValues[selectId] || select.value;
             select.innerHTML = '<option value="" selected>Seçiniz</option>';
-            
+
             if(Array.isArray(field.child_options)){
               field.child_options.forEach(opt => {
                 const normalizedOpt = normalizeCascadeText(opt);
@@ -4424,10 +4438,12 @@
                 select.appendChild(optEl);
               });
             }
-            
+
             select.value = currentValue;
           });
         }
+
+        if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
       } catch (err) {
         console.warn('Failed to load business score options:', err);
       }
