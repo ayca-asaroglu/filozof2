@@ -1,60 +1,137 @@
 {
-    "ok": false,
-    "error": {
-        "values": [
-            "Müşteri Etkisi: child=49 (parent=Ticari Krediler Ürün Yönetimi Şube Kanalı)"
-        ],
-        "strings": [
-            "Select list değerleri bulunamadı: ",
-            ""
-        ],
-        "empty": false,
-        "bytes": "U2VsZWN0IGxpc3QgZGXEn2VybGVyaSBidWx1bmFtYWTEsTogTcO8xZ90ZXJpIEV0a2lzaTogY2hpbGQ9NDkgKHBhcmVudD1UaWNhcmkgS3JlZGlsZXIgw5xyw7xuIFnDtm5ldGltaSDFnnViZSBLYW5hbMSxKQ==",
-        "valueCount": 1
+  "issueKey": "HC-40984",
+  "source_customfield_id": "customfield_10745",
+  "source_customfield_name": "Reporter Birim İsmi",
+  "source_value": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+  "default_parent_value": "Default",
+  "fields": [
+    {
+      "customfield_id": "customfield_20209",
+      "customfield_name": "Gelir Artışı Bireysel Müşteri",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-1.000",
+        "1.001-10.000",
+        "10.001-50.000",
+        "50.001-250.000",
+        "\u003E250.000"
+      ]
     },
-    "details": [
-        {
-            "values": [
-                "Müşteri Etkisi",
-                "49",
-                "Ticari Krediler Ürün Yönetimi Şube Kanalı"
-            ],
-            "strings": [
-                "",
-                ": child=",
-                " (parent=",
-                ")"
-            ],
-            "empty": false,
-            "bytes": "TcO8xZ90ZXJpIEV0a2lzaTogY2hpbGQ9NDkgKHBhcmVudD1UaWNhcmkgS3JlZGlsZXIgw5xyw7xuIFnDtm5ldGltaSDFnnViZSBLYW5hbMSxKQ==",
-            "valueCount": 3
-        }
-    ],
-    "form": [
-        "amac",
-        "kanallar",
-        "stakeholders",
-        "stakeholderOpinions",
-        "q2",
-        "q2Detail",
-        "q3",
-        "q3Detail",
-        "q4",
-        "q4Detail",
-        "q4Attachment",
-        "q5",
-        "q5Attachment",
-        "q6",
-        "q6Detail",
-        "q7Code",
-        "bs1a",
-        "bs1b",
-        "bs1cCount",
-        "bs1cDuration",
-        "bs2a",
-        "bs2b",
-        "bs2c",
-        "bs3CustomerImpact",
-        "bs4OperationalFinancialRisk"
-    ]
+    {
+      "customfield_id": "customfield_20210",
+      "customfield_name": "Gelir Artışı Tüzel Müşteri",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-50",
+        "51-100",
+        "101-250",
+        "251-500",
+        "\u003E500"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20211",
+      "customfield_name": "Operasyon-Verimlilik İşlem Adeti",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-100",
+        "101-250",
+        "101-1.000",
+        "1.001-10.000",
+        "10.001-100.000",
+        "\u003E100.000"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20212",
+      "customfield_name": "Operasyon-Verimlilik İşlem Süresi",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-10",
+        "11 - 50",
+        "11 -- 50",
+        "51-200",
+        "201-500",
+        "\u003E500"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20213",
+      "customfield_name": "Gelir Artışı Bireysel Müşteri (TL)",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-500k",
+        "500k - 2 M",
+        "2M - 7,5 M",
+        "7,5 M - 25 M",
+        "\u003E25M"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20214",
+      "customfield_name": "Gelir Artışı Tüzel Müşteri (TL)",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-25M",
+        "25M - 40 M",
+        "40M - 75M",
+        "75M - 100M",
+        "\u003E100M"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20215",
+      "customfield_name": "Gider Azaltımı",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "0-500K",
+        "500K - 2 M",
+        "2M - 4 M",
+        "4 M - 6 M",
+        "\u003E6M"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20216",
+      "customfield_name": "Müşteri Etkisi",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "1",
+        "0-5%",
+        "5% - 15%",
+        "15% - 30%",
+        "\u003E30%"
+      ]
+    },
+    {
+      "customfield_id": "customfield_20217",
+      "customfield_name": "Operasyonel ve Finansal Risk",
+      "status": "SUCCESS",
+      "match_type": "SOURCE_VALUE",
+      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
+      "child_options": [
+        "Yok",
+        "Düşük",
+        "Orta",
+        "Yüksek",
+        "Çok Yüksek"
+      ]
+    }
+  ]
 }
