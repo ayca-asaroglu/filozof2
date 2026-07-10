@@ -121,12 +121,13 @@ getCascadingChildOptionsForFields(
 
         if (!targetCf) {
             fieldResults << [
-                customfield_id      : targetCfId,
-                customfield_name    : null,
-                status              : "CUSTOM_FIELD_NOT_FOUND",
-                match_type          : null,
-                matched_parent_option: null,
-                child_options       : []
+                customfield_id          : targetCfId,
+                customfield_name        : null,
+                status                  : "CUSTOM_FIELD_NOT_FOUND",
+                match_type              : null,
+                matched_parent_option   : null,
+                matched_parent_option_id: null,
+                child_options           : []
             ]
 
             return
@@ -136,12 +137,13 @@ getCascadingChildOptionsForFields(
 
         if (!fieldConfig) {
             fieldResults << [
-                customfield_id      : targetCfId,
-                customfield_name    : targetCf.name,
-                status              : "FIELD_CONFIG_NOT_FOUND",
-                match_type          : null,
-                matched_parent_option: null,
-                child_options       : []
+                customfield_id          : targetCfId,
+                customfield_name        : targetCf.name,
+                status                  : "FIELD_CONFIG_NOT_FOUND",
+                match_type              : null,
+                matched_parent_option   : null,
+                matched_parent_option_id: null,
+                child_options           : []
             ]
 
             return
@@ -171,29 +173,31 @@ getCascadingChildOptionsForFields(
 
         if (!matchedParentOption) {
             fieldResults << [
-                customfield_id      : targetCfId,
-                customfield_name    : targetCf.name,
-                status              : "PARENT_AND_DEFAULT_OPTION_NOT_MATCHED",
-                match_type          : null,
-                matched_parent_option: null,
-                child_options       : []
+                customfield_id          : targetCfId,
+                customfield_name        : targetCf.name,
+                status                  : "PARENT_AND_DEFAULT_OPTION_NOT_MATCHED",
+                match_type              : null,
+                matched_parent_option   : null,
+                matched_parent_option_id: null,
+                child_options           : []
             ]
 
             return
         }
 
-        List<String> childOptions = matchedParentOption.childOptions
+        List<Map> childOptions = matchedParentOption.childOptions
             ?.findAll { childOption -> !childOption.disabled }
-            ?.collect { childOption -> childOption.value as String }
+            ?.collect { childOption -> [id: childOption.optionId?.toString(), value: childOption.value as String] }
             ?: []
 
         fieldResults << [
-            customfield_id      : targetCfId,
-            customfield_name    : targetCf.name,
-            status              : "SUCCESS",
-            match_type          : matchType,
-            matched_parent_option: matchedParentOption.value,
-            child_options       : childOptions
+            customfield_id          : targetCfId,
+            customfield_name        : targetCf.name,
+            status                  : "SUCCESS",
+            match_type              : matchType,
+            matched_parent_option   : matchedParentOption.value,
+            matched_parent_option_id: matchedParentOption.optionId?.toString(),
+            child_options           : childOptions
         ]
     }
 
