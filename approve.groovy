@@ -374,9 +374,15 @@ fibarprIdeaApprove(
       if (v instanceof Map) {
         def parentVal = coerceCascadeOptionText(v.parent?.value ?: v.parent)
         def childVal  = coerceCascadeOptionText(v.child?.value  ?: v.child)
+        // Frontend, seçilen option'ın Jira option ID'sini de gönderirse (cascade.groovy artık
+        // bunları döndürüyor), metin karşılaştırmasından önce ID ile kesin eşleştirme yapılabilsin.
+        def parentId = v.parentId?.toString()?.trim() ?: null
+        def childId  = v.childId?.toString()?.trim() ?: null
         fields[cfKey] = [
-          parent: parentVal,
-          child : childVal
+          parent  : parentVal,
+          child   : childVal,
+          parentId: parentId,
+          childId : childId
         ]
       } else {
         def s = v.toString().trim()
@@ -453,8 +459,10 @@ fibarprIdeaApprove(
       if (v instanceof Map) {
         def parentVal = coerceCascadeOptionText(v.parent)
         def childVal  = coerceCascadeOptionText(v.child)
+        def parentId  = v.parentId?.toString()?.trim() ?: null
+        def childId   = v.childId?.toString()?.trim() ?: null
 
-        if (parentVal) {
+        if (parentVal || parentId) {
           def config = cf.getRelevantConfig(issue)
           def options = optionsManager.getOptions(config)
 
@@ -465,19 +473,32 @@ fibarprIdeaApprove(
               .replace("İ", "i")
           }
 
-          def parentOpt = options?.find { opt -> normalizeKey(opt?.value) == normalizeKey(parentVal) }
+          // Frontend option ID gönderdiyse önce ID ile kesin eşleştir (metin normalizasyonu,
+          // encoding veya boşluk farklarından etkilenmez); ID yoksa/eşleşmezse metne düş.
+          def parentOpt = null
+          if (parentId) {
+            parentOpt = options?.find { opt -> opt?.optionId?.toString() == parentId }
+          }
+          if (!parentOpt && parentVal) {
+            parentOpt = options?.find { opt -> normalizeKey(opt?.value) == normalizeKey(parentVal) }
+          }
           if (!parentOpt) {
             missingOptions << "${cf.name}: parent=${parentVal}"
             return
           }
 
-          if (childVal) {
+          if (childVal || childId) {
             // Child options can be exposed under parentOpt.childOptions depending on Jira option manager behavior.
             def childPool = parentOpt?.childOptions ?: options?.findAll { opt ->
               opt?.parentOption?.optionId == parentOpt.optionId
             }
-            def childOpt = childPool?.find { opt ->
-              normalizeKey(opt?.value) == normalizeKey(childVal)
+
+            def childOpt = null
+            if (childId) {
+              childOpt = childPool?.find { opt -> opt?.optionId?.toString() == childId }
+            }
+            if (!childOpt && childVal) {
+              childOpt = childPool?.find { opt -> normalizeKey(opt?.value) == normalizeKey(childVal) }
             }
 
             if (!childOpt) {

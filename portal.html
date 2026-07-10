@@ -4408,10 +4408,14 @@
             const select = document.getElementById(selectId);
             if(!select) return;
 
-            // Parent değerini endpoint'teki öncelik sırasına göre kaydet.
+            // Parent değerini endpoint'teki öncelik sırasına göre kaydet (ID varsa metin
+            // eşleştirmesi yerine onayda ID ile kesin eşleştirme yapılabilsin diye).
             const parentCandidate = normalizeCascadeText(field?.matched_parent_option || field?.source_value || globalParentValue || '');
             if(parentCandidate){
-              BS_PARENT_VALUES[selectId] = parentCandidate;
+              BS_PARENT_VALUES[selectId] = {
+                value: parentCandidate,
+                id: field?.matched_parent_option_id != null ? String(field.matched_parent_option_id) : ''
+              };
             }
 
             const currentValue = select.value;
@@ -4419,11 +4423,14 @@
 
             if(Array.isArray(field.child_options)){
               field.child_options.forEach(opt => {
+                // opt artık {id, value} şeklinde geliyor (eski düz string biçimiyle de uyumlu).
+                const optionId = (opt && typeof opt === 'object' && !Array.isArray(opt) && opt.id != null) ? String(opt.id) : '';
                 const normalizedOpt = normalizeCascadeText(opt);
                 if(!normalizedOpt) return;
                 const optEl = document.createElement('option');
                 optEl.value = normalizedOpt;
                 optEl.textContent = normalizedOpt;
+                if(optionId) optEl.dataset.optionId = optionId;
                 select.appendChild(optEl);
               });
             }
@@ -4476,10 +4483,13 @@
 
     function buildApproveForm(){
       const buildCascadeValue = (selectId) => {
-        const childValue = normalizeCascadeText(document.getElementById(selectId)?.value || '');
+        const selectEl = document.getElementById(selectId);
+        const childValue = normalizeCascadeText(selectEl?.value || '');
         if(!childValue) return '';
-        const parentValue = normalizeCascadeText(BS_PARENT_VALUES[selectId] || '');
-        return { parent: parentValue, child: childValue };
+        const parentInfo = BS_PARENT_VALUES[selectId] || {};
+        const parentValue = normalizeCascadeText(parentInfo.value || '');
+        const childId = selectEl?.selectedOptions?.[0]?.dataset?.optionId || '';
+        return { parent: parentValue, parentId: parentInfo.id || '', child: childValue, childId };
       };
       
       return {
