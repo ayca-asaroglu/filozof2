@@ -910,7 +910,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                         String analiz = cArgs?.Analiz_Notu
                         String referenceUrl = referencePortalUrlForRequestTypeLocal(parsedIdea?.talep_tipi)
                         String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
-                        String finalAnswer = "**Tahmini kompleksite**: ${tshirtSize}\n\n**Analiz Notu**: ${analiz}${referenceText}"
+                        String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
                         return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
                     }
@@ -986,7 +986,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
             String analiz = cArgs?.Analiz_Notu
             String referenceUrl = referencePortalUrlForRequestTypeLocal(ideaMap?.talep_tipi)
             String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
-            String finalAnswer = "**Tahmini kompleksite**: ${tshirtSize}\n\n**Analiz Notu**: ${analiz}${referenceText}"
+            String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
             return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
         }

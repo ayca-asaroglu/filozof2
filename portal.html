@@ -1886,20 +1886,24 @@
       cursor:default;
       box-shadow:none;
     }
-    .approval-action.cta-primary{
+    .bubble a.cta-link-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:8px;
+      padding:10px 16px;
       background:var(--primary);
-      border-color:var(--primary);
       color:#fff;
-      font-size:14px;
+      border-radius:8px;
+      font-weight:700;
+      font-size:13.5px;
+      text-decoration:none;
+      line-height:1.4;
       animation:cta-pulse 2.2s ease-in-out infinite;
     }
-    .approval-action.cta-primary:hover{
+    .bubble a.cta-link-btn:hover{
       background:var(--primary-dark);
-      border-color:var(--primary-dark);
       color:#fff;
-    }
-    .approval-action.cta-primary:disabled{
-      animation:none;
     }
     @keyframes cta-pulse{
       0%{ box-shadow:0 0 0 0 rgba(47,93,169,0.45); }
@@ -2866,9 +2870,20 @@
       return null;
     }
 
+    function buildMaturationDeepLink(threadId, issueKey){
+      const url = new URL(location.href);
+      url.searchParams.set('openCalls', '1');
+      if(threadId) url.searchParams.set('threadId', threadId);
+      if(issueKey) url.searchParams.set('issueKey', issueKey);
+      return url.toString();
+    }
+
+    const MATURATION_CTA_LABEL = 'Fikir Olgunlaştırma Ekranını Aç';
+
     function appendMaturationCta(replyText, threadId, state){
       const reply = (replyText || '').toString();
-      if(state !== 'COMPLETED') return { text: reply, target: null };
+      if(state !== 'COMPLETED') return reply;
+      if(reply.includes(`[${MATURATION_CTA_LABEL}]`)) return reply;
       const issueKeyMatch = reply.match(/\b[A-Z][A-Z0-9]+-\d+\b/);
       const issueKey = issueKeyMatch ? issueKeyMatch[0] : '';
       let cleanReply = reply;
@@ -2877,12 +2892,9 @@
         const trailingIssuePattern = new RegExp('(?:\\r?\\n)?\\s*(?:\\*\\*)?(?:\\(|\\[)?' + escapedIssueKey + '(?:\\)|\\])?(?:\\*\\*)?\\s*$', 'i');
         cleanReply = cleanReply.replace(trailingIssuePattern, '').trimEnd();
       }
-      const ctaHint = '\n\n**Sonraki adım:** Süreci devam ettirmek için aşağıdaki butona tıklayın.';
-      const analizIndex = cleanReply.indexOf('\n\n**Analiz Notu**');
-      const text = analizIndex !== -1
-        ? cleanReply.slice(0, analizIndex) + ctaHint + cleanReply.slice(analizIndex)
-        : cleanReply + ctaHint;
-      return { text, target: { threadId: threadId || '', issueKey } };
+      const deepLink = buildMaturationDeepLink(threadId || '', issueKey);
+      const ctaBlock = '**Sonraki adım:** Süreci devam ettirmek için aşağıdaki butona tıklayın.\n[' + MATURATION_CTA_LABEL + '](' + deepLink + ')';
+      return ctaBlock + '\n\n' + cleanReply;
     }
 
     async function navigateToMaturationTarget(target){
@@ -5253,6 +5265,9 @@
         bubble.textContent = userText;
       } else {
         bubble.innerHTML = renderMarkdown(mainText);
+        bubble.querySelectorAll('a').forEach(a => {
+          if((a.textContent || '').trim() === MATURATION_CTA_LABEL) a.classList.add('cta-link-btn');
+        });
       }
 
       const ts = document.createElement('div');
@@ -5353,30 +5368,6 @@
 
         approvalActions.appendChild(approveBtn);
         wrap.appendChild(approvalActions);
-      }
-
-      if(!isUser && message?.meta?.maturationTarget){
-        const maturationActions = document.createElement('div');
-        maturationActions.className = 'approval-actions';
-
-        const maturationBtn = document.createElement('button');
-        maturationBtn.className = 'approval-action cta-primary';
-        maturationBtn.type = 'button';
-        maturationBtn.innerHTML = '🚀 Fikir Olgunlaştırma Ekranını Aç';
-        maturationBtn.addEventListener('click', async () => {
-          maturationBtn.disabled = true;
-          const originalLabel = maturationBtn.innerHTML;
-          maturationBtn.innerHTML = 'Açılıyor...';
-          try{
-            await navigateToMaturationTarget(message.meta.maturationTarget);
-          } finally {
-            maturationBtn.disabled = false;
-            maturationBtn.innerHTML = originalLabel;
-          }
-        });
-
-        maturationActions.appendChild(maturationBtn);
-        wrap.appendChild(maturationActions);
       }
 
       wrap.appendChild(ts);
@@ -5523,7 +5514,7 @@
         const res = await callBot('', convo, 'APPROVE');
         hideTyping();
         const rawReply = normalizeEscapedText(res?.answer || 'Yanıt alınamadı.');
-        const { text: reply, target: maturationTarget } = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
+        const reply = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
         if(res?.threadId){
           convo.threadId = res.threadId;
           if(String(convo.id||'').startsWith('c_') && convo.id !== res.threadId){
@@ -5532,7 +5523,7 @@
           }
           saveState();
         }
-        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '', maturationTarget });
+        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
         if(res?.state === 'COMPLETED'){
           loadCalls();
           setTimeout(() => openFeedbackModal('chat'), 800);
@@ -5587,7 +5578,7 @@
         const res = await callBot(composedQuestion, convo, action);
         hideTyping();
         const rawReply = normalizeEscapedText(res?.answer || 'Yanıt alınamadı.');
-        const { text: reply, target: maturationTarget } = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
+        const reply = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
         if(res?.threadId){
           convo.threadId = res.threadId;
           if(String(convo.id||'').startsWith('c_') && convo.id !== res.threadId){
@@ -5596,7 +5587,7 @@
           }
           saveState();
         }
-        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '', maturationTarget });
+        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
         clearPendingAttachment(convo);
         // Başarılı oluşturma mesajı → feedback modal
         if(res?.state === 'COMPLETED'){
