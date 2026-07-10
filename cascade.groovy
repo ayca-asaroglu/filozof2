@@ -31,6 +31,7 @@ getCascadingChildOptionsForFields(
     String customFieldIdsParam = queryParams.getFirst("customFieldIds") as String
 
     String sourceCfId = "customfield_10745"
+    String defaultParentValue = "Default"
 
     Closure<String> normalizeCfId = { String cfId ->
         if (!cfId) {
@@ -76,7 +77,7 @@ getCascadingChildOptionsForFields(
     if (!sourceCf) {
         return Response.status(404)
             .entity(JsonOutput.toJson([
-                error              : "Source custom field bulunamadı.",
+                error                : "Source custom field bulunamadı.",
                 source_customfield_id: sourceCfId
             ]))
             .type("application/json")
@@ -120,12 +121,12 @@ getCascadingChildOptionsForFields(
 
         if (!targetCf) {
             fieldResults << [
-                customfield_id          : targetCfId,
-                customfield_name        : null,
-                status                  : "CUSTOM_FIELD_NOT_FOUND",
-                matched_parent_option   : null,
-                matched_parent_option_id: null,
-                child_options           : []
+                customfield_id      : targetCfId,
+                customfield_name    : null,
+                status              : "CUSTOM_FIELD_NOT_FOUND",
+                match_type          : null,
+                matched_parent_option: null,
+                child_options       : []
             ]
 
             return
@@ -135,12 +136,12 @@ getCascadingChildOptionsForFields(
 
         if (!fieldConfig) {
             fieldResults << [
-                customfield_id          : targetCfId,
-                customfield_name        : targetCf.name,
-                status                  : "FIELD_CONFIG_NOT_FOUND",
-                matched_parent_option   : null,
-                matched_parent_option_id: null,
-                child_options           : []
+                customfield_id      : targetCfId,
+                customfield_name    : targetCf.name,
+                status              : "FIELD_CONFIG_NOT_FOUND",
+                match_type          : null,
+                matched_parent_option: null,
+                child_options       : []
             ]
 
             return
@@ -148,48 +149,65 @@ getCascadingChildOptionsForFields(
 
         def allOptions = optionsManager.getOptions(fieldConfig)
 
+        // Önce issue üzerindeki birim değerini parent option olarak ara.
         def matchedParentOption = allOptions.find { option ->
             option.parentOption == null &&
             !option.disabled &&
             option.value?.trim()?.equalsIgnoreCase(sourceValue)
         }
 
+        String matchType = "SOURCE_VALUE"
+
+        // Birim eşleşmesi yoksa "Default" parent option'ını ara.
+        if (!matchedParentOption) {
+            matchedParentOption = allOptions.find { option ->
+                option.parentOption == null &&
+                !option.disabled &&
+                option.value?.trim()?.equalsIgnoreCase(defaultParentValue)
+            }
+
+            matchType = matchedParentOption ? "DEFAULT" : null
+        }
+
         if (!matchedParentOption) {
             fieldResults << [
-                customfield_id          : targetCfId,
-                customfield_name        : targetCf.name,
-                status                  : "PARENT_OPTION_NOT_MATCHED",
-                matched_parent_option   : null,
-                matched_parent_option_id: null,
-                child_options           : []
+                customfield_id      : targetCfId,
+                customfield_name    : targetCf.name,
+                status              : "PARENT_AND_DEFAULT_OPTION_NOT_MATCHED",
+                match_type          : null,
+                matched_parent_option: null,
+                child_options       : []
             ]
 
             return
         }
 
-        List<Map> childOptions = matchedParentOption.childOptions
+        List<String> childOptions = matchedParentOption.childOptions
             ?.findAll { childOption -> !childOption.disabled }
-            ?.collect { childOption -> [id: childOption.optionId?.toString(), value: childOption.value as String] }
+            ?.collect { childOption -> childOption.value as String }
             ?: []
 
         fieldResults << [
-            customfield_id          : targetCfId,
-            customfield_name        : targetCf.name,
-            status                  : "SUCCESS",
-            matched_parent_option   : matchedParentOption.value,
-            matched_parent_option_id: matchedParentOption.optionId?.toString(),
-            child_options           : childOptions
+            customfield_id      : targetCfId,
+            customfield_name    : targetCf.name,
+            status              : "SUCCESS",
+            match_type          : matchType,
+            matched_parent_option: matchedParentOption.value,
+            child_options       : childOptions
         ]
     }
 
     def responseBody = [
-        issueKey                  : issueKey,
-        source_customfield_id     : sourceCfId,
-        source_customfield_name   : sourceCf.name,
-        source_value              : sourceValue,
-        fields                    : fieldResults
+        issueKey                : issueKey,
+        source_customfield_id   : sourceCfId,
+        source_customfield_name : sourceCf.name,
+        source_value            : sourceValue,
+        default_parent_value    : defaultParentValue,
+        fields                  : fieldResults
     ]
+
     log.warn(responseBody)
+
     return Response.ok(JsonOutput.toJson(responseBody))
         .type("application/json")
         .build()
