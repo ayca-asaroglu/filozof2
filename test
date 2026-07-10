@@ -1,0 +1,60 @@
+{
+    "ok": false,
+    "error": {
+        "values": [
+            "Müşteri Etkisi: child=49 (parent=Ticari Krediler Ürün Yönetimi Şube Kanalı)"
+        ],
+        "strings": [
+            "Select list değerleri bulunamadı: ",
+            ""
+        ],
+        "empty": false,
+        "bytes": "U2VsZWN0IGxpc3QgZGXEn2VybGVyaSBidWx1bmFtYWTEsTogTcO8xZ90ZXJpIEV0a2lzaTogY2hpbGQ9NDkgKHBhcmVudD1UaWNhcmkgS3JlZGlsZXIgw5xyw7xuIFnDtm5ldGltaSDFnnViZSBLYW5hbMSxKQ==",
+        "valueCount": 1
+    },
+    "details": [
+        {
+            "values": [
+                "Müşteri Etkisi",
+                "49",
+                "Ticari Krediler Ürün Yönetimi Şube Kanalı"
+            ],
+            "strings": [
+                "",
+                ": child=",
+                " (parent=",
+                ")"
+            ],
+            "empty": false,
+            "bytes": "TcO8xZ90ZXJpIEV0a2lzaTogY2hpbGQ9NDkgKHBhcmVudD1UaWNhcmkgS3JlZGlsZXIgw5xyw7xuIFnDtm5ldGltaSDFnnViZSBLYW5hbMSxKQ==",
+            "valueCount": 3
+        }
+    ],
+    "form": [
+        "amac",
+        "kanallar",
+        "stakeholders",
+        "stakeholderOpinions",
+        "q2",
+        "q2Detail",
+        "q3",
+        "q3Detail",
+        "q4",
+        "q4Detail",
+        "q4Attachment",
+        "q5",
+        "q5Attachment",
+        "q6",
+        "q6Detail",
+        "q7Code",
+        "bs1a",
+        "bs1b",
+        "bs1cCount",
+        "bs1cDuration",
+        "bs2a",
+        "bs2b",
+        "bs2c",
+        "bs3CustomerImpact",
+        "bs4OperationalFinancialRisk"
+    ]
+}
