@@ -4215,7 +4215,9 @@
           ? rawValue.child
           : null;
         const val = normalizeCustomFieldValue(mapping.type === 'cascade' && cascadeChild != null ? cascadeChild : rawValue);
-        if(!val) return;
+        // Cascade seçenek metinleri her zaman kelime — saf sayısal bir string Jira option id'sidir,
+        // metin değil; select'e yanlış değer olarak yazılmasın.
+        if(!val || (mapping.type === 'cascade' && /^\d+$/.test(val))) return;
         const el = document.getElementById(mapping.id);
         if(!el) return;
 
@@ -4269,7 +4271,7 @@
       clearFieldErrors();
       if(typeof window.setMatureStage === 'function') window.setMatureStage(options?.stage === 'business' ? 'business' : 'form');
       const issueKey = item?.issueKey || item?.key;
-      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey, item);
+      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey);
     }
 
     function closeMatureModal(){
@@ -4382,7 +4384,7 @@
       return str;
     }
 
-    async function loadBusinessScoreOptions(issueKey, item){
+    async function loadBusinessScoreOptions(issueKey){
       if(!issueKey) return;
       try {
         Object.keys(BS_PARENT_VALUES).forEach(key => delete BS_PARENT_VALUES[key]);
@@ -4391,26 +4393,6 @@
         const response = await fetch(url);
         const data = await response.json();
         const globalParentValue = normalizeCascadeText(data?.source_value);
-
-        // Bu select'lerin seçenekleri bu fetch tamamlanana kadar boştur, bu yüzden
-        // prefillMatureFormFromCustomFields'ın erken atadığı değer sessizce kaybolmuş olabilir
-        // (eşleşen <option> henüz yoktu). Jira'daki gerçek kayıtlı değeri burada
-        // item.customFields'tan tekrar okuyup select.value yerine bunu esas alıyoruz.
-        const desiredValues = {};
-        const cfs = Array.isArray(item?.customFields) ? item.customFields : [];
-        Object.entries(BS_FIELD_MAPPING).forEach(([selectId, fieldId]) => {
-          const cf = cfs.find(f => f && f.id === fieldId);
-          if(!cf) return;
-          // Cascading select değeri {value: "Ebeveyn", child: {value: "Çocuk"}} şeklinde gelir;
-          // bu select'ler child (alt) değeri gösterdiği için önce child'ı çıkarıp normalize ediyoruz.
-          const rawValue = cf.value != null ? cf.value : cf.values;
-          const cascadeChild = (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && rawValue.child != null)
-            ? rawValue.child
-            : rawValue;
-          const val = normalizeCustomFieldValue(cascadeChild);
-          if(!val) return;
-          desiredValues[selectId] = val;
-        });
 
         if(data.fields && Array.isArray(data.fields)){
           // Reverse mapping: customfield_ID -> selectId
@@ -4432,7 +4414,7 @@
               BS_PARENT_VALUES[selectId] = parentCandidate;
             }
 
-            const currentValue = desiredValues[selectId] || select.value;
+            const currentValue = select.value;
             select.innerHTML = '<option value="" selected>Seçiniz</option>';
 
             if(Array.isArray(field.child_options)){
