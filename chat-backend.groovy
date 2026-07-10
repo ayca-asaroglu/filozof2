@@ -910,7 +910,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                         String analiz = cArgs?.Analiz_Notu
                         String referenceUrl = referencePortalUrlForRequestTypeLocal(parsedIdea?.talep_tipi)
                         String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
-                        String finalAnswer = "Fikriniz draft durumunda kaydedilmiştir.\nTahmini kompleksite: **${tshirtSize}**\n\nDevam etmek için şimdi olgunlaştırma adımına geçin: **Fikirlerim > Fikir Olgunlaştır**.\n\n**Analiz Notu**: ${analiz}${referenceText}"
+                        String finalAnswer = "**Tahmini kompleksite**: ${tshirtSize}\n\n**Analiz Notu**: ${analiz}${referenceText}"
 
                         return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
                     }
@@ -986,7 +986,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
             String analiz = cArgs?.Analiz_Notu
             String referenceUrl = referencePortalUrlForRequestTypeLocal(ideaMap?.talep_tipi)
             String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
-            String finalAnswer = "Fikriniz draft durumunda kaydedilmiştir.\nTahmini kompleksite: **${tshirtSize}**\n\nDevam etmek için şimdi olgunlaştırma adımına geçin: **Fikirlerim > Fikir Olgunlaştır**.\n\n**Analiz Notu**: ${analiz}${referenceText}"
+            String finalAnswer = "**Tahmini kompleksite**: ${tshirtSize}\n\n**Analiz Notu**: ${analiz}${referenceText}"
 
             return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
         }
@@ -1308,6 +1308,7 @@ Map onProcessDone(def args, def threadId, def size) {
     setCf(params, "customfield_19806", idea.kpi)
     setCf(params, "customfield_19807", threadId)
     setSelectList(params, "customfield_19809", size, issueContext)
+    setSelectList(params, "customfield_10717", "Yazılım Geliştirme Talepleri", issueContext)
 
 
     // Kanallar = multi-select

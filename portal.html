@@ -1042,9 +1042,29 @@
     .block-body{
       font-size:13px;
       line-height:1.55;
-      white-space:pre-wrap;
+      white-space:normal;
       color:var(--text);
     }
+    .block-body p, .preview-text p{ margin:0 0 8px; }
+    .block-body p:last-child, .preview-text p:last-child{ margin-bottom:0; }
+    .block-body h1, .block-body h2, .block-body h3, .block-body h4, .block-body h5, .block-body h6,
+    .preview-text h1, .preview-text h2, .preview-text h3, .preview-text h4, .preview-text h5, .preview-text h6{
+      margin:12px 0 6px; line-height:1.3; color:var(--text);
+    }
+    .block-body h1:first-child, .preview-text h1:first-child,
+    .block-body h2:first-child, .preview-text h2:first-child,
+    .block-body h3:first-child, .preview-text h3:first-child{ margin-top:0; }
+    .block-body ul, .block-body ol, .preview-text ul, .preview-text ol{ margin:0 0 8px; padding-left:22px; }
+    .block-body li, .preview-text li{ margin-bottom:2px; }
+    .block-body blockquote, .preview-text blockquote{
+      margin:0 0 8px; padding:4px 12px; border-left:3px solid var(--border); color:var(--text-muted);
+    }
+    .block-body pre, .preview-text pre{
+      margin:0 0 8px; padding:8px 10px; background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--radius); overflow-x:auto; font-size:12.5px;
+    }
+    .block-body code, .preview-text code{ font-size:12.5px; }
+    .block-body hr, .preview-text hr{ border:none; border-top:1px solid var(--border); margin:10px 0; }
 
     /* "Chat ile Güncelle" button */
     .btn-update-chat{
@@ -1307,6 +1327,7 @@
       justify-content:space-between;
       align-items:center;
     }
+    #previewDescription{ white-space:normal; }
     .preview-text{
       font-size:13px;
       line-height:1.55;
@@ -1865,6 +1886,26 @@
       cursor:default;
       box-shadow:none;
     }
+    .approval-action.cta-primary{
+      background:var(--primary);
+      border-color:var(--primary);
+      color:#fff;
+      font-size:14px;
+      animation:cta-pulse 2.2s ease-in-out infinite;
+    }
+    .approval-action.cta-primary:hover{
+      background:var(--primary-dark);
+      border-color:var(--primary-dark);
+      color:#fff;
+    }
+    .approval-action.cta-primary:disabled{
+      animation:none;
+    }
+    @keyframes cta-pulse{
+      0%{ box-shadow:0 0 0 0 rgba(47,93,169,0.45); }
+      70%{ box-shadow:0 0 0 9px rgba(47,93,169,0); }
+      100%{ box-shadow:0 0 0 0 rgba(47,93,169,0); }
+    }
 
     /* ===== Sidebar: conv-info wrapper + snippet ===== */
     .conv-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
@@ -2390,7 +2431,7 @@
                       <div class="business-subgroup-title">1C) Operasyonel Verimlilik</div>
 
                       <div class="q-item" id="bs1cCountItem">
-                        <label>İşlem Adedi</label>
+                        <label>1C1) İşlem Adedi</label>
                         <select class="q-input q-select" id="bs1cCountSelect">
                           <option value="" selected>Seçiniz</option>
                           <option value="Azalacak">Azalacak</option>
@@ -2400,7 +2441,7 @@
                       </div>
 
                       <div class="q-item" id="bs1cDurationItem">
-                        <label>İşlem Süresi</label>
+                        <label>1C2) İşlem Süresi</label>
                         <select class="q-input q-select" id="bs1cDurationSelect">
                           <option value="" selected>Seçiniz</option>
                           <option value="Kısalacak">Kısalacak</option>
@@ -2409,7 +2450,7 @@
                         </select>
                       </div>
 
-                      <div class="q-warn" id="bs1GroupWarn">Bu başlık altında yalnızca bir seçenek işaretlenebilir (1A, 1B veya 1C). Diğer alan(lar) otomatik olarak temizlendi ve devre dışı bırakıldı.</div>
+                      <div class="q-warn" id="bs1GroupWarn">Bu başlık altında yalnızca bir seçenek işaretlenebilir (1A, 1B veya 1C). Bu nedenle Diğer alanlar devre dışı bırakıldı.</div>
                     </div>
                   </div>
                 </div>
@@ -2550,21 +2591,26 @@
 
           <div class="preview-section">
             <div class="preview-label">
-              <span>Custom Alanlar</span>
+              <span>Temel Alanlar</span>
               <button class="btn-update-chat" id="btnUpdate" type="button">💬 Chat ile Güncelle</button>
             </div>
             <div class="preview-answers" id="previewCustomFields"></div>
           </div>
 
           <div class="preview-section">
-            <div class="preview-label">Sorular ve Yanıtlar</div>
+            <div class="preview-label">Olgunlaştırma Soruları</div>
             <div id="previewAiWarningInfo" style="display:none; margin-bottom:10px;">
               <div style="padding:12px 16px; font-size:13px; line-height:1.6;">
                 <div style="font-weight:700; color:#FF8B00; margin-bottom:6px;">ℹ️ AI Tutarlılık Kontrolü</div>
                 <div>AI tutarlılık kontrolünden bu alanlar için dönüş alındı. Tooltip iconları üzerinden detayına bakabilirsiniz. Güncelleme yapmak istiyorsanız <strong>"Geri Dön"</strong> ile olgunlaştırma formuna dönüp alanları güncelleyebilir veya bu şekilde devam etmek istiyorsanız tekrar <strong>"Yönetici Onayına Gönder"</strong> butonuna basın.</div>
               </div>
             </div>
-            <div class="preview-answers" id="previewAnswers"></div>
+            <div class="preview-answers" id="previewAnswersMaturation"></div>
+          </div>
+
+          <div class="preview-section">
+            <div class="preview-label">Business Score Soruları</div>
+            <div class="preview-answers" id="previewAnswersBusiness"></div>
           </div>
 
           <div class="preview-section" id="previewWarningsSection" style="display:none;">
@@ -2701,7 +2747,8 @@
     const previewSummary = document.getElementById('previewSummary');
     const previewDescription = document.getElementById('previewDescription');
     const previewCustomFields = document.getElementById('previewCustomFields');
-    const previewAnswers = document.getElementById('previewAnswers');
+    const previewAnswersMaturation = document.getElementById('previewAnswersMaturation');
+    const previewAnswersBusiness = document.getElementById('previewAnswersBusiness');
     const btnUpdate = document.getElementById('btnUpdate');
     const btnApprove = document.getElementById('btnApprove');
     const btnBack = document.getElementById('btnBack');
@@ -2804,14 +2851,6 @@
       history.replaceState({}, '', url.toString());
     }
 
-    function buildMaturationDeepLink(threadId, issueKey){
-      const url = new URL(location.href);
-      url.searchParams.set('openCalls', '1');
-      if(threadId) url.searchParams.set('threadId', threadId);
-      if(issueKey) url.searchParams.set('issueKey', issueKey);
-      return url.toString();
-    }
-
     function findCallItemByDeepLink(items, target){
       if(!Array.isArray(items) || !target) return null;
       const issueKey = (target.issueKey || '').toLowerCase();
@@ -2827,10 +2866,9 @@
       return null;
     }
 
-    function appendMaturationCta(replyText, threadId){
+    function appendMaturationCta(replyText, threadId, state){
       const reply = (replyText || '').toString();
-      if(!/Fikriniz draft durumunda kaydedilmiştir/i.test(reply)) return reply;
-      if(/\[(Fikirlerim|Fikir Olgunlaştırma) ekranını aç\]\(/i.test(reply)) return reply;
+      if(state !== 'COMPLETED') return { text: reply, target: null };
       const issueKeyMatch = reply.match(/\b[A-Z][A-Z0-9]+-\d+\b/);
       const issueKey = issueKeyMatch ? issueKeyMatch[0] : '';
       let cleanReply = reply;
@@ -2839,11 +2877,12 @@
         const trailingIssuePattern = new RegExp('(?:\\r?\\n)?\\s*(?:\\*\\*)?(?:\\(|\\[)?' + escapedIssueKey + '(?:\\)|\\])?(?:\\*\\*)?\\s*$', 'i');
         cleanReply = cleanReply.replace(trailingIssuePattern, '').trimEnd();
       }
-      const deepLink = buildMaturationDeepLink(threadId || '', issueKey);
-      const linkText = '\n\n**Sonraki adım:** Olgunlaştırma sürecini başlatmak için aşağıdaki bağlantıya tıklayın.\n[Fikir Olgunlaştırma ekranını aç](' + deepLink + ')';
+      const ctaHint = '\n\n**Sonraki adım:** Süreci devam ettirmek için aşağıdaki butona tıklayın.';
       const analizIndex = cleanReply.indexOf('\n\n**Analiz Notu**');
-      if(analizIndex !== -1) return cleanReply.slice(0, analizIndex) + linkText + cleanReply.slice(analizIndex);
-      return cleanReply + linkText;
+      const text = analizIndex !== -1
+        ? cleanReply.slice(0, analizIndex) + ctaHint + cleanReply.slice(analizIndex)
+        : cleanReply + ctaHint;
+      return { text, target: { threadId: threadId || '', issueKey } };
     }
 
     async function navigateToMaturationTarget(target){
@@ -3211,6 +3250,81 @@
         para.push(inline(line));
       }
       flushPara(); flushList();
+      return out.join('\n');
+    }
+
+    // Jira wiki-markup renderer — used for Jira "description" fields (h1., *bold*, {{mono}}, bq., {code}, lists),
+    // as opposed to renderMarkdown() above which parses the standard markdown our own chat text uses.
+    function renderWikiText(text){
+      const raw = (text == null ? '' : String(text)).trim();
+      if(!raw) return '—';
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      // Pull out {code}/{noformat} blocks first so inline rules don't touch their contents
+      const blocks = {};
+      let blockIdx = 0;
+      const stashBlock = (code) => {
+        const token = ` WIKIBLOCK${blockIdx++} `;
+        blocks[token] = `<pre><code>${esc(code.trim())}</code></pre>`;
+        return token;
+      };
+      let working = raw
+        .replace(/\{code(?::[^}]*)?\}([\s\S]*?)\{code\}/gi, (_, code) => stashBlock(code))
+        .replace(/\{noformat\}([\s\S]*?)\{noformat\}/gi, (_, code) => stashBlock(code));
+
+      function inline(s){
+        s = esc(s);
+        s = s.replace(/\{\{([^}]+)\}\}/g, '<code>$1</code>');
+        s = s.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+        s = s.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+        s = s.replace(/\[([^\|\]]+)\|(https?:\/\/[^\]]+)\]/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        s = s.replace(/\[(https?:\/\/[^\]]+)\]/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        return s;
+      }
+
+      const lines = working.split('\n');
+      const out = [];
+      let para = [];
+      let listType = null; // 'ul' | 'ol' | null
+
+      function flushPara(){
+        if(!para.length) return;
+        out.push('<p>' + para.join('<br>') + '</p>');
+        para = [];
+      }
+      function closeList(){
+        if(!listType) return;
+        out.push(listType === 'ol' ? '</ol>' : '</ul>');
+        listType = null;
+      }
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+
+        if(trimmed === ''){ flushPara(); closeList(); return; }
+
+        if(trimmed.startsWith(' WIKIBLOCK')){ flushPara(); closeList(); out.push(blocks[trimmed] || ''); return; }
+
+        const headingMatch = trimmed.match(/^h([1-6])\.\s*(.*)$/i);
+        if(headingMatch){ flushPara(); closeList(); const n = headingMatch[1]; out.push(`<h${n}>${inline(headingMatch[2])}</h${n}>`); return; }
+
+        if(/^bq\.\s+/i.test(trimmed)){ flushPara(); closeList(); out.push('<blockquote>' + inline(trimmed.replace(/^bq\.\s+/i,'')) + '</blockquote>'); return; }
+
+        if(/^-{4,}$/.test(trimmed)){ flushPara(); closeList(); out.push('<hr>'); return; }
+
+        const listMatch = trimmed.match(/^(\*+|#+)\s+(.*)$/);
+        if(listMatch){
+          flushPara();
+          const type = listMatch[1][0] === '#' ? 'ol' : 'ul';
+          if(listType !== type){ closeList(); out.push(type === 'ol' ? '<ol>' : '<ul>'); listType = type; }
+          out.push('<li>' + inline(listMatch[2]) + '</li>');
+          return;
+        }
+
+        closeList();
+        para.push(inline(line));
+      });
+      flushPara(); closeList();
       return out.join('\n');
     }
 
@@ -4097,6 +4211,7 @@
 
     function openMatureModal(item, options = {}){
       const nextKey = getMatureStateKey(item);
+      const isSameItem = !!lastMatureKey && lastMatureKey === nextKey;
       if(lastMatureKey && lastMatureKey !== nextKey) captureMatureFormState(lastMatureKey);
       // Summary/description alanları gibi sorularda da backend verisini temel al.
       resetMatureForm();
@@ -4113,7 +4228,7 @@
       if(matureStatus){ matureStatus.textContent = item?.status || 'Durum'; }
       if(matureTime) matureTime.textContent = item?.time || '';
       if(matureSummary) matureSummary.textContent = item?.summary || '—';
-      if(matureDescription) matureDescription.textContent = item?.description || '—';
+      if(matureDescription) matureDescription.innerHTML = renderWikiText(item?.description);
       const channelRaw = item?.customFields?.find(f => f.id === "customfield_10427" || f.name === "Etkilenecek Kanallar")?.value;
       const channelValue = normalizeCustomFieldValue(channelRaw);
       const amacRaw = item?.customFields?.find(f => f.id === "customfield_19801" || f.name === "Amaç")?.value;
@@ -4126,7 +4241,7 @@
       clearFieldErrors();
       if(typeof window.setMatureStage === 'function') window.setMatureStage(options?.stage === 'business' ? 'business' : 'form');
       const issueKey = item?.issueKey || item?.key;
-      if(issueKey) loadBusinessScoreOptions(issueKey);
+      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey);
     }
 
     function closeMatureModal(){
@@ -4296,31 +4411,32 @@
       document.querySelectorAll('.question-grid .q-item').forEach(item => {
         const label = item.querySelector('label')?.textContent?.trim() || '';
         if(!label || item.classList.contains('is-hidden')) return;
+        const group = item.closest('#businessAccordion') ? 'business' : 'maturation';
         if(item.id === 'qStakeholders'){
           const st = (document.getElementById('stakeholdersValue')?.value || '').trim();
           const opJson = (document.getElementById('stakeholderOpinionsValue')?.value || '').trim();
-          answers.push({ label:'Paydaşlar', value: st || '—' });
+          answers.push({ label:'Paydaşlar', value: st || '—', group });
           const pretty = prettyOpinions(opJson);
-          if(pretty) answers.push({ label:'Paydaş Görüşleri', value: pretty });
-          else if(opJson && opJson !== "{}") answers.push({ label:'Paydaş Görüşleri (JSON)', value: opJson });
+          if(pretty) answers.push({ label:'Paydaş Görüşleri', value: pretty, group });
+          else if(opJson && opJson !== "{}") answers.push({ label:'Paydaş Görüşleri (JSON)', value: opJson, group });
           return;
         }
         if(item.id === 'qChannelsItem'){
           const channels = getSelectedValues('qChannelsSelect').join(', ');
-          if(channels) answers.push({ label, value: channels });
+          if(channels) answers.push({ label, value: channels, group });
           return;
         }
         const inputEl = item.querySelector('textarea, select, input');
         if(!inputEl) return;
         const isFileInput = inputEl.type === 'file';
         const value = isFileInput ? '' : (inputEl.value || '').trim();
-        if(value) answers.push({ label, value });
+        if(value) answers.push({ label, value, group });
         const detail = item.querySelector('.q-detail');
         if(detail && detail.classList.contains('open')){
           let dv = '';
           if(detail.type === 'file'){ const f = detail.files && detail.files[0]; dv = f ? f.name : ''; }
           else { dv = (detail.value || '').trim(); }
-          if(dv) answers.push({ label: label + ' (Detay)', value: dv });
+          if(dv) answers.push({ label: label + ' (Detay)', value: dv, group });
         }
       });
       return answers;
@@ -4545,7 +4661,7 @@
     function renderPreview(item, answers){
       if(previewTitle) previewTitle.textContent = item?.title || 'Kayıt';
       if(previewSummary) previewSummary.textContent = item?.summary || '—';
-      if(previewDescription) previewDescription.textContent = item?.description || '—';
+      if(previewDescription) previewDescription.innerHTML = renderWikiText(item?.description);
 
       const LABEL_TO_FIELD_ID = {
         'Bu talep için NPS ölçümü var mı? Varsa hangi noktalarda yapılacak?': 'customfield_10722',
@@ -4579,35 +4695,41 @@
             const warning = findWarningForField(cfId, null);
             row.className = warning ? (warning.level === 'error' ? 'preview-answer has-error' : 'preview-answer has-warning') : 'preview-answer';
             const content = document.createElement('div'); content.style.display = 'inline';
-            content.appendChild(document.createTextNode((cf.name||'Alan')+': '+(cf.value||'—')));
-            if(warning){ const ic = renderWarningIcon(warning, `cf-${idx}`); if(ic) content.appendChild(ic); }
+            const labelSpan = document.createElement('span'); labelSpan.style.fontWeight = '600';
+            labelSpan.textContent = cf.name || 'Alan';
+            if(warning){ const ic = renderWarningIcon(warning, `cf-${idx}`); if(ic) labelSpan.appendChild(ic); }
+            content.appendChild(labelSpan);
+            content.appendChild(document.createTextNode(': '+(cf.value||'—')));
             row.appendChild(content); previewCustomFields.appendChild(row);
           });
         }
       }
 
-      if(previewAnswers){
-        previewAnswers.innerHTML = '';
-        if(!answers.length){
+      function renderAnswerGroup(container, list){
+        if(!container) return;
+        container.innerHTML = '';
+        if(!list.length){
           const empty = document.createElement('div'); empty.className = 'preview-answer'; empty.textContent = 'Yanıt yok.';
-          previewAnswers.appendChild(empty);
-        } else {
-          answers.forEach((a, idx) => {
-            const row = document.createElement('div');
-            const fieldId = LABEL_TO_FIELD_ID[a.label] || null;
-            const impactKey = fieldId ? Object.keys(IMPACT_TO_FIELD_ID).find(k => IMPACT_TO_FIELD_ID[k] === fieldId) : null;
-            const warning = (fieldId || impactKey) ? findWarningForField(fieldId, impactKey) : null;
-            row.className = warning ? (warning.level === 'error' ? 'preview-answer has-error' : 'preview-answer has-warning') : 'preview-answer';
-            const content = document.createElement('div'); content.style.whiteSpace = 'pre-wrap';
-            const labelSpan = document.createElement('span'); labelSpan.style.fontWeight = '600';
-            labelSpan.textContent = a.label;
-            if(warning){ const ic = renderWarningIcon(warning, `ans-${idx}`); if(ic) labelSpan.appendChild(ic); }
-            content.appendChild(labelSpan);
-            content.appendChild(document.createTextNode('\n' + a.value));
-            row.appendChild(content); previewAnswers.appendChild(row);
-          });
+          container.appendChild(empty);
+          return;
         }
+        list.forEach((a, idx) => {
+          const row = document.createElement('div');
+          const fieldId = LABEL_TO_FIELD_ID[a.label] || null;
+          const impactKey = fieldId ? Object.keys(IMPACT_TO_FIELD_ID).find(k => IMPACT_TO_FIELD_ID[k] === fieldId) : null;
+          const warning = (fieldId || impactKey) ? findWarningForField(fieldId, impactKey) : null;
+          row.className = warning ? (warning.level === 'error' ? 'preview-answer has-error' : 'preview-answer has-warning') : 'preview-answer';
+          const content = document.createElement('div'); content.style.whiteSpace = 'pre-wrap';
+          const labelSpan = document.createElement('span'); labelSpan.style.fontWeight = '600';
+          labelSpan.textContent = a.label;
+          if(warning){ const ic = renderWarningIcon(warning, `ans-${idx}`); if(ic) labelSpan.appendChild(ic); }
+          content.appendChild(labelSpan);
+          content.appendChild(document.createTextNode('\n' + a.value));
+          row.appendChild(content); container.appendChild(row);
+        });
       }
+      renderAnswerGroup(previewAnswersMaturation, answers.filter(a => a.group !== 'business'));
+      renderAnswerGroup(previewAnswersBusiness, answers.filter(a => a.group === 'business'));
 
       const previewAiWarningInfo = document.getElementById('previewAiWarningInfo');
       if(previewAiWarningInfo){
@@ -5233,6 +5355,30 @@
         wrap.appendChild(approvalActions);
       }
 
+      if(!isUser && message?.meta?.maturationTarget){
+        const maturationActions = document.createElement('div');
+        maturationActions.className = 'approval-actions';
+
+        const maturationBtn = document.createElement('button');
+        maturationBtn.className = 'approval-action cta-primary';
+        maturationBtn.type = 'button';
+        maturationBtn.innerHTML = '🚀 Fikir Olgunlaştırma Ekranını Aç';
+        maturationBtn.addEventListener('click', async () => {
+          maturationBtn.disabled = true;
+          const originalLabel = maturationBtn.innerHTML;
+          maturationBtn.innerHTML = 'Açılıyor...';
+          try{
+            await navigateToMaturationTarget(message.meta.maturationTarget);
+          } finally {
+            maturationBtn.disabled = false;
+            maturationBtn.innerHTML = originalLabel;
+          }
+        });
+
+        maturationActions.appendChild(maturationBtn);
+        wrap.appendChild(maturationActions);
+      }
+
       wrap.appendChild(ts);
       wrap.appendChild(actions);
 
@@ -5377,7 +5523,7 @@
         const res = await callBot('', convo, 'APPROVE');
         hideTyping();
         const rawReply = normalizeEscapedText(res?.answer || 'Yanıt alınamadı.');
-        const reply = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '');
+        const { text: reply, target: maturationTarget } = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
         if(res?.threadId){
           convo.threadId = res.threadId;
           if(String(convo.id||'').startsWith('c_') && convo.id !== res.threadId){
@@ -5386,8 +5532,8 @@
           }
           saveState();
         }
-        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
-        if(reply.includes('Fikriniz draft durumunda kaydedilmiştir') || reply.includes('Fikriniz draft durumunda kaydedilmiştir')){
+        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '', maturationTarget });
+        if(res?.state === 'COMPLETED'){
           loadCalls();
           setTimeout(() => openFeedbackModal('chat'), 800);
         }
@@ -5441,7 +5587,7 @@
         const res = await callBot(composedQuestion, convo, action);
         hideTyping();
         const rawReply = normalizeEscapedText(res?.answer || 'Yanıt alınamadı.');
-        const reply = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '');
+        const { text: reply, target: maturationTarget } = appendMaturationCta(rawReply, res?.threadId || convo.threadId || convo.id || '', res?.state);
         if(res?.threadId){
           convo.threadId = res.threadId;
           if(String(convo.id||'').startsWith('c_') && convo.id !== res.threadId){
@@ -5450,10 +5596,10 @@
           }
           saveState();
         }
-        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
+        addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '', maturationTarget });
         clearPendingAttachment(convo);
         // Başarılı oluşturma mesajı → feedback modal
-        if(reply.includes('Fikriniz draft durumunda kaydedilmiştir') || reply.includes('Fikriniz draft durumunda kaydedilmiştir')){
+        if(res?.state === 'COMPLETED'){
           loadCalls();
           setTimeout(() => openFeedbackModal('chat'), 800);
         }
