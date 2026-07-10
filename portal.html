@@ -4207,19 +4207,20 @@
       cfs.forEach(cf => {
         const mapping = CF_TO_FORM[cf.id];
         if(!mapping) return;
-        const val = normalizeCustomFieldValue(cf.value != null ? cf.value : cf.values);
+        // Jira cascading select değeri {value: "Ebeveyn", child: {value: "Çocuk"}} şeklinde gelir.
+        // normalizeCustomFieldValue bunu normalize ederken .value alanını (ebeveyn) döndürüp
+        // child'ı yok sayar — bu yüzden cascade alanlarda önce child'ı çıkarıp öyle normalize ediyoruz.
+        const rawValue = cf.value != null ? cf.value : cf.values;
+        const cascadeChild = (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && rawValue.child != null)
+          ? rawValue.child
+          : null;
+        const val = normalizeCustomFieldValue(mapping.type === 'cascade' && cascadeChild != null ? cascadeChild : rawValue);
         if(!val) return;
         const el = document.getElementById(mapping.id);
         if(!el) return;
-        
-        // Cascade select list alanları için child value'yu set et
+
         if(mapping.type === 'cascade'){
-          // Cascade alanlar object olabilir {parent, child} ya da string child value
-          let childValue = val;
-          if(typeof val === 'object' && val.child){
-            childValue = val.child;
-          }
-          el.value = childValue;
+          el.value = val;
         } else {
           el.value = val;
           if(mapping.type === 'text' && el.classList.contains('open') === false && val){
@@ -4400,9 +4401,15 @@
         Object.entries(BS_FIELD_MAPPING).forEach(([selectId, fieldId]) => {
           const cf = cfs.find(f => f && f.id === fieldId);
           if(!cf) return;
-          const raw = normalizeCustomFieldValue(cf.value != null ? cf.value : cf.values);
-          if(!raw) return;
-          desiredValues[selectId] = (typeof raw === 'object' && raw.child) ? raw.child : raw;
+          // Cascading select değeri {value: "Ebeveyn", child: {value: "Çocuk"}} şeklinde gelir;
+          // bu select'ler child (alt) değeri gösterdiği için önce child'ı çıkarıp normalize ediyoruz.
+          const rawValue = cf.value != null ? cf.value : cf.values;
+          const cascadeChild = (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && rawValue.child != null)
+            ? rawValue.child
+            : rawValue;
+          const val = normalizeCustomFieldValue(cascadeChild);
+          if(!val) return;
+          desiredValues[selectId] = val;
         });
 
         if(data.fields && Array.isArray(data.fields)){
