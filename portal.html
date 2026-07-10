@@ -4098,6 +4098,17 @@
         if(mergeNonEmpty && next.trim() === '') return;
         el.value = next;
       };
+      // Business Score alanları karşılıklı dışlamalı gruplar halinde (1A/1B/1C gibi). Bir grupta
+      // yalnızca bir seçenek dolu olabilir; bu yüzden burada mergeNonEmpty uygulanmaz — snapshot'taki
+      // boş değer de "bu seçenek seçili değil" anlamına gelir ve prefillMatureFormFromCustomFields'ın
+      // Jira'dan geri doldurduğu eski/başka seçeneğe ait değeri temizlemek için yazılmalıdır.
+      // Aksi halde syncBusinessScoreGroup, oturumda az önce seçilen seçenek yerine bu eski kalıntıyı
+      // "aktif" sanıp doğru seçeneği devre dışı bırakıp sıfırlayabilir.
+      const setValForce = (id, value) => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.value = (value || '').toString();
+      };
       setVal('qAmacSelect', state.qAmacSelect);
       if(!mergeNonEmpty || (state.qChannelsValue || '').toString().trim()) {
         setSelectedValues('qChannelsSelect', splitCsvValues(state.qChannelsValue));
@@ -4109,10 +4120,10 @@
       setVal('q5Select', state.q5Select); setVal('q5Detail', state.q5Detail);
       setVal('q8Select', state.q8Select); setVal('q10Select', state.q10Select);
       setVal('q10Detail', state.q10Detail); setVal('q7Code', state.q7Code);
-      setVal('bs1aSelect', state.bs1aSelect); setVal('bs1bSelect', state.bs1bSelect);
-      setVal('bs1cCountSelect', state.bs1cCountSelect); setVal('bs1cDurationSelect', state.bs1cDurationSelect);
-      setVal('bs2aSelect', state.bs2aSelect); setVal('bs2bSelect', state.bs2bSelect); setVal('bs2cSelect', state.bs2cSelect);
-      setVal('bs3Select', state.bs3Select); setVal('bs4Select', state.bs4Select);
+      setValForce('bs1aSelect', state.bs1aSelect); setValForce('bs1bSelect', state.bs1bSelect);
+      setValForce('bs1cCountSelect', state.bs1cCountSelect); setValForce('bs1cDurationSelect', state.bs1cDurationSelect);
+      setValForce('bs2aSelect', state.bs2aSelect); setValForce('bs2bSelect', state.bs2bSelect); setValForce('bs2cSelect', state.bs2cSelect);
+      setValForce('bs3Select', state.bs3Select); setValForce('bs4Select', state.bs4Select);
       if(typeof window.restoreStakeholdersSelection === 'function'){
         window.restoreStakeholdersSelection(
           mergeNonEmpty ? (state.stakeholdersValue || '') : state.stakeholdersValue,
@@ -4241,13 +4252,17 @@
       if(matureTime) matureTime.textContent = item?.time || '';
       if(matureSummary) matureSummary.textContent = item?.summary || '—';
       if(matureDescription) matureDescription.innerHTML = renderWikiText(item?.description);
+      // Amaç/Kanallar customfield_19801 ve customfield_10427 prefillMatureFormFromCustomFields'ın
+      // kapsamı dışında bırakıldığı için burada ayrıca dolduruluyor. restoreMatureFormState gibi
+      // sadece Jira'da gerçek bir değer varsa uygula — yoksa az önce restore edilen oturum
+      // değerini (aynı fikre "Geri Dön" ile dönüşte) ezmesin.
       const channelRaw = item?.customFields?.find(f => f.id === "customfield_10427" || f.name === "Etkilenecek Kanallar")?.value;
       const channelValue = normalizeCustomFieldValue(channelRaw);
       const amacRaw = item?.customFields?.find(f => f.id === "customfield_19801" || f.name === "Amaç")?.value;
       const amacValue = normalizeCustomFieldValue(amacRaw);
       const qAmacSelect = document.getElementById('qAmacSelect');
-      if(qAmacSelect) qAmacSelect.value = amacValue || '';
-      setSelectedValues('qChannelsSelect', splitCsvValues(channelValue));
+      if(qAmacSelect && amacValue) qAmacSelect.value = amacValue;
+      if(channelValue) setSelectedValues('qChannelsSelect', splitCsvValues(channelValue));
       syncChannelDrivenVisibility();
       ensureAiWarningDivs();
       clearFieldErrors();
