@@ -4748,7 +4748,15 @@
 
       if(previewCustomFields){
         previewCustomFields.innerHTML = '';
-        const hiddenCustomFieldIds = new Set(['customfield_19801', 'customfield_10427']);
+        // Business Score alanları kendi bölümünde (previewAnswersBusiness, collectAnswers'tan)
+        // zaten gösteriliyor ve boş olanlar orada otomatik filtreleniyor; burada tekrar
+        // gösterilmesinler (boş olsalar bile "—" satırı olarak görünmesinler).
+        const hiddenCustomFieldIds = new Set([
+          'customfield_19801', 'customfield_10427',
+          'customfield_20209', 'customfield_20210', 'customfield_20211', 'customfield_20212',
+          'customfield_20213', 'customfield_20214', 'customfield_20215', 'customfield_20216',
+          'customfield_20217'
+        ]);
         const hiddenCustomFieldNames = new Set(['Amaç', 'Etkilenecek Kanallar']);
         const list = (item?.customFields || []).filter(cf => {
           const cfId = String(cf?.id || '').trim();
