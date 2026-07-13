@@ -5350,17 +5350,6 @@
       actions.appendChild(copyBtn);
 
       if(!isUser){
-        const retryBtn = document.createElement('button');
-        retryBtn.className = 'msg-action';
-        retryBtn.type = 'button';
-        retryBtn.innerHTML = '↻ Yenile';
-        retryBtn.addEventListener('click', () => {
-          const convo = getActiveConversation(); if(!convo) return;
-          const lastUser = [...(convo.messages||[])].reverse().find(m => m.role === 'user');
-          if(lastUser){ document.getElementById('input').value = lastUser.text; sendMessage(); }
-        });
-        actions.appendChild(retryBtn);
-
         // TTS speak button
         const speakBtn = document.createElement('button');
         speakBtn.className = 'msg-action tts-speak';
