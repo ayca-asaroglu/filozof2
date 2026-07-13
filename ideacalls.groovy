@@ -25,6 +25,16 @@ fibarprIdeaCalls(
     "customfield_19804",
     "customfield_19805",
     "customfield_19806",
+    // Business Score cascade select list alanları (approve.groovy FIELD_MAP ile aynı)
+    "customfield_20209",
+    "customfield_20210",
+    "customfield_20211",
+    "customfield_20212",
+    "customfield_20213",
+    "customfield_20214",
+    "customfield_20215",
+    "customfield_20216",
+    "customfield_20217",
   ]
 
   def user = ComponentAccessor.jiraAuthenticationContext.loggedInUser
@@ -86,13 +96,33 @@ fibarprIdeaCalls(
     def customFields = cfKeys.collect { key ->
       def cf = resolveCf(key)
       def val = cf ? i.getCustomFieldValue(cf) : null
-      def out = val
-      if (val instanceof Collection) out = val.collect { it?.toString() }.join(", ")
-      else if (val instanceof Map) out = JsonOutput.toJson(val)
+      boolean isCascade = cf?.customFieldType?.key?.toLowerCase()?.contains("cascadingselect")
+
+      def out
+      if (isCascade && val instanceof Map) {
+        // Cascading select değeri Jira'da Map<String, Option> olarak gelir: null anahtarı
+        // ebeveyn (parent), "1" anahtarı çocuk (child) option'ını taşır. Bunu frontend'in
+        // beklediği {value, child:{value}} şekline dönüştürüyoruz; aksi halde JSON.toString()
+        // ile düz metne çevrilip select'teki hiçbir option ile eşleşmeyen bir string olurdu.
+        def parentOpt = val[null]
+        def childOpt = val["1"]
+        out = [
+          value: parentOpt?.value,
+          id   : parentOpt?.optionId?.toString(),
+          child: childOpt ? [value: childOpt.value, id: childOpt.optionId?.toString()] : null
+        ]
+      } else if (val instanceof Collection) {
+        out = val.collect { it?.toString() }.join(", ")
+      } else if (val instanceof Map) {
+        out = JsonOutput.toJson(val)
+      } else {
+        out = (val != null ? val.toString() : "")
+      }
+
       return [
         id: key,
         name: (cf?.name ?: key),
-        value: (out != null ? out.toString() : "")
+        value: out
       ]
     }
     [
