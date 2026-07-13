@@ -5584,7 +5584,6 @@
         addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
         if(res?.state === 'COMPLETED'){
           loadCalls();
-          setTimeout(() => openFeedbackModal('chat'), 800);
         }
       }catch(err){
         hideTyping();
@@ -5647,10 +5646,8 @@
         }
         addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
         clearPendingAttachment(convo);
-        // Başarılı oluşturma mesajı → feedback modal
         if(res?.state === 'COMPLETED'){
           loadCalls();
-          setTimeout(() => openFeedbackModal('chat'), 800);
         }
       }catch(err){
         hideTyping();
