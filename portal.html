@@ -4214,7 +4214,12 @@
         const cascadeChild = (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && rawValue.child != null)
           ? rawValue.child
           : null;
-        const val = normalizeCustomFieldValue(mapping.type === 'cascade' && cascadeChild != null ? cascadeChild : rawValue);
+        // Cascade alanlarda Jira bazen child metnini byte-array/utf16 kodlu döndürür
+        // (bkz. normalizeCascadeText/decodeCascadeByteList); normalizeCustomFieldValue bunu
+        // çözemediği için değer select'teki hiçbir option ile eşleşmez ve sessizce kaybolurdu.
+        const val = mapping.type === 'cascade'
+          ? normalizeCascadeText(cascadeChild != null ? cascadeChild : rawValue)
+          : normalizeCustomFieldValue(rawValue);
         // Cascade seçenek metinleri her zaman kelime — saf sayısal bir string Jira option id'sidir,
         // metin değil; select'e yanlış değer olarak yazılmasın.
         if(!val || (mapping.type === 'cascade' && /^\d+$/.test(val))) return;
@@ -4271,7 +4276,7 @@
       clearFieldErrors();
       if(typeof window.setMatureStage === 'function') window.setMatureStage(options?.stage === 'business' ? 'business' : 'form');
       const issueKey = item?.issueKey || item?.key;
-      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey);
+      if(issueKey && !isSameItem) loadBusinessScoreOptions(issueKey, item);
     }
 
     function closeMatureModal(){
@@ -4384,7 +4389,7 @@
       return str;
     }
 
-    async function loadBusinessScoreOptions(issueKey){
+    async function loadBusinessScoreOptions(issueKey, item){
       if(!issueKey) return;
       try {
         Object.keys(BS_PARENT_VALUES).forEach(key => delete BS_PARENT_VALUES[key]);
@@ -4393,6 +4398,29 @@
         const response = await fetch(url);
         const data = await response.json();
         const globalParentValue = normalizeCascadeText(data?.source_value);
+
+        // Bu endpoint issue üzerinde o alan için ZATEN kayıtlı olan child değerini döndürmez,
+        // sadece seçilebilecek olası child listesini döndürür. Select'ler bu fetch bitene kadar
+        // eski/varsayılan option listesiyle geldiği için, prefillMatureFormFromCustomFields'ın
+        // atadığı değer o anda select'te eşleşen bir <option> bulamayıp sessizce kaybolmuş olabilir.
+        // Bu yüzden, SADECE select şu an boşsa (yani prefill veya oturumdan geri yükleme başarılı
+        // olmadıysa) Jira'daki gerçek kayıtlı değeri burada tekrar okuyup yeni option listesine
+        // karşı deniyoruz. Select'te zaten bir değer varsa (prefill veya restoreMatureFormState'ten
+        // gelen) ona asla dokunmuyoruz — aksi halde kullanıcının oturumdaki güncel seçimi Jira'daki
+        // eski değerle ezilir (bkz. "Remove risky stale-value override" commit'i).
+        const cfs = Array.isArray(item?.customFields) ? item.customFields : [];
+        const fallbackValues = {};
+        Object.entries(BS_FIELD_MAPPING).forEach(([selectId, fieldId]) => {
+          const cf = cfs.find(f => f && f.id === fieldId);
+          if(!cf) return;
+          const rawValue = cf.value != null ? cf.value : cf.values;
+          const cascadeChild = (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue) && rawValue.child != null)
+            ? rawValue.child
+            : null;
+          const val = normalizeCascadeText(cascadeChild != null ? cascadeChild : rawValue);
+          if(!val || /^\d+$/.test(val)) return;
+          fallbackValues[selectId] = val;
+        });
 
         if(data.fields && Array.isArray(data.fields)){
           // Reverse mapping: customfield_ID -> selectId
@@ -4435,7 +4463,7 @@
               });
             }
 
-            select.value = currentValue;
+            select.value = currentValue || fallbackValues[selectId] || '';
           });
         }
 
