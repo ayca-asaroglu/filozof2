@@ -4687,12 +4687,6 @@ function renderMarkdown(text) {
         if(isAffirmative(sel.value) && !(detail.value||'').trim()) markError(detail);
       }
       function requireText(id){ const el = document.getElementById(id); if(!el || isHidden(el)) return; if(!(el.value||'').trim()) markError(el); }
-      function requireAttachment(selectId, fileId){
-        const sel = document.getElementById(selectId), file = document.getElementById(fileId);
-        if(!sel || !file || isHidden(sel) || isHidden(file)) return;
-        if(!sel.value){ markError(sel); return; }
-        if(sel.value === 'Evet' && (!file.files || !file.files.length)) markError(file);
-      }
 
       requireDetail('q2Select','q2Detail');
       requireDetail('q3Select','q3Detail');
@@ -4703,7 +4697,8 @@ function renderMarkdown(text) {
           else if(q5Sel.value === 'Var' && !(q5Det.value||'').trim()) markError(q5Det);
         }
       }
-      requireAttachment('q8Select','q8Attachment');
+      const q8Sel = document.getElementById('q8Select');
+      if(q8Sel && !isHidden(q8Sel) && !q8Sel.value) markError(q8Sel);
       requireDetail('q10Select','q10Detail');
       requireText('q7Code');
       if(stage === 'all' || stage === 'business'){
