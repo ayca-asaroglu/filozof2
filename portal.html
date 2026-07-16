@@ -2050,6 +2050,102 @@
       word-break:break-word;
     }
 
+    /* ===== Help & Feedback floating widget ===== */
+    .help-widget{
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      z-index:150;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:14px;
+    }
+    .help-fab{
+      width:56px; height:56px;
+      border-radius:50%;
+      border:none;
+      cursor:pointer;
+      background:linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 55%, var(--primary-dark) 100%);
+      color:#fff;
+      box-shadow:0 10px 24px rgba(47,93,169,0.35), 0 2px 6px rgba(9,30,66,0.18);
+      display:grid; place-items:center;
+      position:relative;
+      flex-shrink:0;
+      transition:transform .18s cubic-bezier(0.2,0,0,1), box-shadow .18s;
+    }
+    .help-fab:hover{ transform:translateY(-2px) scale(1.04); box-shadow:0 14px 30px rgba(47,93,169,0.4), 0 4px 10px rgba(9,30,66,0.2); }
+    .help-fab:active{ transform:translateY(0) scale(0.96); }
+    .help-fab-icon{
+      font-size:22px; font-weight:700; line-height:1;
+      position:absolute;
+      transition:opacity .15s ease, transform .2s ease;
+    }
+    .help-fab-icon-close{ opacity:0; transform:rotate(-45deg) scale(0.5); font-size:20px; }
+    .help-widget.open .help-fab-icon-default{ opacity:0; transform:rotate(45deg) scale(0.5); }
+    .help-widget.open .help-fab-icon-close{ opacity:1; transform:rotate(0deg) scale(1); }
+    .help-fab::before{
+      content:'';
+      position:absolute; inset:-4px;
+      border-radius:50%;
+      border:2px solid var(--primary-light);
+      opacity:0;
+      pointer-events:none;
+      animation:helpFabPulse 2.4s ease-out 1s 2;
+    }
+    @keyframes helpFabPulse{
+      0%{ opacity:.55; transform:scale(0.9); }
+      100%{ opacity:0; transform:scale(1.35); }
+    }
+    .help-popover{
+      width:min(320px, calc(100vw - 48px));
+      background:var(--surface);
+      border-radius:16px;
+      box-shadow:0 20px 48px rgba(9,30,66,0.24), 0 4px 12px rgba(9,30,66,0.08);
+      border:1px solid var(--border-light);
+      overflow:hidden;
+      transform-origin:bottom right;
+      transform:translateY(8px) scale(0.96);
+      opacity:0;
+      pointer-events:none;
+      transition:transform .18s cubic-bezier(0.2,0,0,1), opacity .18s ease;
+    }
+    .help-widget.open .help-popover{
+      transform:translateY(0) scale(1);
+      opacity:1;
+      pointer-events:auto;
+    }
+    .help-popover-head{
+      padding:18px 20px 14px;
+      background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color:#fff;
+    }
+    .help-popover-title{ font-size:15px; font-weight:700; }
+    .help-popover-subtitle{ font-size:12.5px; color:rgba(255,255,255,0.85); margin-top:2px; }
+    .help-popover-item{
+      width:100%;
+      display:flex; align-items:center; gap:12px;
+      padding:14px 20px;
+      background:none; border:none; border-top:1px solid var(--border-light);
+      cursor:pointer; text-align:left; font-family:inherit;
+      transition:background .12s;
+    }
+    .help-popover-item:hover{ background:var(--bg); }
+    .help-item-icon{
+      width:36px; height:36px; border-radius:10px;
+      display:grid; place-items:center; font-size:17px;
+      flex-shrink:0;
+    }
+    .help-item-icon-support{ background:rgba(222,53,11,0.1); }
+    .help-item-icon-feedback{ background:rgba(54,179,126,0.12); }
+    .help-item-copy{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+    .help-item-title{ font-size:13.5px; font-weight:600; color:var(--text); }
+    .help-item-desc{ font-size:12px; color:var(--text-subtle); line-height:1.4; }
+    .help-item-arrow{ font-size:18px; color:var(--text-disabled); flex-shrink:0; }
+    @media (max-width:600px){
+      .help-widget{ right:16px; bottom:16px; }
+    }
+
     /* ===== Info Banner ===== */
     .info-banner{
       background:linear-gradient(135deg, rgba(76,154,255,0.08) 0%, rgba(47,93,169,0.05) 100%);
@@ -2156,7 +2252,6 @@
       <header class="header">
         <div class="header-right">
           <a class="tiny-btn" id="btnHome" href="https://atlas.fibabanka.local/jira/rest/scriptrunner/latest/custom/navigationHub">Anasayfa</a>
-          <button class="tiny-btn" id="btnSupport" type="button">Destek Hattı</button>
           <button class="tiny-btn primary" id="btnCalls" onclick="openCallsPanel()">Fikirlerim</button>
         </div>
       </header>
@@ -2693,6 +2788,36 @@
     </div>
   </div>
 
+  <!-- Help & Feedback floating widget -->
+  <div class="help-widget" id="helpWidget">
+    <div class="help-popover" id="helpPopover" role="menu" aria-hidden="true">
+      <div class="help-popover-head">
+        <div class="help-popover-title">Yardım &amp; Geri Bildirim</div>
+        <div class="help-popover-subtitle">Size nasıl yardımcı olabiliriz?</div>
+      </div>
+      <button class="help-popover-item" id="helpItemSupport" type="button" role="menuitem">
+        <span class="help-item-icon help-item-icon-support">🛠️</span>
+        <span class="help-item-copy">
+          <span class="help-item-title">Destek Talebi Oluştur</span>
+          <span class="help-item-desc">Bir sorunla mı karşılaştınız? Ekibimize iletin.</span>
+        </span>
+        <span class="help-item-arrow">›</span>
+      </button>
+      <button class="help-popover-item" id="helpItemFeedback" type="button" role="menuitem">
+        <span class="help-item-icon help-item-icon-feedback">💬</span>
+        <span class="help-item-copy">
+          <span class="help-item-title">Geri Bildirim Gönder</span>
+          <span class="help-item-desc">Deneyiminizi puanlayın, önerinizi paylaşın.</span>
+        </span>
+        <span class="help-item-arrow">›</span>
+      </button>
+    </div>
+    <button class="help-fab" id="helpFabBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Yardım ve geri bildirim">
+      <span class="help-fab-icon help-fab-icon-default">?</span>
+      <span class="help-fab-icon help-fab-icon-close">✕</span>
+    </button>
+  </div>
+
   <!-- Toast container -->
   <div class="toast-container" id="toastContainer"></div>
 
@@ -2707,7 +2832,6 @@
     const btnNew = document.getElementById('btnNew');
     const btnSearch = document.getElementById('btnSearch');
     const btnCalls = document.getElementById('btnCalls');
-    const btnSupport = document.getElementById('btnSupport');
 
     const ctxMenu = document.getElementById('ctxMenu');
     const ctxRename = document.getElementById('ctxRename');
@@ -3547,7 +3671,6 @@ function renderMarkdown(text) {
     document.getElementById('feedbackOverlay').addEventListener('click', e => {
       if(e.target === e.currentTarget) closeFeedbackModal();
     });
-    if(btnSupport) btnSupport.addEventListener('click', openSupportModal);
     if(supportClose) supportClose.addEventListener('click', closeSupportModal);
     if(supportCancel) supportCancel.addEventListener('click', closeSupportModal);
     if(supportOverlay){
@@ -3578,6 +3701,38 @@ function renderMarkdown(text) {
       });
     }
     if(supportSubmit) supportSubmit.addEventListener('click', submitSupportRequest);
+
+    // ===== Help & Feedback floating widget =====
+    (function initHelpWidget(){
+      const widget = document.getElementById('helpWidget');
+      const fab = document.getElementById('helpFabBtn');
+      const popover = document.getElementById('helpPopover');
+      const itemSupport = document.getElementById('helpItemSupport');
+      const itemFeedback = document.getElementById('helpItemFeedback');
+      if(!widget || !fab || !popover) return;
+
+      function openPanel(){
+        widget.classList.add('open');
+        fab.setAttribute('aria-expanded', 'true');
+        popover.setAttribute('aria-hidden', 'false');
+      }
+      function closePanel(){
+        widget.classList.remove('open');
+        fab.setAttribute('aria-expanded', 'false');
+        popover.setAttribute('aria-hidden', 'true');
+      }
+      window.closeHelpWidget = closePanel;
+
+      fab.addEventListener('click', (e) => {
+        e.stopPropagation();
+        widget.classList.contains('open') ? closePanel() : openPanel();
+      });
+      document.addEventListener('click', (e) => {
+        if(widget.classList.contains('open') && !widget.contains(e.target)) closePanel();
+      });
+      if(itemSupport) itemSupport.addEventListener('click', () => { closePanel(); openSupportModal(); });
+      if(itemFeedback) itemFeedback.addEventListener('click', () => { closePanel(); openFeedbackModal('manual'); });
+    })();
 
     // ===== Toast =====
     function showToast(message, type = 'info'){
@@ -6166,6 +6321,7 @@ function renderMarkdown(text) {
         if(matureModal.classList.contains('open')) closeMatureModal();
         if(previewModal.classList.contains('open')) closePreviewModal();
         if(supportOverlay && supportOverlay.classList.contains('open')) closeSupportModal();
+        if(document.getElementById('helpWidget')?.classList.contains('open')) window.closeHelpWidget?.();
       }
     });
 
