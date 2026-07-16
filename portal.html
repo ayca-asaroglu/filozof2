@@ -2059,31 +2059,43 @@
       display:flex;
       flex-direction:column;
       align-items:flex-end;
-      gap:14px;
+      gap:16px;
     }
     .help-fab{
-      width:56px; height:56px;
+      width:60px; height:60px;
       border-radius:50%;
       border:none;
       cursor:pointer;
-      background:linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 55%, var(--primary-dark) 100%);
+      background:linear-gradient(140deg, var(--primary-light) 0%, var(--primary) 52%, var(--primary-dark) 100%);
       color:#fff;
-      box-shadow:0 10px 24px rgba(47,93,169,0.35), 0 2px 6px rgba(9,30,66,0.18);
+      box-shadow:0 8px 24px rgba(47,93,169,0.36), 0 2px 6px rgba(9,30,66,0.20);
       display:grid; place-items:center;
       position:relative;
       flex-shrink:0;
-      transition:transform .18s cubic-bezier(0.2,0,0,1), box-shadow .18s;
+      transition:transform .18s cubic-bezier(0.2,0,0,1), box-shadow .18s ease;
     }
-    .help-fab:hover{ transform:translateY(-2px) scale(1.04); box-shadow:0 14px 30px rgba(47,93,169,0.4), 0 4px 10px rgba(9,30,66,0.2); }
+    /* Üstten ince highlight — camsı, hacimli görünüm */
+    .help-fab::after{
+      content:'';
+      position:absolute; inset:0;
+      border-radius:50%;
+      background:linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0) 55%);
+      pointer-events:none;
+    }
+    .help-fab:hover{ transform:translateY(-2px) scale(1.04); box-shadow:0 14px 32px rgba(47,93,169,0.44), 0 4px 10px rgba(9,30,66,0.22); }
     .help-fab:active{ transform:translateY(0) scale(0.96); }
+    .help-fab:focus-visible{ outline:none; box-shadow:0 8px 24px rgba(47,93,169,0.36), 0 0 0 3px #fff, 0 0 0 6px var(--primary-light); }
     .help-fab-icon{
-      font-size:22px; font-weight:700; line-height:1;
       position:absolute;
-      transition:opacity .15s ease, transform .2s ease;
+      display:grid; place-items:center;
+      line-height:0;
+      transition:opacity .18s ease, transform .22s cubic-bezier(0.2,0,0,1);
     }
-    .help-fab-icon-close{ opacity:0; transform:rotate(-45deg) scale(0.5); font-size:20px; }
-    .help-widget.open .help-fab-icon-default{ opacity:0; transform:rotate(45deg) scale(0.5); }
+    .help-fab-icon svg{ display:block; }
+    .help-fab-icon-close{ opacity:0; transform:rotate(-90deg) scale(0.4); }
+    .help-widget.open .help-fab-icon-default{ opacity:0; transform:rotate(90deg) scale(0.4); }
     .help-widget.open .help-fab-icon-close{ opacity:1; transform:rotate(0deg) scale(1); }
+    /* Dikkat çekme halkası — yalnızca ilk ziyarette birkaç kez */
     .help-fab::before{
       content:'';
       position:absolute; inset:-4px;
@@ -2091,24 +2103,53 @@
       border:2px solid var(--primary-light);
       opacity:0;
       pointer-events:none;
-      animation:helpFabPulse 2.4s ease-out 1s 2;
     }
+    .help-widget.nudge .help-fab::before{ animation:helpFabPulse 2.4s ease-out 0s 3; }
     @keyframes helpFabPulse{
-      0%{ opacity:.55; transform:scale(0.9); }
-      100%{ opacity:0; transform:scale(1.35); }
+      0%{ opacity:.5; transform:scale(0.92); }
+      100%{ opacity:0; transform:scale(1.4); }
     }
+
+    /* İlk ziyaret ipucu balonu */
+    .help-tooltip{
+      position:absolute;
+      right:72px; bottom:12px;
+      white-space:nowrap;
+      background:var(--text);
+      color:#fff;
+      font-size:12.5px; font-weight:600;
+      padding:8px 12px;
+      border-radius:10px;
+      box-shadow:0 8px 20px rgba(9,30,66,0.24);
+      opacity:0; transform:translateX(6px);
+      pointer-events:none;
+      transition:opacity .25s ease, transform .25s cubic-bezier(0.2,0,0,1);
+    }
+    .help-tooltip::after{
+      content:'';
+      position:absolute; right:-5px; top:50%;
+      transform:translateY(-50%);
+      border:6px solid transparent;
+      border-left-color:var(--text);
+      border-right-width:0;
+    }
+    .help-widget.show-tooltip .help-tooltip{ opacity:1; transform:translateX(0); }
+    .help-widget.open .help-tooltip{ opacity:0 !important; pointer-events:none; }
+
     .help-popover{
-      width:min(320px, calc(100vw - 48px));
-      background:var(--surface);
-      border-radius:16px;
-      box-shadow:0 20px 48px rgba(9,30,66,0.24), 0 4px 12px rgba(9,30,66,0.08);
-      border:1px solid var(--border-light);
+      width:min(340px, calc(100vw - 40px));
+      background:rgba(255,255,255,0.86);
+      backdrop-filter:blur(16px) saturate(160%);
+      -webkit-backdrop-filter:blur(16px) saturate(160%);
+      border-radius:20px;
+      box-shadow:0 24px 60px -12px rgba(9,30,66,0.28), 0 8px 20px -8px rgba(9,30,66,0.14);
+      border:1px solid rgba(255,255,255,0.6);
       overflow:hidden;
       transform-origin:bottom right;
-      transform:translateY(8px) scale(0.96);
+      transform:translateY(10px) scale(0.95);
       opacity:0;
       pointer-events:none;
-      transition:transform .18s cubic-bezier(0.2,0,0,1), opacity .18s ease;
+      transition:transform .22s cubic-bezier(0.2,0,0,1), opacity .18s ease;
     }
     .help-widget.open .help-popover{
       transform:translateY(0) scale(1);
@@ -2116,34 +2157,75 @@
       pointer-events:auto;
     }
     .help-popover-head{
-      padding:18px 20px 14px;
-      background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding:18px 20px 15px;
+      background:linear-gradient(140deg, var(--primary) 0%, var(--primary-dark) 100%);
       color:#fff;
+      position:relative;
     }
-    .help-popover-title{ font-size:15px; font-weight:700; }
-    .help-popover-subtitle{ font-size:12.5px; color:rgba(255,255,255,0.85); margin-top:2px; }
+    .help-popover-head::after{
+      content:'';
+      position:absolute; left:0; right:0; top:0; height:1px;
+      background:rgba(255,255,255,0.28);
+    }
+    .help-popover-title{ font-size:15.5px; font-weight:700; letter-spacing:-0.01em; }
+    .help-popover-subtitle{ font-size:12.5px; color:rgba(255,255,255,0.85); margin-top:3px; }
+    .help-popover-body{ padding:8px; display:flex; flex-direction:column; gap:2px; }
     .help-popover-item{
       width:100%;
-      display:flex; align-items:center; gap:12px;
-      padding:14px 20px;
-      background:none; border:none; border-top:1px solid var(--border-light);
+      display:flex; align-items:center; gap:14px;
+      padding:12px 12px;
+      border-radius:12px;
+      background:none; border:none;
       cursor:pointer; text-align:left; font-family:inherit;
-      transition:background .12s;
+      transition:background .15s ease, transform .1s ease;
+      opacity:0;
+    }
+    .help-widget.open .help-popover-item{ animation:helpItemIn .28s ease-out forwards; }
+    .help-widget.open .help-popover-item:nth-child(1){ animation-delay:.06s; }
+    .help-widget.open .help-popover-item:nth-child(2){ animation-delay:.11s; }
+    @keyframes helpItemIn{
+      from{ opacity:0; transform:translateY(6px); }
+      to{ opacity:1; transform:translateY(0); }
     }
     .help-popover-item:hover{ background:var(--bg); }
+    .help-popover-item:active{ transform:scale(0.985); }
+    .help-popover-item:focus-visible{ outline:none; background:var(--bg); box-shadow:0 0 0 2px var(--focus-ring); }
     .help-item-icon{
-      width:36px; height:36px; border-radius:10px;
-      display:grid; place-items:center; font-size:17px;
+      width:40px; height:40px; border-radius:12px;
+      display:grid; place-items:center;
       flex-shrink:0;
+      transition:transform .15s ease;
     }
-    .help-item-icon-support{ background:rgba(222,53,11,0.1); }
-    .help-item-icon-feedback{ background:rgba(54,179,126,0.12); }
+    .help-popover-item:hover .help-item-icon{ transform:scale(1.06); }
+    .help-item-icon svg{ display:block; }
+    .help-item-icon-support{ background:rgba(222,53,11,0.10); color:var(--danger); }
+    .help-item-icon-feedback{ background:rgba(54,179,126,0.14); color:var(--success-dark); }
     .help-item-copy{ display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
-    .help-item-title{ font-size:13.5px; font-weight:600; color:var(--text); }
-    .help-item-desc{ font-size:12px; color:var(--text-subtle); line-height:1.4; }
-    .help-item-arrow{ font-size:18px; color:var(--text-disabled); flex-shrink:0; }
+    .help-item-title{ font-size:14px; font-weight:600; color:var(--text); letter-spacing:-0.01em; }
+    .help-item-desc{ font-size:12px; color:var(--text-muted); line-height:1.45; }
+    .help-item-arrow{
+      color:var(--text-disabled);
+      flex-shrink:0;
+      display:grid; place-items:center;
+      transition:transform .15s cubic-bezier(0.2,0,0,1), color .15s ease;
+    }
+    .help-popover-item:hover .help-item-arrow{ transform:translateX(4px); color:var(--primary); }
+    .help-popover-foot{
+      padding:11px 20px;
+      border-top:1px solid var(--border-light);
+      font-size:11.5px; color:var(--text-subtle);
+      display:flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,0.5);
+    }
+    .help-foot-dot{ width:6px; height:6px; border-radius:50%; background:var(--success); flex-shrink:0; }
     @media (max-width:600px){
       .help-widget{ right:16px; bottom:16px; }
+      .help-tooltip{ display:none; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .help-fab, .help-fab-icon, .help-popover, .help-popover-item,
+      .help-item-icon, .help-item-arrow, .help-tooltip{ transition:none; animation:none; }
+      .help-widget.nudge .help-fab::before{ animation:none; }
     }
 
     /* ===== Info Banner ===== */
@@ -2792,29 +2874,45 @@
   <div class="help-widget" id="helpWidget">
     <div class="help-popover" id="helpPopover" role="menu" aria-hidden="true">
       <div class="help-popover-head">
-        <div class="help-popover-title">Yardım &amp; Geri Bildirim</div>
-        <div class="help-popover-subtitle">Size nasıl yardımcı olabiliriz?</div>
+        <div class="help-popover-title">Yardımcı olalım</div>
+        <div class="help-popover-subtitle">Bir sorun mu var, bir fikrin mi?</div>
       </div>
-      <button class="help-popover-item" id="helpItemSupport" type="button" role="menuitem">
-        <span class="help-item-icon help-item-icon-support">🛠️</span>
-        <span class="help-item-copy">
-          <span class="help-item-title">Destek Talebi Oluştur</span>
-          <span class="help-item-desc">Bir sorunla mı karşılaştınız? Ekibimize iletin.</span>
-        </span>
-        <span class="help-item-arrow">›</span>
-      </button>
-      <button class="help-popover-item" id="helpItemFeedback" type="button" role="menuitem">
-        <span class="help-item-icon help-item-icon-feedback">💬</span>
-        <span class="help-item-copy">
-          <span class="help-item-title">Geri Bildirim Gönder</span>
-          <span class="help-item-desc">Deneyiminizi puanlayın, önerinizi paylaşın.</span>
-        </span>
-        <span class="help-item-arrow">›</span>
-      </button>
+      <div class="help-popover-body">
+        <button class="help-popover-item" id="helpItemSupport" type="button" role="menuitem">
+          <span class="help-item-icon help-item-icon-support" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </span>
+          <span class="help-item-copy">
+            <span class="help-item-title">Destek al</span>
+            <span class="help-item-desc">Takıldığın yeri yaz, ekibimiz dönsün.</span>
+          </span>
+          <span class="help-item-arrow" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </button>
+        <button class="help-popover-item" id="helpItemFeedback" type="button" role="menuitem">
+          <span class="help-item-icon help-item-icon-feedback" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <span class="help-item-copy">
+            <span class="help-item-title">Fikrini paylaş</span>
+            <span class="help-item-desc">Neyi sevdin, neyi değiştirelim?</span>
+          </span>
+          <span class="help-item-arrow" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </span>
+        </button>
+      </div>
+      <div class="help-popover-foot"><span class="help-foot-dot"></span>Yanıt süresi genellikle 1 iş günüdür.</div>
     </div>
+    <div class="help-tooltip" id="helpTooltip" aria-hidden="true">Yardım &amp; geri bildirim burada 👋</div>
     <button class="help-fab" id="helpFabBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Yardım ve geri bildirim">
-      <span class="help-fab-icon help-fab-icon-default">?</span>
-      <span class="help-fab-icon help-fab-icon-close">✕</span>
+      <span class="help-fab-icon help-fab-icon-default" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </span>
+      <span class="help-fab-icon help-fab-icon-close" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </span>
     </button>
   </div>
 
@@ -3711,17 +3809,27 @@ function renderMarkdown(text) {
       const itemFeedback = document.getElementById('helpItemFeedback');
       if(!widget || !fab || !popover) return;
 
+      const SEEN_KEY = '_helpWidgetSeen_v1';
+      function dismissNudge(){
+        widget.classList.remove('nudge', 'show-tooltip');
+        try{ localStorage.setItem(SEEN_KEY, '1'); }catch(e){}
+      }
+
       function openPanel(){
         widget.classList.add('open');
         fab.setAttribute('aria-expanded', 'true');
         popover.setAttribute('aria-hidden', 'false');
+        dismissNudge();
+        // Klavye erişimi: panel açılınca ilk eyleme odak
+        setTimeout(() => { itemSupport?.focus(); }, 60);
       }
-      function closePanel(){
+      function closePanel(opts = {}){
         widget.classList.remove('open');
         fab.setAttribute('aria-expanded', 'false');
         popover.setAttribute('aria-hidden', 'true');
+        if(opts.returnFocus) fab.focus();
       }
-      window.closeHelpWidget = closePanel;
+      window.closeHelpWidget = () => closePanel({ returnFocus: true });
 
       fab.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3732,6 +3840,17 @@ function renderMarkdown(text) {
       });
       if(itemSupport) itemSupport.addEventListener('click', () => { closePanel(); openSupportModal(); });
       if(itemFeedback) itemFeedback.addEventListener('click', () => { closePanel(); openFeedbackModal('manual'); });
+
+      // İlk ziyaret: bir kez dikkat halkası + ipucu balonu, sonra kalıcı olarak susar.
+      let alreadySeen = true;
+      try{ alreadySeen = localStorage.getItem(SEEN_KEY) === '1'; }catch(e){}
+      if(!alreadySeen){
+        setTimeout(() => {
+          if(widget.classList.contains('open')) return;
+          widget.classList.add('nudge', 'show-tooltip');
+          setTimeout(() => widget.classList.remove('show-tooltip'), 6000);
+        }, 1400);
+      }
     })();
 
     // ===== Toast =====
