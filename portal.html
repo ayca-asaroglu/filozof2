@@ -2871,7 +2871,7 @@
       return url.toString();
     }
 
-    const MATURATION_CTA_LABEL = 'Fikir Olgunlaştırma Ekranını Aç';
+    const MATURATION_CTA_LABEL = 'Fikir Geliştirme Ekranını Aç';
 
     function appendMaturationCta(replyText, threadId, state){
       const reply = (replyText || '').toString();
@@ -3783,7 +3783,7 @@ function renderMarkdown(text) {
           const btn = document.createElement('button');
           btn.className = 'call-action';
           btn.type = 'button';
-          btn.textContent = 'Fikir Olgunlaştır';
+          btn.textContent = 'Fikir Geliştirme';
           btn.addEventListener('click', (e) => { e.stopPropagation(); openMatureModal(it); });
           actions.appendChild(btn);
         }
@@ -5256,7 +5256,7 @@ function renderMarkdown(text) {
         ? 'Fikrinden bahset, birlikte olgunlaştıralım…'
         : (blockedByRequestType
             ? 'Yazılım Geliştirme dışındaki fikirlerin iletilen link üzerinden süreci ilerletilmektedir. Yazılım geliştirme fikirleriniz için yeni sohbet başlatabilirsiniz.'
-            : 'Bu sohbet tamamlandı. Güncelleme için Fikir Olgunlaştır ekranından Chat ile Güncelle seçin.');
+            : 'Bu sohbet tamamlandı. Güncelleme için Fikir Geliştirme ekranından Chat ile Güncelle seçin.');
       autoResizeComposerInput();
     }
 
@@ -5646,7 +5646,7 @@ function renderMarkdown(text) {
         showToast(
           blockedByRequestType
             ? 'Yazılım Geliştirme Talepleri dışındaki talepler iletilen link üzerinden süreci ilerletilmektedir. Yazılım geliştirme fikirleriniz için yeni sohbet başlatabilirsiniz.'
-            : 'Bu sohbet tamamlandı. Güncelleme için Fikir Olgunlaştır ekranından Chat ile Güncelle kullanın.',
+            : 'Bu sohbet tamamlandı. Güncelleme için Fikir Geliştirme ekranından Chat ile Güncelle kullanın.',
           'warning'
         );
         return;
