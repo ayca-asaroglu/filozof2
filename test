@@ -1,137 +1,145 @@
-{
-  "issueKey": "HC-40984",
-  "source_customfield_id": "customfield_10745",
-  "source_customfield_name": "Reporter Birim İsmi",
-  "source_value": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-  "default_parent_value": "Default",
-  "fields": [
-    {
-      "customfield_id": "customfield_20209",
-      "customfield_name": "Gelir Artışı Bireysel Müşteri",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-1.000",
-        "1.001-10.000",
-        "10.001-50.000",
-        "50.001-250.000",
-        "\u003E250.000"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20210",
-      "customfield_name": "Gelir Artışı Tüzel Müşteri",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-50",
-        "51-100",
-        "101-250",
-        "251-500",
-        "\u003E500"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20211",
-      "customfield_name": "Operasyon-Verimlilik İşlem Adeti",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-100",
-        "101-250",
-        "101-1.000",
-        "1.001-10.000",
-        "10.001-100.000",
-        "\u003E100.000"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20212",
-      "customfield_name": "Operasyon-Verimlilik İşlem Süresi",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-10",
-        "11 - 50",
-        "11 -- 50",
-        "51-200",
-        "201-500",
-        "\u003E500"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20213",
-      "customfield_name": "Gelir Artışı Bireysel Müşteri (TL)",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-500k",
-        "500k - 2 M",
-        "2M - 7,5 M",
-        "7,5 M - 25 M",
-        "\u003E25M"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20214",
-      "customfield_name": "Gelir Artışı Tüzel Müşteri (TL)",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-25M",
-        "25M - 40 M",
-        "40M - 75M",
-        "75M - 100M",
-        "\u003E100M"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20215",
-      "customfield_name": "Gider Azaltımı",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "0-500K",
-        "500K - 2 M",
-        "2M - 4 M",
-        "4 M - 6 M",
-        "\u003E6M"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20216",
-      "customfield_name": "Müşteri Etkisi",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "1",
-        "0-5%",
-        "5% - 15%",
-        "15% - 30%",
-        "\u003E30%"
-      ]
-    },
-    {
-      "customfield_id": "customfield_20217",
-      "customfield_name": "Operasyonel ve Finansal Risk",
-      "status": "SUCCESS",
-      "match_type": "SOURCE_VALUE",
-      "matched_parent_option": "Ticari Krediler Ürün Yönetimi Şube Kanalı",
-      "child_options": [
-        "Yok",
-        "Düşük",
-        "Orta",
-        "Yüksek",
-        "Çok Yüksek"
-      ]
-    }
-  ]
-}
+Sen deneyimli bir Senior Product Designer (UX/UI) ve Design System uzmanısın. Modern SaaS ürünleri (ChatGPT, Claude, Notion, Linear, Slack, Jira, Azure Portal, Intercom, HubSpot, Zendesk vb.) seviyesinde kullanıcı deneyimi tasarlıyorsun.
+
+Bir chatbot uygulamam için sağ altta yer alan "Yardım & Geri Bildirim" bileşenini tasarladım. Genel yapısını beğeniyorum ancak daha modern, premium ve kullanıcı etkileşimini artıracak hale getirmek istiyorum.
+
+Mevcut tasarımın amacı:
+
+Kullanıcıların kolayca destek talebi oluşturabilmesi
+Kullanıcıların geri bildirim / öneri gönderebilmesi
+Chat ekranını bozmadan bu özelliklere erişebilmesi
+
+Bu tasarımı aşağıdaki kriterlere göre değerlendir ve geliştir.
+
+İstediğim iyileştirmeler
+1. Görsel Hiyerarşi
+Kartların okunabilirliğini artır.
+Başlık, açıklama ve ikonların ağırlığını yeniden düzenle.
+Daha premium bir görünüm oluştur.
+Gerekiyorsa boşluk (spacing), padding ve radius değerlerini öner.
+2. Modern UI
+2025 tasarım trendlerine uygun öneriler sun.
+Gerekiyorsa gradient, blur, shadow veya glassmorphism gibi efektleri dengeli şekilde öner.
+Kartların daha canlı görünmesini sağla.
+3. Mikro Etkileşimler
+
+Aşağıdaki durumlar için animasyon öner:
+
+FAB açılırken
+Panel açılırken
+Kart hover
+Kart tıklama
+Ok ikonunun hareketi
+FAB hover
+FAB kapatılırken
+
+Animasyon sürelerini de öner (örn. 150ms, 250ms).
+
+4. FAB Tasarımı
+
+Şu an FAB yalnızca "?" ikonu içeriyor.
+
+Alternatif öneriler sun.
+
+Örneğin;
+
+?
+💬
+🎧
+✨
+Yardım
+Yardım +
+
+Hangisinin neden daha doğru olduğunu UX açısından açıkla.
+
+5. Kart İçeriği
+
+Şu an iki kart var:
+
+Destek Talebi Oluştur
+Geri Bildirim Gönder
+
+Başlık ve açıklamaları daha kullanıcı odaklı hale getir.
+
+Örneğin daha sıcak, daha teşvik edici ve daha anlaşılır metinler öner.
+
+6. Bilgi Mimarisi
+
+İki kart yeterli mi?
+
+Eklenmesi faydalı olabilecek yeni seçenekler öner.
+
+Örneğin:
+
+Yardım Merkezi
+Sık Sorulan Sorular
+Yenilikler
+Dokümantasyon
+
+Ancak panelin karmaşıklaşmamasına dikkat et.
+
+7. Accessibility
+
+Aşağıdaki konuları değerlendir.
+
+Kontrast
+Minimum dokunma alanı
+Keyboard navigation
+Focus state
+Screen reader
+Renk körlüğü
+8. UX
+
+Kullanıcının yardım panelini keşfetmesini artıracak öneriler sun.
+
+Örneğin:
+
+İlk girişte tooltip
+"Yeni" rozeti
+Bildirim noktası
+Kullanım ipuçları
+
+Ancak dikkat dağıtıcı olmasın.
+
+9. Premium Görünüm
+
+Kurumsal bir bankacılık uygulaması olduğu için güven veren ama modern görünen bir tasarım öner.
+
+Intercom, Slack ve Notion seviyesinde sade fakat kaliteli bir görünüm hedefleniyor.
+
+10. Çıktı Formatı
+
+Lütfen aşağıdaki formatta cevap ver.
+
+Güçlü Yönler
+
+...
+
+İyileştirme Önerileri
+
+...
+
+Yeni Metin Önerileri
+
+...
+
+Mikro Animasyonlar
+
+...
+
+Spacing Önerileri
+
+...
+
+Shadow Önerileri
+
+...
+
+Hover Durumları
+
+...
+
+Final Tasarım Konsepti
+
+Modern SaaS seviyesinde tek bir nihai tasarım önerisi oluştur.
+
+Tasarımı mümkün olduğunca sade, premium ve kullanıcı dostu olacak şekilde optimize et. Gereksiz öğeler ekleme; her önerinin UX açısından neden faydalı olduğunu da açıkla.
