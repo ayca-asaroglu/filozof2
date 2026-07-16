@@ -913,7 +913,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                         String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
                         String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
-                        return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
+                        return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL"]]
                     }
 
                     return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY"]]
@@ -989,7 +989,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
             String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
             String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
-            return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, state: "COMPLETED", mode: "FINAL"]]
+            return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL"]]
         }
 
         return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fnName, arguments: fnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY"]]
@@ -1000,7 +1000,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
 
 @TypeChecked(TypeCheckingMode.SKIP)
 @CompileDynamic
-Map processJiraStep(def args, def threadId, def size, def answer, def isDone, def state, def mode) {
+Map processJiraStep(def args, def threadId, def size, def analysisNote, def answer, def isDone, def state, def mode) {
     Map result = [
         answer      : answer,
         isDone      : isDone,
@@ -1015,7 +1015,7 @@ Map processJiraStep(def args, def threadId, def size, def answer, def isDone, de
 
     Map jiraResult
     try {
-        jiraResult = onProcessDone(args, threadId, size)
+        jiraResult = onProcessDone(args, threadId, size, analysisNote)
     } catch (Exception e) {
         jiraResult = [ok: false, error: errorContract(ERR_UNEXPECTED, STAGE_JIRA, true, "Jira işleminde hata oluştu", e.message ?: "Bilinmeyen hata")]
     }
@@ -1086,6 +1086,7 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
         def isDone = false
         def args = null
         def size = null
+        def analysisNote = null
         def state = null
         def mode = null
         def promptKey = null
@@ -1097,6 +1098,7 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
         isDone = firstNonNull(j["isDone"], jOutputs["isDone"], false)
         args = firstNonNull(j["args"], jOutputs["args"], j["arguments"], jOutputs["arguments"])
         size = firstNonNull(j["complexity"], jOutputs["complexity"])
+        analysisNote = firstNonNull(j["analysis_note"], jOutputs["analysis_note"])
         state = firstNonNull(j["state"], jOutputs["state"])
         mode = firstNonNull(j["mode"], jOutputs["mode"])
         promptKey = firstNonNull(j["prompt_key"], jOutputs["prompt_key"])
@@ -1144,7 +1146,7 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
                     VALUES (?, ?, N'user', ?)
                 """, [threadId, CATEGORY, question])
 
-                Map jiraStep = processJiraStep(args, threadId, size, answer, isDone, state, mode)
+                Map jiraStep = processJiraStep(args, threadId, size, analysisNote, answer, isDone, state, mode)
                 answer = jiraStep.answer
                 isDone = jiraStep.isDone
                 state = jiraStep.state
@@ -1236,7 +1238,7 @@ fibarprSpeechTts(httpMethod: "POST") { MultivaluedMap qp, String body ->
 
 @TypeChecked(TypeCheckingMode.SKIP)
 @CompileDynamic
-Map onProcessDone(def args, def threadId, def size) {
+Map onProcessDone(def args, def threadId, def size, def analysisNote = null) {
     log.warn("thread id")
     log.warn(threadId)
     log.warn("size")
@@ -1325,6 +1327,7 @@ Map onProcessDone(def args, def threadId, def size) {
     setCf(params, "customfield_19806", idea.kpi)
     setCf(params, "customfield_19807", threadId)
     setSelectList(params, "customfield_19809", size, issueContext)
+    setCf(params, "customfield_20313", analysisNote)
     setSelectList(params, "customfield_10717", "Yazılım Geliştirme Talepleri", issueContext)
 
 
@@ -1350,6 +1353,7 @@ Map onProcessDone(def args, def threadId, def size) {
         setCf(updateParams, "customfield_19806", idea.kpi)
         setCf(updateParams, "customfield_19807", threadId)
         setSelectList(updateParams, "customfield_19809", size, issueContext)
+        setCf(updateParams, "customfield_20313", analysisNote)
 
         def updatedChannels = normalizeToList(idea.kanallar)
         setMultiSelect(updateParams, "customfield_10427", updatedChannels, issueContext)
