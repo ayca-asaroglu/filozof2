@@ -1,145 +1,230 @@
-Sen deneyimli bir Senior Product Designer (UX/UI) ve Design System uzmanısın. Modern SaaS ürünleri (ChatGPT, Claude, Notion, Linear, Slack, Jira, Azure Portal, Intercom, HubSpot, Zendesk vb.) seviyesinde kullanıcı deneyimi tasarlıyorsun.
+Sen deneyimli bir Staff Product Designer, Senior UX Designer ve Design System Architect olarak hareket et.
 
-Bir chatbot uygulamam için sağ altta yer alan "Yardım & Geri Bildirim" bileşenini tasarladım. Genel yapısını beğeniyorum ancak daha modern, premium ve kullanıcı etkileşimini artıracak hale getirmek istiyorum.
+Bir AI chatbot uygulamasının giriş alanını (input composer) modern SaaS standartlarına çıkarmak istiyorum.
 
-Mevcut tasarımın amacı:
+Önemli Kısıtlar
 
-Kullanıcıların kolayca destek talebi oluşturabilmesi
-Kullanıcıların geri bildirim / öneri gönderebilmesi
-Chat ekranını bozmadan bu özelliklere erişebilmesi
+Mevcut yerleşim (layout) korunacak.
+Bileşenlerin yeri değişmeyecek.
+Yeni özellik eklenmeyecek.
+Yeni buton eklenmeyecek.
+Bilgi mimarisi değişmeyecek.
+Tasarım sade kalacak.
+Amaç yalnızca premium hissini artırmak.
 
-Bu tasarımı aşağıdaki kriterlere göre değerlendir ve geliştir.
+Hedef, ChatGPT, Claude, Notion AI, Linear, Cursor ve Apple Human Interface seviyesinde kaliteli, rafine ve güven veren bir arayüz elde etmek.
 
-İstediğim iyileştirmeler
-1. Görsel Hiyerarşi
-Kartların okunabilirliğini artır.
-Başlık, açıklama ve ikonların ağırlığını yeniden düzenle.
-Daha premium bir görünüm oluştur.
-Gerekiyorsa boşluk (spacing), padding ve radius değerlerini öner.
-2. Modern UI
-2025 tasarım trendlerine uygun öneriler sun.
-Gerekiyorsa gradient, blur, shadow veya glassmorphism gibi efektleri dengeli şekilde öner.
-Kartların daha canlı görünmesini sağla.
-3. Mikro Etkileşimler
+Değerlendirmeni istediğim alanlar
+1. Visual Polish
 
-Aşağıdaki durumlar için animasyon öner:
+Aşağıdaki bileşenleri tek tek değerlendir.
 
-FAB açılırken
-Panel açılırken
-Kart hover
-Kart tıklama
-Ok ikonunun hareketi
-FAB hover
-FAB kapatılırken
+Input
+Gönder butonu
+Mikrofon ikonu
+Placeholder
+Border
+Shadow
+Radius
+Padding
+Spacing
 
-Animasyon sürelerini de öner (örn. 150ms, 250ms).
+Her biri için
 
-4. FAB Tasarımı
+mevcut durum
+neden premium hissettirmediği
+önerilen iyileştirme
 
-Şu an FAB yalnızca "?" ikonu içeriyor.
+şeklinde yaz.
 
-Alternatif öneriler sun.
+2. Elevation
 
-Örneğin;
+Input kartının daha kaliteli görünmesi için
 
-?
-💬
-🎧
-✨
-Yardım
-Yardım +
+Shadow
+Blur
+Border
+Ambient light
+Layering
 
-Hangisinin neden daha doğru olduğunu UX açısından açıkla.
+önerileri ver.
 
-5. Kart İçeriği
+CSS seviyesinde uygulanabilecek değerler öner.
 
-Şu an iki kart var:
+Örneğin
 
-Destek Talebi Oluştur
-Geri Bildirim Gönder
+Shadow opacity
+Blur radius
+Border opacity
+3. Typography
 
-Başlık ve açıklamaları daha kullanıcı odaklı hale getir.
+Aşağıdaki metinleri değerlendir.
 
-Örneğin daha sıcak, daha teşvik edici ve daha anlaşılır metinler öner.
+Placeholder
 
-6. Bilgi Mimarisi
+Bilgilendirme metni
 
-İki kart yeterli mi?
+Klavye kısayolları
 
-Eklenmesi faydalı olabilecek yeni seçenekler öner.
+Font weight
 
-Örneğin:
+Letter spacing
 
-Yardım Merkezi
-Sık Sorulan Sorular
-Yenilikler
-Dokümantasyon
+Line height
 
-Ancak panelin karmaşıklaşmamasına dikkat et.
+Opacity
 
-7. Accessibility
+Hangileri daha rafine olabilir?
 
-Aşağıdaki konuları değerlendir.
+4. Spacing
 
-Kontrast
-Minimum dokunma alanı
-Keyboard navigation
-Focus state
-Screen reader
-Renk körlüğü
-8. UX
+Premium ürünlerde kullanılan spacing mantığına göre değerlendir.
 
-Kullanıcının yardım panelini keşfetmesini artıracak öneriler sun.
+Örneğin
 
-Örneğin:
+Input yüksekliği
+İç boşluk
+İkon ile metin arası
+Gönder butonu ile kenar arası
+Alt bilgi ile input arası
 
-İlk girişte tooltip
-"Yeni" rozeti
-Bildirim noktası
-Kullanım ipuçları
+Gerekirse 8pt Grid System öner.
 
-Ancak dikkat dağıtıcı olmasın.
+5. Motion Design
 
-9. Premium Görünüm
+Mikro animasyon öner.
 
-Kurumsal bir bankacılık uygulaması olduğu için güven veren ama modern görünen bir tasarım öner.
+Yalnızca aşağıdaki durumlar için.
 
-Intercom, Slack ve Notion seviyesinde sade fakat kaliteli bir görünüm hedefleniyor.
+Input Hover
 
-10. Çıktı Formatı
+Input Focus
 
-Lütfen aşağıdaki formatta cevap ver.
+Placeholder Fade
 
-Güçlü Yönler
+Gönder Butonu Hover
 
-...
+Gönder Butonu Press
 
-İyileştirme Önerileri
+Gönder Butonu Disable
 
-...
+Mikrofon Hover
 
-Yeni Metin Önerileri
+Animasyon süreleri
 
-...
+Easing
 
-Mikro Animasyonlar
+Scale
 
-...
+Opacity
 
-Spacing Önerileri
+Translate
 
-...
+değerlerini belirt.
 
-Shadow Önerileri
+6. Color Refinement
 
-...
+Renkleri tamamen değiştirme.
 
-Hover Durumları
+Sadece daha premium görünmeleri için öner.
 
-...
+Örneğin
 
-Final Tasarım Konsepti
+Border
+Background
+Hover
+Focus Ring
+Disabled State
+7. Premium Details
 
-Modern SaaS seviyesinde tek bir nihai tasarım önerisi oluştur.
+Modern ürünlerde kullanıcı fark etmese bile kalite hissi oluşturan küçük detayları öner.
 
-Tasarımı mümkün olduğunca sade, premium ve kullanıcı dostu olacak şekilde optimize et. Gereksiz öğeler ekleme; her önerinin UX açısından neden faydalı olduğunu da açıkla.
+Örneğin
+
+Focus Ring
+Inner Shadow
+Soft Highlight
+Hairline Border
+Hover Glow
+Active State
+Cursor değişimi
+Basma efekti
+8. Accessibility
+
+Premium görünüm korunurken
+
+WCAG
+
+Focus
+
+Contrast
+
+Touch Target
+
+Keyboard
+
+Screen Reader
+
+açısından geliştirme öner.
+
+9. Design Tokens
+
+Sonunda aşağıdaki gibi öneriler oluştur.
+
+Border Radius
+
+Shadow
+
+Transition
+
+Border Color
+
+Focus Ring
+
+Spacing
+
+Typography
+
+Opacity
+
+Animation Duration
+
+Animation Curve
+
+10. Geliştirici Gereksinimleri
+
+Son bölümde geliştiricinin doğrudan uygulayabileceği maddeler oluştur.
+
+Örneğin
+
+✅ Input yüksekliği 64px yapılacak.
+
+✅ Border #E6EAF2 olacak.
+
+✅ Hover'da border opacity %15 artacak.
+
+✅ Focus durumunda 2px primary focus ring gösterilecek.
+
+✅ Shadow değeri ... olacak.
+
+✅ Gönder butonu hover'da scale(1.03) olacak.
+
+✅ Placeholder opacity %60 olacak.
+
+Her gereksinim mümkün olduğunca sayısal değerler içersin.
+
+Çıktı Formatı
+
+Lütfen cevabı aşağıdaki başlıklarla oluştur.
+
+Genel Değerlendirme
+Premium Hissi Azaltan Noktalar
+Görsel İyileştirmeler
+Motion & Interaction
+Typography
+Color Refinement
+Design Tokens
+Developer Requirements
+Final Premium Tasarım Özeti
+
+Önemli: Tasarımı yeniden tasarlama. Mevcut düzeni koruyarak yalnızca premium hissini artıracak, rafine ve profesyonel dokunuşlar öner. Tüm öneriler uygulanabilir ve geliştiriciye aktarılabilecek teknik detaylar içersin.
