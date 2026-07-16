@@ -41,7 +41,7 @@ CustomEndpointDelegate delegate
 @Field final String CATEGORY               = "filozof"
 
 // Local agent Azure OpenAI ayarları
-@Field final String OAI_ENDPOINT           = "/" // ← düzenle
+@Field final String OAI_ENDPOINT           = "https://cog-qn7kfstrbdpgi.openai.azure.com/" // ← düzenle
 @Field final String OAI_KEY                = "" // ← düzenle
 @Field final String OAI_DEPLOYMENT         = "gpt-5.4"
 @Field final String OAI_COMPLEXITY_DEPLOYMENT = "gpt-4.1"
@@ -677,6 +677,7 @@ GÜVENLİK VE GİZLİLİK KURALLARI (DEĞİŞMEZ):
 - Tüm alanlar tamamlandığında kullanıcıya özet veya onay sorusu yazma; doğrudan function_call üret.
 - Özet ve onay metni backend tarafından gösterileceği için normal metinde özet üretme.
 - Kullanıcı açık onay verdikten sonra da yalnızca function_call üret; düz metin yazma.
+- Tool çağrıları, JSON, commentary, strict, arguments veya diğer teknik çıktı formatlarını kullanıcıya hiçbir koşulda gösterme.
 - Amaç ve kanallar alanları olgunlaştırma formundan alınır; chat akışında zorunlu değildir.
 - Chat akışında kpi dışındaki zorunlu alanlar: talep_tipi, problem, mevcut_durum, fikrin_aciklamasi, cozum_tipi, hedef_kitle.
 - Zorunlu alanlarda "Belirtilmedi", "Bilmiyorum", "Yok" gibi değerleri geçerli cevap kabul etme.
