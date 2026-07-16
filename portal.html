@@ -6280,6 +6280,7 @@ function renderMarkdown(text) {
               selected.add(name);
               opinions[name] = normalizeOpinionEntry(opinions[name]);
             }
+            msInput.value = '';
             msInput.focus(); render(); openDropdown();
           });
           msDropdown.appendChild(row);
@@ -6519,6 +6520,7 @@ function renderMarkdown(text) {
           row.addEventListener('click', () => {
             if(selected.has(name)) selected.delete(name);
             else selected.add(name);
+            input.value = '';
             render();
             openDropdown();
             input.focus();
