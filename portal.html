@@ -252,13 +252,13 @@
     .header-right{margin-left:auto;display:flex;gap:8px;align-items:center;}
 
     .tiny-btn{
-      height:34px;
+      height:36px;
       padding:0 14px;
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,0.3);
-      background:rgba(255,255,255,0.1);
+      border-radius:var(--radius-lg);
+      border:1px solid transparent;
+      background:transparent;
       cursor:pointer;
-      color:rgba(255,255,255,0.95);
+      color:rgba(255,255,255,0.88);
       font-size:13px;
       font-weight:600;
       font-family:inherit;
@@ -266,24 +266,37 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      gap:7px;
       white-space:nowrap;
       text-decoration:none;
-      transition:background .15s, border-color .15s, color .15s;
+      transition:background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease, box-shadow .15s ease;
     }
+    .tiny-btn svg{ display:block; flex-shrink:0; }
+    /* Anasayfa — sessiz ghost (uygulamadan çıkış linki, ikincil) */
     .tiny-btn:hover{
-      background:rgba(255,255,255,0.2);
-      border-color:rgba(255,255,255,0.5);
+      background:rgba(255,255,255,0.16);
       color:#fff;
     }
+    .tiny-btn:active{ transform:translateY(0.5px); }
+    .tiny-btn:focus-visible{ outline:none; box-shadow:0 0 0 2px rgba(255,255,255,0.75); }
+    /* Fikirlerim — dolu beyaz CTA (uygulama içi asıl eylem) */
     .tiny-btn.primary{
-      background:rgba(255,255,255,0.18);
-      color:#fff;
-      border-color:rgba(255,255,255,0.45);
+      background:#fff;
+      color:var(--primary);
+      border-color:#fff;
+      box-shadow:0 1px 2px rgba(9,30,66,0.18);
     }
     .tiny-btn.primary:hover{
-      background:rgba(255,255,255,0.28);
-      border-color:rgba(255,255,255,0.6);
+      background:#fff;
+      color:var(--primary-dark);
+      transform:translateY(-1px);
+      box-shadow:0 4px 12px rgba(9,30,66,0.24);
     }
+    .tiny-btn.primary:active{
+      transform:translateY(0);
+      box-shadow:0 1px 2px rgba(9,30,66,0.18);
+    }
+    .tiny-btn.primary:focus-visible{ box-shadow:0 0 0 2px var(--primary), 0 0 0 4px rgba(255,255,255,0.85); }
     .tiny-btn.has-notification{
       position:relative;
       overflow:visible;
@@ -2333,8 +2346,14 @@
     <main class="main">
       <header class="header">
         <div class="header-right">
-          <a class="tiny-btn" id="btnHome" href="https://atlas.fibabanka.local/jira/rest/scriptrunner/latest/custom/navigationHub">Anasayfa</a>
-          <button class="tiny-btn primary" id="btnCalls" onclick="openCallsPanel()">Fikirlerim</button>
+          <a class="tiny-btn" id="btnHome" href="https://atlas.fibabanka.local/jira/rest/scriptrunner/latest/custom/navigationHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"/></svg>
+            <span>Anasayfa</span>
+          </a>
+          <button class="tiny-btn primary" id="btnCalls" onclick="openCallsPanel()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.2 1 2.5h6c0-1.3.5-2 1-2.5A6 6 0 0 0 12 3z"/></svg>
+            <span>Fikirlerim</span>
+          </button>
         </div>
       </header>
 
