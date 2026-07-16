@@ -1270,6 +1270,22 @@ Map onProcessDone(def args, def threadId, def size) {
 
     Map idea = new JsonSlurper().parseText(argumentsRaw) as Map
 
+    // Kullanıcının anlattığı problem/mevcut durum/çözüm/açıklamada "mobil" geçiyorsa,
+    // kanallar alanı LLM tarafından boş bırakılmış veya eksik doldurulmuş olsa bile
+    // Mobil Bankacılık kanalı otomatik eklensin. LLM'in bunu her seferinde tutarlı
+    // şekilde çıkarması garanti olmadığı için burada deterministik olarak zorunlu kılıyoruz.
+    def mobileTr = new Locale("tr", "TR")
+    boolean mentionsMobile = [idea.problem, idea.mevcut_durum, idea.cozum_tipi, idea.fikrin_aciklamasi, idea.fikrin_ozeti]
+        .any { it?.toString()?.toLowerCase(mobileTr)?.contains("mobil") }
+    if (mentionsMobile) {
+        List<String> channels = (idea.kanallar instanceof List) ? new ArrayList((List) idea.kanallar) : []
+        boolean hasMobileChannel = channels.any { it?.toString()?.toLowerCase(mobileTr)?.contains("mobil") }
+        if (!hasMobileChannel) {
+            channels << "Mobil Bankacılık"
+            idea.kanallar = channels
+        }
+    }
+
     // ---------- 2) Jira services ----------
     def issueService = ComponentAccessor.getComponent(IssueService)
     def searchService = ComponentAccessor.getComponent(SearchService)
