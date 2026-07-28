@@ -1,0 +1,13 @@
+requirement
+
+HC talep tipi ve alt seçeneğinin  iş biriminden alınması ve olgunluk kontrolü kısmında alınan bilgilerin set edilerek görüntülenmesi. Deadline: 28/07
+*** Yazılım Geliştirme seçildiğinde; "İş İhtiyacı" / "Stratejik Geliştirme" / "Yasal Zorunluluk" / "Denetim Bulgusu" seçenekleri çıksın.
+
+*** Yasal zorunluluk seçildiğinde; "Yasal zorunluluk açıklaması" ve "Yasal zorunluluk tarihi". Her iki kısımda zorunlu alan. Tarih ksımı takvim açılarak s
+
+customFieldId=10400
+Business (İş Birimi) Talepleri
+Stratejik geliştirme,Yasal zorunluluk,Denetim bulgusu,İş ihtiyacı
+
+yasal zorunluluk açıklaması : customFieldId=10406
+yasal zorunluluk tarihi : customFieldId=10405
