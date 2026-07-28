@@ -815,7 +815,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                         "enum": [
                             "Çağrı Merkezi", "İnternet Bankacılığı", "Mobil Bankacılık",
                             "Şube", "ATM", "Web", "Video Bankacılık", "IVR",
-                            "Servis Bankacılığı"
+                            "Servis Bankacılığı", "Taksitlio", "Getirfinans", "Online kredi"
                         ]
                     ],
                     uniqueItems: true
