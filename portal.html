@@ -2497,6 +2497,11 @@
                   <input class="q-input" id="yasalTarih" type="date">
                 </div>
 
+                <div class="q-item required is-hidden" id="bulguKoduItem">
+                  <label>Bulgu Kodu</label>
+                  <input class="q-input" id="bulguKodu" type="text" placeholder="Denetim bulgusu kodunu giriniz...">
+                </div>
+
                 <div class="q-item required" id="qAmacItem">
                   <label>Amaç</label>
                   <select class="q-input q-select" id="qAmacSelect">
@@ -4274,17 +4279,26 @@ function renderMarkdown(text) {
       setQuestion7Visibility(selectedChannels);
     }
 
-    // Talep Tipi "Yasal Zorunluluk" seçilince yasal açıklama + son tarih alanlarını göster/gizle.
+    // Talep Tipi'ne göre koşullu alanları göster/gizle:
+    //  - "Yasal Zorunluluk"  → açıklama + son tarih
+    //  - "Denetim Bulgusu"   → bulgu kodu
     function syncTalepTipiDetails(){
       const sel = document.getElementById('qTalepTipiSelect');
-      const isYasal = !!sel && sel.value === 'Yasal Zorunluluk';
+      const val = sel ? sel.value : '';
+      const isYasal = val === 'Yasal Zorunluluk';
+      const isDenetim = val === 'Denetim Bulgusu';
       ['yasalAciklamaItem', 'yasalTarihItem'].forEach(id => {
         const el = document.getElementById(id);
         if(el) el.classList.toggle('is-hidden', !isYasal);
       });
+      const bulguItem = document.getElementById('bulguKoduItem');
+      if(bulguItem) bulguItem.classList.toggle('is-hidden', !isDenetim);
       if(!isYasal){
         const a = document.getElementById('yasalAciklama'); if(a) a.value = '';
         const t = document.getElementById('yasalTarih'); if(t) t.value = '';
+      }
+      if(!isDenetim){
+        const b = document.getElementById('bulguKodu'); if(b) b.value = '';
       }
     }
     window.syncTalepTipiDetails = syncTalepTipiDetails;
@@ -4435,6 +4449,7 @@ function renderMarkdown(text) {
       const snapshot = {
         qTalepTipiSelect:getVal('qTalepTipiSelect'),
         yasalAciklama:getVal('yasalAciklama'), yasalTarih:getVal('yasalTarih'),
+        bulguKodu:getVal('bulguKodu'),
         qAmacSelect:getVal('qAmacSelect'), qChannelsValue:getSelectedChannelsValue(),
         stakeholdersValue, stakeholderOpinionsValue,
         q2Select:getVal('q2Select'), q2Detail:getVal('q2Detail'),
@@ -4478,6 +4493,7 @@ function renderMarkdown(text) {
       setVal('qTalepTipiSelect', state.qTalepTipiSelect);
       setVal('yasalAciklama', state.yasalAciklama);
       setVal('yasalTarih', state.yasalTarih);
+      setVal('bulguKodu', state.bulguKodu);
       setVal('qAmacSelect', state.qAmacSelect);
       if(!mergeNonEmpty || (state.qChannelsValue || '').toString().trim()) {
         setSelectedValues('qChannelsSelect', splitCsvValues(state.qChannelsValue));
@@ -4556,6 +4572,7 @@ function renderMarkdown(text) {
         'customfield_10400': { id: 'qTalepTipiSelect',        type: 'cascade' },
         'customfield_10406': { id: 'yasalAciklama',           type: 'text'   },
         'customfield_10405': { id: 'yasalTarih',              type: 'date'   },
+        'customfield_10407': { id: 'bulguKodu',               type: 'text'   },
         'customfield_10722': { id: 'q2Select',               type: 'select' },
         'customfield_19812': { id: 'q2Detail',               type: 'text'   },
         'customfield_16503': { id: 'q3Select',               type: 'select' },
@@ -4908,14 +4925,16 @@ function renderMarkdown(text) {
       const talepTipiCascade = talepTipiChild
         ? { parent: 'Business (İş Birimi) Talepleri', child: talepTipiChild }
         : '';
-      // Yasal alanları yalnızca "Yasal Zorunluluk" seçiliyken gönder; aksi halde eski/stale
+      // Koşullu alanları yalnızca ilgili talep tipi seçiliyken gönder; aksi halde eski/stale
       // değer Jira'ya yazılmasın.
       const isYasal = talepTipiChild === 'Yasal Zorunluluk';
+      const isDenetim = talepTipiChild === 'Denetim Bulgusu';
 
       return {
         talepTipi: talepTipiCascade,
         yasalAciklama: isYasal ? (document.getElementById('yasalAciklama')?.value || '') : '',
         yasalTarih: isYasal ? (document.getElementById('yasalTarih')?.value || '') : '',
+        bulguKodu: isDenetim ? (document.getElementById('bulguKodu')?.value || '') : '',
         amac: document.getElementById('qAmacSelect')?.value || '',
         kanallar: getSelectedChannelsValue(),
         stakeholders: document.getElementById('stakeholdersValue')?.value || '',
@@ -5043,6 +5062,11 @@ function renderMarkdown(text) {
         const yt = document.getElementById('yasalTarih');
         if(yt && !isHidden(yt) && !(yt.value||'').trim()) markError(yt);
       }
+      // Denetim Bulgusu seçiliyse bulgu kodu zorunlu.
+      if(qTalepTipiSelect && qTalepTipiSelect.value === 'Denetim Bulgusu'){
+        const bk = document.getElementById('bulguKodu');
+        if(bk && !isHidden(bk) && !(bk.value||'').trim()) markError(bk);
+      }
       const qAmacSelect = document.getElementById('qAmacSelect');
       if(qAmacSelect && !qAmacSelect.value) markError(qAmacSelect);
       const qChannelsSelect = document.getElementById('qChannelsSelect');
@@ -5147,11 +5171,13 @@ function renderMarkdown(text) {
 
       if(previewCustomFields){
         previewCustomFields.innerHTML = '';
-        // Business Score alanları kendi bölümünde (previewAnswersBusiness, collectAnswers'tan)
-        // zaten gösteriliyor ve boş olanlar orada otomatik filtreleniyor; burada tekrar
-        // gösterilmesinler (boş olsalar bile "—" satırı olarak görünmesinler).
+        // Business Score + Talep Tipi/Yasal Zorunluluk alanları kendi bölümünde
+        // (Olgunlaştırma/Business Score Soruları — collectAnswers'tan) zaten gösteriliyor ve boş
+        // olanlar orada otomatik filtreleniyor; burada tekrar gösterilmesinler. Ayrıca cascade
+        // alanları (10400 gibi) burada nesne olarak gelip "[object Object]" basardı.
         const hiddenCustomFieldIds = new Set([
           'customfield_19801', 'customfield_10427',
+          'customfield_10400', 'customfield_10405', 'customfield_10406', 'customfield_10407',
           'customfield_20209', 'customfield_20210', 'customfield_20211', 'customfield_20212',
           'customfield_20213', 'customfield_20214', 'customfield_20215', 'customfield_20216',
           'customfield_20217'
