@@ -25,6 +25,10 @@ fibarprIdeaCalls(
     "customfield_19804",
     "customfield_19805",
     "customfield_19806",
+    // Talep Tipi (cascade) + Yasal Zorunluluk açıklama/son tarih alanları
+    "customfield_10400",
+    "customfield_10406",
+    "customfield_10405",
     // Business Score cascade select list alanları (approve.groovy FIELD_MAP ile aynı)
     "customfield_20209",
     "customfield_20210",

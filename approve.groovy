@@ -27,6 +27,9 @@ fibarprIdeaApprove(
 
   // UI'dan gelen form anahtarlarını Jira custom field'a map eder
   final Map<String, String> FIELD_MAP = [
+    talepTipi                   : "customfield_10400",
+    yasalAciklama               : "customfield_10406",
+    yasalTarih                  : "customfield_10405",
     amac                        : "customfield_19801",
     kanallar                    : "customfield_10427",
     // stakeholders             : "customfield_10493",
@@ -76,6 +79,9 @@ fibarprIdeaApprove(
 
   // Label -> form key
   final Map<String, String> LABEL_TO_FORM_KEY = [
+    "Talep Tipi": "talepTipi",
+    "Yasal Zorunluluk Açıklaması": "yasalAciklama",
+    "Yasal Zorunluluk Son Tarih": "yasalTarih",
     "Amaç": "amac",
     "Etkilenecek Kanallar": "kanallar",
     "Paydaşlar": "stakeholders",
@@ -356,6 +362,7 @@ fibarprIdeaApprove(
 
   // ===== Cascade select list alanları =====
   final Set<String> CASCADE_FIELDS = [
+    "customfield_10400",
     "customfield_20209", "customfield_20210", "customfield_20211", "customfield_20212",
     "customfield_20213", "customfield_20214", "customfield_20215", "customfield_20216",
     "customfield_20217"
@@ -405,6 +412,23 @@ fibarprIdeaApprove(
     if (!str && !(raw instanceof Collection) && !(raw instanceof Map)) return null
 
     def typeKey = cf?.customFieldType?.key ?: ""
+
+    // Tarih alanları: frontend <input type="date"> ISO (yyyy-MM-dd) gönderir; Jira datepicker
+    // alanı IssueInputParameters üzerinden kendi yapılandırılmış formatını bekler. Aynı format
+    // property'sini + varsayılan locale'i kullanarak round-trip yapıyoruz.
+    if (typeKey.contains("datepicker") || typeKey.contains("datetime")) {
+      if (!str) return null
+      try {
+        def dateObj = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
+        def fmtKey = typeKey.contains("datetime") ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
+        def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) ?: "dd/MMM/yy"
+        return new java.text.SimpleDateFormat(fmt).format(dateObj)
+      } catch (ignored) {
+        // Zaten Jira formatındaysa (ISO değilse) olduğu gibi bırak.
+        return str
+      }
+    }
+
     def isSelect = typeKey.contains("select")
     if (!isSelect) return str
 

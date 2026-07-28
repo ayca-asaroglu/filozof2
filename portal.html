@@ -2317,7 +2317,7 @@
     .brand-with-icon{ display:flex; align-items:center; gap:8px; }
     .brand-with-icon img{ width:22px; height:22px; border-radius:50%; object-fit:cover; }
   </style>
-<script>NS_CSM_td=1628725550;NS_CSM_pd=275116664;NS_CSM_u="/clm10";NS_CSM_col="AAAAAAW4tK9TvSzGFOVdac0B21K0KsD/NBl7hoA5Nd4ql9YCAxEhZxfKshmprGPjgi0DKlVU7sqU0tLQzIjU+T77wb0y";</script><script type="text/javascript">function sendTimingInfoInit(){setTimeout(sendTimingInfo,0)}function sendTimingInfo(){var wp=window.performance;if(wp){var c1,c2,t;c1=wp.timing;if(c1){var cm={};cm.ns=c1.navigationStart;if((t=c1.unloadEventStart)>0)cm.us=t;if((t=c1.unloadEventEnd)>0)cm.ue=t;if((t=c1.redirectStart)>0)cm.rs=t;if((t=c1.redirectEnd)>0)cm.re=t;cm.fs=c1.fetchStart;cm.dls=c1.domainLookupStart;cm.dle=c1.domainLookupEnd;cm.cs=c1.connectStart;cm.ce=c1.connectEnd;if((t=c1.secureConnectionStart)>0)cm.scs=t;cm.rqs=c1.requestStart;cm.rss=c1.responseStart;cm.rse=c1.responseEnd;cm.dl=c1.domLoading;cm.di=c1.domInteractive;cm.dcls=c1.domContentLoadedEventStart;cm.dcle=c1.domContentLoadedEventEnd;cm.dc=c1.domComplete;if((t=c1.loadEventStart)>0)cm.ls=t;if((t=c1.loadEventEnd)>0)cm.le=t;cm.tid=NS_CSM_td;cm.pid=NS_CSM_pd;cm.ac=NS_CSM_col;var xhttp=new XMLHttpRequest();if(xhttp){var JSON=JSON||{};JSON.stringify=JSON.stringify||function(ob){var t=typeof(ob);if(t!="object"||ob===null){if(t=="string")ob='"'+ob+'"';return String(ob);}else{var n,v,json=[],arr=(ob&&ob.constructor==Array);for(n in ob){v=ob[n];t=typeof(v);if(t=="string")v='"'+v+'"';else if(t=="object"&&v!==null)v=JSON.stringify(v);json.push((arr?"":'"'+n+'":')+String(v));}return(arr?"[":"{")+String(json)+(arr?"]":"}");}};xhttp.open("POST",NS_CSM_u,true);xhttp.send(JSON.stringify(cm));}}}}if(window.addEventListener)window.addEventListener("load",sendTimingInfoInit,false);else if(window.attachEvent)window.attachEvent("onload",sendTimingInfoInit);else window.onload=sendTimingInfoInit;</script></head>
+</head>
 
 <body>
   <div class="app">
@@ -2476,6 +2476,27 @@
             <div class="mature-stage active" id="formStage">
               <div class="question-title">Olgunlaştırma Soruları</div>
               <div class="question-grid">
+                <div class="q-item required" id="qTalepTipiItem">
+                  <label>Talep Tipi</label>
+                  <select class="q-input q-select" id="qTalepTipiSelect">
+                    <option value="" selected>Seçiniz</option>
+                    <option value="İş İhtiyacı">İş İhtiyacı</option>
+                    <option value="Stratejik Geliştirme">Stratejik Geliştirme</option>
+                    <option value="Yasal Zorunluluk">Yasal Zorunluluk</option>
+                    <option value="Denetim Bulgusu">Denetim Bulgusu</option>
+                  </select>
+                </div>
+
+                <div class="q-item required is-hidden" id="yasalAciklamaItem">
+                  <label>Yasal Zorunluluk Açıklaması</label>
+                  <textarea class="q-input" id="yasalAciklama" rows="2" placeholder="Yasal zorunluluğun kapsamını ve gerekçesini yazınız..."></textarea>
+                </div>
+
+                <div class="q-item required is-hidden" id="yasalTarihItem">
+                  <label>Yasal Zorunluluk Son Tarih</label>
+                  <input class="q-input" id="yasalTarih" type="date">
+                </div>
+
                 <div class="q-item required" id="qAmacItem">
                   <label>Amaç</label>
                   <select class="q-input q-select" id="qAmacSelect">
@@ -4253,6 +4274,21 @@ function renderMarkdown(text) {
       setQuestion7Visibility(selectedChannels);
     }
 
+    // Talep Tipi "Yasal Zorunluluk" seçilince yasal açıklama + son tarih alanlarını göster/gizle.
+    function syncTalepTipiDetails(){
+      const sel = document.getElementById('qTalepTipiSelect');
+      const isYasal = !!sel && sel.value === 'Yasal Zorunluluk';
+      ['yasalAciklamaItem', 'yasalTarihItem'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.toggle('is-hidden', !isYasal);
+      });
+      if(!isYasal){
+        const a = document.getElementById('yasalAciklama'); if(a) a.value = '';
+        const t = document.getElementById('yasalTarih'); if(t) t.value = '';
+      }
+    }
+    window.syncTalepTipiDetails = syncTalepTipiDetails;
+
     // Business Score başlıkları altında en fazla bir seçenek işaretlenebilir.
     // "1C) Operasyonel Verimlilik" iki alanı (İşlem Adedi + İşlem Süresi) birlikte tek bir seçenek sayılır.
     const BUSINESS_SCORE_GROUPS = [
@@ -4397,6 +4433,8 @@ function renderMarkdown(text) {
         stakeholderOpinionsValue = getVal('stakeholderOpinionsValue');
       }
       const snapshot = {
+        qTalepTipiSelect:getVal('qTalepTipiSelect'),
+        yasalAciklama:getVal('yasalAciklama'), yasalTarih:getVal('yasalTarih'),
         qAmacSelect:getVal('qAmacSelect'), qChannelsValue:getSelectedChannelsValue(),
         stakeholdersValue, stakeholderOpinionsValue,
         q2Select:getVal('q2Select'), q2Detail:getVal('q2Detail'),
@@ -4437,6 +4475,9 @@ function renderMarkdown(text) {
         if(!el) return;
         el.value = (value || '').toString();
       };
+      setVal('qTalepTipiSelect', state.qTalepTipiSelect);
+      setVal('yasalAciklama', state.yasalAciklama);
+      setVal('yasalTarih', state.yasalTarih);
       setVal('qAmacSelect', state.qAmacSelect);
       if(!mergeNonEmpty || (state.qChannelsValue || '').toString().trim()) {
         setSelectedValues('qChannelsSelect', splitCsvValues(state.qChannelsValue));
@@ -4459,6 +4500,7 @@ function renderMarkdown(text) {
         );
       }
       syncChannelDrivenVisibility();
+      if(typeof window.syncTalepTipiDetails === 'function') window.syncTalepTipiDetails();
       updateNpsWarning();
       if(typeof window.syncYesNoDetails === 'function') window.syncYesNoDetails();
       if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
@@ -4467,6 +4509,7 @@ function renderMarkdown(text) {
 
     function resetMatureForm(){
       clearFieldErrors();
+      const qTalepTipi = document.getElementById('qTalepTipiSelect'); if(qTalepTipi) qTalepTipi.value = '';
       const qAmac = document.getElementById('qAmacSelect'); if(qAmac) qAmac.value = '';
       setSelectedValues('qChannelsSelect', []);
       ['q2Select','q3Select','q5Select','q8Select','q10Select'].forEach(id => {
@@ -4485,6 +4528,8 @@ function renderMarkdown(text) {
       if(file){ file.value = ''; file.classList.remove('open'); }
       const q7 = document.getElementById('q7Code'); if(q7) q7.value = '';
       if(typeof window.resetStakeholdersSelection === 'function') window.resetStakeholdersSelection();
+      // Talep Tipi sıfırlandı → yasal zorunluluk alanlarını gizle ve temizle.
+      if(typeof window.syncTalepTipiDetails === 'function') window.syncTalepTipiDetails();
       updateNpsWarning();
       if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
     }
@@ -4508,6 +4553,9 @@ function renderMarkdown(text) {
     function prefillMatureFormFromCustomFields(item){
       // Jira custom field ID → form element ID eşlemesi (approve.groovy FIELD_MAP'in tersi)
       const CF_TO_FORM = {
+        'customfield_10400': { id: 'qTalepTipiSelect',        type: 'cascade' },
+        'customfield_10406': { id: 'yasalAciklama',           type: 'text'   },
+        'customfield_10405': { id: 'yasalTarih',              type: 'date'   },
         'customfield_10722': { id: 'q2Select',               type: 'select' },
         'customfield_19812': { id: 'q2Detail',               type: 'text'   },
         'customfield_16503': { id: 'q3Select',               type: 'select' },
@@ -4556,6 +4604,11 @@ function renderMarkdown(text) {
 
         if(mapping.type === 'cascade'){
           el.value = val;
+        } else if(mapping.type === 'date'){
+          // Jira tarih alanı "2026-08-15 00:00:00.0" gibi gelebilir; <input type="date">
+          // için ISO (YYYY-MM-DD) kısmını çıkar. Eşleşme yoksa boş bırak.
+          const m = String(val).match(/\d{4}-\d{2}-\d{2}/);
+          if(m) el.value = m[0];
         } else {
           el.value = val;
           if(mapping.type === 'text' && el.classList.contains('open') === false && val){
@@ -4564,6 +4617,7 @@ function renderMarkdown(text) {
         }
       });
       if(typeof window.syncYesNoDetails === 'function') window.syncYesNoDetails();
+      if(typeof window.syncTalepTipiDetails === 'function') window.syncTalepTipiDetails();
       updateNpsWarning();
       if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
     }
@@ -4848,7 +4902,20 @@ function renderMarkdown(text) {
         return { parent: parentValue, parentId: parentInfo.id || '', child: childValue, childId };
       };
       
+      // Talep Tipi: cascade select — parent sabit "Business (İş Birimi) Talepleri",
+      // child kullanıcının seçtiği değer. customfield_10400'e gönderilir.
+      const talepTipiChild = document.getElementById('qTalepTipiSelect')?.value || '';
+      const talepTipiCascade = talepTipiChild
+        ? { parent: 'Business (İş Birimi) Talepleri', child: talepTipiChild }
+        : '';
+      // Yasal alanları yalnızca "Yasal Zorunluluk" seçiliyken gönder; aksi halde eski/stale
+      // değer Jira'ya yazılmasın.
+      const isYasal = talepTipiChild === 'Yasal Zorunluluk';
+
       return {
+        talepTipi: talepTipiCascade,
+        yasalAciklama: isYasal ? (document.getElementById('yasalAciklama')?.value || '') : '',
+        yasalTarih: isYasal ? (document.getElementById('yasalTarih')?.value || '') : '',
         amac: document.getElementById('qAmacSelect')?.value || '',
         kanallar: getSelectedChannelsValue(),
         stakeholders: document.getElementById('stakeholdersValue')?.value || '',
@@ -4967,6 +5034,15 @@ function renderMarkdown(text) {
       if(stVal && opinionTextareas.length === 0) markError(msControl);
       if(stVal) opinionTextareas.forEach(ta => { if(!(ta.value||'').trim()) markError(ta); });
       if(document.getElementById('q2Select')?.value === 'Evet' && !hasRequiredNpsUnit()){ markError(msControl); updateNpsWarning(); }
+      const qTalepTipiSelect = document.getElementById('qTalepTipiSelect');
+      if(qTalepTipiSelect && !qTalepTipiSelect.value) markError(qTalepTipiSelect);
+      // Yasal Zorunluluk seçiliyse açıklama ve son tarih zorunlu.
+      if(qTalepTipiSelect && qTalepTipiSelect.value === 'Yasal Zorunluluk'){
+        const ya = document.getElementById('yasalAciklama');
+        if(ya && !isHidden(ya) && !(ya.value||'').trim()) markError(ya);
+        const yt = document.getElementById('yasalTarih');
+        if(yt && !isHidden(yt) && !(yt.value||'').trim()) markError(yt);
+      }
       const qAmacSelect = document.getElementById('qAmacSelect');
       if(qAmacSelect && !qAmacSelect.value) markError(qAmacSelect);
       const qChannelsSelect = document.getElementById('qChannelsSelect');
@@ -6419,6 +6495,8 @@ function renderMarkdown(text) {
     if(q2Select && q2Warn){ q2Select.addEventListener('change', updateNpsWarning); updateNpsWarning(); }
     const qChannelsSelect = document.getElementById('qChannelsSelect');
     if(qChannelsSelect){ qChannelsSelect.addEventListener('change', syncChannelDrivenVisibility); syncChannelDrivenVisibility(); }
+    const qTalepTipiSelectEl = document.getElementById('qTalepTipiSelect');
+    if(qTalepTipiSelectEl){ qTalepTipiSelectEl.addEventListener('change', syncTalepTipiDetails); syncTalepTipiDetails(); }
     bindBusinessScoreExclusivity();
 
     searchInput.addEventListener('input', () => {
