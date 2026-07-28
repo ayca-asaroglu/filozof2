@@ -2608,6 +2608,12 @@
                   <label>Ekran Kodu</label>
                   <input class="q-input" id="q7Code" type="text" placeholder="Örn: MOB-001">
                 </div>
+
+                <div class="q-item" id="matureAttachmentItem">
+                  <label>Ek Belgeler</label>
+                  <input class="q-input" id="matureAttachment" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xls,.xlsx">
+                  <div class="q-help">Varsa gerekli evrakları (sözleşme, resmi belge, kurum yazısı) ekleyebilirsiniz.</div>
+                </div>
               </div>
 
               <div class="form-actions">
@@ -4542,6 +4548,7 @@ function renderMarkdown(text) {
       });
       const file = document.getElementById('q8Attachment');
       if(file){ file.value = ''; file.classList.remove('open'); }
+      const matureAtt = document.getElementById('matureAttachment'); if(matureAtt) matureAtt.value = '';
       const q7 = document.getElementById('q7Code'); if(q7) q7.value = '';
       if(typeof window.resetStakeholdersSelection === 'function') window.resetStakeholdersSelection();
       // Talep Tipi sıfırlandı → yasal zorunluluk alanlarını gizle ve temizle.
@@ -4980,6 +4987,10 @@ function renderMarkdown(text) {
         const f = document.getElementById(id)?.files?.[0];
         if(f) files.push(f);
       });
+
+      // Ek Belgeler alanı çoklu dosya destekler — tüm seçilenleri ekle.
+      const matureFiles = document.getElementById('matureAttachment')?.files;
+      if(matureFiles) Array.from(matureFiles).forEach(f => { if(f) files.push(f); });
 
       const attachments = [];
       for(const file of files){
