@@ -1257,51 +1257,124 @@
     .q-help{ margin-top:6px; font-size:12px; color:var(--text-subtle); line-height:1.4; }
 
     /* ── Field guide: yeniden kullanılabilir görsel yardım bileşeni ── */
+    /* Bilgi metni: hafif mavi/gri arka planlı, ince kenarlıklı info card */
     .field-hint{
-      margin-top:6px;
-      display:flex; align-items:flex-start; gap:6px;
-      font-size:12px; line-height:1.45; color:var(--text-subtle);
+      margin-top:10px;
+      display:flex; align-items:flex-start; gap:10px;
+      padding:11px 13px;
+      background:linear-gradient(135deg, rgba(76,154,255,0.08) 0%, rgba(47,93,169,0.05) 100%);
+      border:1px solid rgba(47,93,169,0.18);
+      border-radius:var(--radius-lg);
+      font-size:12.5px; line-height:1.55; color:var(--text-muted);
     }
-    .field-hint-icon{ flex-shrink:0; line-height:1.45; }
+    .field-hint-icon{ flex-shrink:0; color:var(--primary); margin-top:1px; display:grid; place-items:center; }
+    .field-hint-icon svg{ display:block; }
 
-    .field-guide{ margin-top:8px; }
+    .field-guide{ margin-top:14px; }
     .field-guide-toggle{
-      display:inline-flex; align-items:center; gap:6px;
-      margin-left:-8px; padding:6px 8px;
+      display:inline-flex; align-items:center; gap:7px;
+      margin-left:-8px; padding:7px 10px;
       background:transparent; border:none; border-radius:var(--radius-md);
       color:var(--primary); font-size:12.5px; font-weight:600; cursor:pointer;
       transition:background .15s;
     }
     .field-guide-toggle:hover{ background:rgba(47,93,169,0.08); }
     .field-guide-toggle:focus-visible{ outline:2px solid var(--primary-light); outline-offset:2px; }
-    .field-guide-chevron{ font-size:10px; transition:transform .2s ease; }
+    .field-guide-toggle-icon{ display:grid; place-items:center; flex-shrink:0; }
+    .field-guide-toggle-icon svg{ display:block; }
+    .field-guide-chevron{ display:grid; place-items:center; flex-shrink:0; transition:transform .2s ease; }
+    .field-guide-chevron svg{ display:block; }
     .field-guide-toggle[aria-expanded="true"] .field-guide-chevron{ transform:rotate(180deg); }
 
-    .field-guide-panel{ margin-top:8px; animation:fieldGuideIn .18s ease; }
+    .field-guide-panel{ margin-top:12px; animation:fieldGuideIn .18s ease; }
     .field-guide-panel[hidden]{ display:none; }
     @keyframes fieldGuideIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
 
-    .field-guide-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+    .field-guide-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
     @media (max-width:560px){ .field-guide-grid{ grid-template-columns:1fr; } }
 
-    .field-guide-item{ margin:0; display:flex; flex-direction:column; gap:6px; }
-    .field-guide-thumb{
-      width:100%; padding:0;
-      background:var(--bg); border:1px solid var(--border);
-      border-radius:var(--radius-lg); overflow:hidden; cursor:zoom-in;
+    /* Görsel kartı: başlık (açıklama) + görsel tek bir kart içinde */
+    .field-guide-item{
+      margin:0; display:flex; flex-direction:column;
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      background:var(--surface);
+      overflow:hidden;
       box-shadow:var(--shadow-sm);
       transition:box-shadow .15s, border-color .15s, transform .15s;
     }
-    .field-guide-thumb:hover{ box-shadow:var(--shadow-md); border-color:var(--primary-light); transform:translateY(-1px); }
-    .field-guide-thumb:focus-visible{ outline:2px solid var(--primary-light); outline-offset:2px; }
+    .field-guide-item:hover{ box-shadow:var(--shadow-md); border-color:var(--primary-light); transform:translateY(-1px); }
+    .field-guide-item:focus-within{ border-color:var(--primary-light); box-shadow:0 0 0 2px var(--focus-ring); }
+    /* Açıklama artık kartın içinde, belirgin bir başlık şeridi */
+    .field-guide-caption{
+      display:flex; align-items:center; gap:7px;
+      padding:9px 12px;
+      font-size:12.5px; font-weight:650; color:var(--text);
+      background:var(--bg);
+      border-bottom:1px solid var(--border-light);
+      text-align:left;
+    }
+    .field-guide-caption svg{ display:block; color:var(--primary); flex-shrink:0; }
+
+    .field-guide-thumb{
+      position:relative;
+      display:block; width:100%; padding:0;
+      background:var(--bg); border:none; cursor:zoom-in;
+    }
+    .field-guide-thumb:focus-visible{ outline:2px solid var(--primary-light); outline-offset:-2px; }
     .field-guide-thumb img{ display:block; width:100%; height:auto; aspect-ratio:16/10; object-fit:cover; }
+
+    /* "Büyüt" ipucu — görselin üzerinde, hover'da belirginleşir */
+    .field-guide-zoom{
+      position:absolute; right:8px; bottom:8px;
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 9px; border-radius:999px;
+      background:rgba(23,43,77,0.72); color:#fff;
+      font-size:11px; font-weight:600; letter-spacing:.2px;
+      opacity:0; transform:translateY(4px);
+      transition:opacity .15s ease, transform .15s ease;
+      pointer-events:none;
+    }
+    .field-guide-zoom svg{ display:block; }
+    .field-guide-thumb:hover .field-guide-zoom,
+    .field-guide-thumb:focus-visible .field-guide-zoom{ opacity:1; transform:translateY(0); }
+
+    /* Ekran kodunun konumunu işaretleyen kırmızı çerçeve (görsel üstünde) */
+    .fg-marker{
+      position:absolute; box-sizing:border-box;
+      border:2.5px solid var(--danger); border-radius:6px;
+      box-shadow:0 0 0 3px rgba(222,53,11,0.22), inset 0 0 0 1px rgba(255,255,255,0.65);
+      pointer-events:none;
+    }
+    .fg-marker.high{ animation:fgMarkerPulse 1.8s ease-out infinite; }
+    @keyframes fgMarkerPulse{
+      0%{ box-shadow:0 0 0 0 rgba(222,53,11,0.55), inset 0 0 0 1px rgba(255,255,255,0.65); }
+      70%{ box-shadow:0 0 0 9px rgba(222,53,11,0), inset 0 0 0 1px rgba(255,255,255,0.65); }
+      100%{ box-shadow:0 0 0 0 rgba(222,53,11,0), inset 0 0 0 1px rgba(255,255,255,0.65); }
+    }
+    .fg-marker-label{
+      position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+      display:inline-flex; align-items:center; gap:4px;
+      background:var(--danger); color:#fff;
+      font-size:10.5px; font-weight:700; white-space:nowrap;
+      padding:3px 8px; border-radius:999px;
+      box-shadow:0 3px 8px rgba(222,53,11,0.38);
+    }
+    .fg-marker-label::after{
+      content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+      border:5px solid transparent; border-top-color:var(--danger); border-bottom-width:0;
+    }
+
     .field-guide-thumb.is-empty{
-      cursor:default; box-shadow:none; border-style:dashed;
-      aspect-ratio:16/10; display:grid; place-items:center; gap:4px;
+      cursor:default;
+      aspect-ratio:16/10; display:grid; place-items:center; gap:6px;
       padding:12px; text-align:center; color:var(--text-subtle); font-size:12px;
     }
-    .field-guide-thumb.is-empty:hover{ transform:none; box-shadow:none; border-color:var(--border); }
-    .field-guide-caption{ font-size:12px; color:var(--text-subtle); text-align:center; }
+    .field-guide-thumb.is-empty svg{ color:var(--text-disabled); }
+    @media (prefers-reduced-motion: reduce){
+      .fg-marker.high, .img-lightbox-marker{ animation:none; }
+      .field-guide-item{ transition:none; }
+    }
 
     /* Görsel lightbox */
     .img-lightbox{
@@ -1311,15 +1384,28 @@
     }
     .img-lightbox.open{ display:flex; }
     .img-lightbox-figure{
-      margin:0; max-width:min(1100px, 100%); max-height:100%;
-      display:flex; flex-direction:column; gap:12px; align-items:center;
+      margin:0; max-width:min(1200px, 100%); max-height:100%;
+      display:flex; flex-direction:column; gap:14px; align-items:center;
+    }
+    .img-lightbox-media{
+      position:relative; display:inline-block;
+      max-width:100%; max-height:84vh; line-height:0;
     }
     .img-lightbox-img{
-      max-width:100%; max-height:80vh; object-fit:contain;
+      max-width:100%; max-height:84vh; object-fit:contain;
       border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,0.2);
       box-shadow:var(--shadow-lg); background:var(--surface);
     }
-    .img-lightbox-caption{ color:#fff; font-size:13px; text-align:center; }
+    /* Lightbox içindeki kırmızı işaret — .fg-marker ile aynı görünüm */
+    .img-lightbox-marker{
+      position:absolute; box-sizing:border-box;
+      border:3px solid var(--danger); border-radius:8px;
+      box-shadow:0 0 0 4px rgba(222,53,11,0.22), inset 0 0 0 1px rgba(255,255,255,0.65);
+      pointer-events:none; animation:fgMarkerPulse 1.8s ease-out infinite;
+    }
+    .img-lightbox-marker[hidden]{ display:none; }
+    .img-lightbox-marker .fg-marker-label{ font-size:12px; padding:4px 10px; }
+    .img-lightbox-caption{ color:#fff; font-size:13.5px; font-weight:600; text-align:center; }
     .img-lightbox-close{
       position:absolute; top:16px; right:16px;
       width:36px; height:36px; border-radius:var(--radius-md);
@@ -1328,33 +1414,91 @@
       transition:background .15s;
     }
     .img-lightbox-close:hover{ background:rgba(255,255,255,0.24); }
-    .mature-file-list{ margin-top:8px; display:flex; flex-direction:column; gap:6px; }
-    .mature-file-row{
-      display:flex; align-items:center; gap:8px;
-      padding:6px 10px;
+    /* ===== Ek Belgeler — modern attachment component ===== */
+    .attach{ margin-top:8px; display:flex; flex-direction:column; gap:10px; }
+    /* Native input görünmez ama erişilebilir kalır; etkileşim dropzone üzerinden. */
+    .attach-input{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+    }
+    .attach-dropzone{
+      display:flex; align-items:center; gap:14px; width:100%;
+      padding:16px 18px; text-align:left; cursor:pointer;
+      background:var(--bg);
+      border:1.5px dashed var(--border);
+      border-radius:var(--radius-lg);
+      font-family:inherit; color:var(--text-muted);
+      transition:border-color .15s, background .15s, box-shadow .15s;
+    }
+    .attach-dropzone:hover{ border-color:var(--primary-light); background:rgba(76,154,255,0.06); }
+    .attach-dropzone:focus-visible{ outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px var(--focus-ring); }
+    .attach.is-dragover .attach-dropzone{
+      border-color:var(--primary); border-style:solid;
+      background:rgba(76,154,255,0.10); box-shadow:0 0 0 3px var(--focus-ring);
+    }
+    .attach-dz-icon{
+      flex-shrink:0; width:42px; height:42px; border-radius:12px;
+      display:grid; place-items:center;
+      background:rgba(47,93,169,0.10); color:var(--primary);
+      transition:transform .15s;
+    }
+    .attach-dropzone:hover .attach-dz-icon,
+    .attach.is-dragover .attach-dz-icon{ transform:translateY(-2px); }
+    .attach-dz-icon svg{ display:block; }
+    .attach-dz-text{ display:flex; flex-direction:column; gap:3px; min-width:0; }
+    .attach-dz-title{ font-size:13px; color:var(--text); line-height:1.4; }
+    .attach-dz-title strong{ color:var(--primary); font-weight:700; }
+    .attach-dz-hint{ font-size:11.5px; color:var(--text-subtle); line-height:1.4; }
+
+    .attach-list{ display:flex; flex-direction:column; gap:8px; }
+    .attach-list:empty{ display:none; }
+    .attach-file{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 12px;
       border:1px solid var(--border);
       border-radius:var(--radius-md);
-      background:var(--bg);
-      font-size:12.5px;
+      background:var(--surface);
+      box-shadow:var(--shadow-sm);
+      animation:attachIn .18s ease-out;
     }
-    .mature-file-row .mf-icon{
-      width:22px; height:22px; border-radius:6px; flex-shrink:0;
-      display:grid; place-items:center;
-      background:rgba(47,93,169,0.1); color:var(--primary); font-size:12px;
+    @keyframes attachIn{ from{ opacity:0; transform:translateY(-3px); } to{ opacity:1; transform:none; } }
+    .attach-file-ico{
+      flex-shrink:0; width:38px; height:38px; border-radius:9px;
+      display:grid; place-items:center; overflow:hidden;
+      font-size:10px; font-weight:800; letter-spacing:.4px;
+      background:var(--border-light); color:var(--text-muted);
     }
-    .mature-file-row .mf-name{
-      flex:1; min-width:0; color:var(--text); font-weight:600;
+    .attach-file-ico svg{ display:block; }
+    .attach-file-ico img{ width:100%; height:100%; object-fit:cover; }
+    .attach-file-ico.kind-pdf{ background:rgba(222,53,11,0.10); color:#DE350B; }
+    .attach-file-ico.kind-doc{ background:rgba(47,93,169,0.10); color:#2F5DA9; }
+    .attach-file-ico.kind-xls{ background:rgba(54,179,126,0.14); color:#2F9E6B; }
+    .attach-file-ico.kind-img{ background:rgba(101,84,192,0.12); color:#6554C0; }
+    .attach-file-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .attach-file-name{
+      font-size:13px; font-weight:600; color:var(--text);
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    .mature-file-row .mf-size{ color:var(--text-subtle); flex-shrink:0; }
-    .mature-file-row .mf-remove{
-      flex-shrink:0; width:22px; height:22px; border:none; background:transparent;
-      color:var(--text-subtle); cursor:pointer; border-radius:6px; font-size:15px; line-height:1;
+    .attach-file-meta{ font-size:11.5px; color:var(--text-subtle); }
+    .attach-file-remove{
+      flex-shrink:0; width:30px; height:30px; border:none; background:transparent;
+      color:var(--text-subtle); cursor:pointer; border-radius:8px;
       display:grid; place-items:center; transition:background .15s, color .15s;
     }
-    .mature-file-row .mf-remove:hover{ background:rgba(222,53,11,0.1); color:var(--danger); }
-    .mature-file-total{ font-size:11.5px; color:var(--text-subtle); padding:2px 2px 0; }
-    .mature-file-total.over{ color:var(--danger); font-weight:600; }
+    .attach-file-remove:hover{ background:rgba(222,53,11,0.10); color:var(--danger); }
+    .attach-file-remove:focus-visible{ outline:2px solid var(--primary-light); outline-offset:1px; }
+    .attach-file-remove svg{ display:block; }
+
+    .attach-total{
+      display:flex; align-items:center; gap:6px;
+      font-size:11.5px; color:var(--text-subtle); padding:1px 2px;
+    }
+    .attach-total.over{ color:var(--danger); font-weight:600; }
+    .attach-total svg{ display:block; flex-shrink:0; }
+    @media (prefers-reduced-motion: reduce){
+      .attach-file{ animation:none; }
+      .attach-dropzone, .attach-dz-icon{ transition:none; }
+    }
 
     .q-warn{
       margin-top:6px;
@@ -2715,27 +2859,48 @@
                   <label>Ekran Kodu</label>
                   <input class="q-input" id="q7Code" type="text" placeholder="Örn: PRD10006">
                   <div class="field-hint">
-                    <span class="field-hint-icon" aria-hidden="true">ℹ️</span>
+                    <span class="field-hint-icon" aria-hidden="true">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+                    </span>
                     <span>Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında tarih bilgisinin sol kısmında yer almaktadır.</span>
                   </div>
                   <div class="field-guide" data-field-guide>
                     <button type="button" class="field-guide-toggle" aria-expanded="false">
-                      <span class="field-guide-chevron" aria-hidden="true">▾</span>
-                      <span class="field-guide-toggle-label">📷 Ekran kodunun bulunduğu yeri göster</span>
+                      <span class="field-guide-toggle-icon" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-4.5-4.5L6 21"/></svg>
+                      </span>
+                      <span class="field-guide-toggle-label">Ekran kodunu nerede bulabilirim?</span>
+                      <span class="field-guide-chevron" aria-hidden="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                      </span>
                     </button>
                     <div class="field-guide-panel" hidden>
                       <div class="field-guide-grid">
                         <figure class="field-guide-item">
-                          <button type="button" class="field-guide-thumb" data-guide-img="mercan" data-caption="Mercan ekranında konumu">
+                          <figcaption class="field-guide-caption">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                            <span>Mercan ekranında konumu</span>
+                          </figcaption>
+                          <button type="button" class="field-guide-thumb" data-guide-img="mercan" data-caption="Mercan ekranında ekran kodunun konumu">
                             <img alt="Mercan ekranında ekran kodunun konumu" loading="lazy">
+                            <span class="field-guide-zoom" aria-hidden="true">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                              Büyüt
+                            </span>
                           </button>
-                          <figcaption class="field-guide-caption">Mercan ekranında konumu</figcaption>
                         </figure>
                         <figure class="field-guide-item">
-                          <button type="button" class="field-guide-thumb" data-guide-img="omnia" data-caption="Omnia ekranında konumu">
+                          <figcaption class="field-guide-caption">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                            <span>Omnia ekranında konumu</span>
+                          </figcaption>
+                          <button type="button" class="field-guide-thumb" data-guide-img="omnia" data-caption="Omnia ekranında ekran kodunun konumu">
                             <img alt="Omnia ekranında ekran kodunun konumu" loading="lazy">
+                            <span class="field-guide-zoom" aria-hidden="true">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                              Büyüt
+                            </span>
                           </button>
-                          <figcaption class="field-guide-caption">Omnia ekranında konumu</figcaption>
                         </figure>
                       </div>
                     </div>
@@ -2744,9 +2909,20 @@
 
                 <div class="q-item" id="matureAttachmentItem">
                   <label>Ek Belgeler</label>
-                  <input class="q-input" id="matureAttachment" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xls,.xlsx">
-                  <div class="q-help">Varsa gerekli evrakları (sözleşme, resmi belge, kurum yazısı) ekleyebilirsiniz. Birden fazla dosya ekleyebilirsiniz.</div>
-                  <div class="mature-file-list" id="matureAttachmentList"></div>
+                  <div class="attach" id="matureAttach">
+                    <input class="attach-input" id="matureAttachment" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xls,.xlsx">
+                    <button type="button" class="attach-dropzone" id="matureAttachDrop" aria-describedby="matureAttachHint">
+                      <span class="attach-dz-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.4 18.6A5 5 0 0 0 18 9h-1.3A8 8 0 1 0 4 16.9"/></svg>
+                      </span>
+                      <span class="attach-dz-text">
+                        <span class="attach-dz-title"><strong>Yüklemek için tıklayın</strong> veya dosyaları buraya sürükleyin</span>
+                        <span class="attach-dz-hint">PDF, Word, Excel, PNG, JPG · birden fazla dosya ekleyebilirsiniz</span>
+                      </span>
+                    </button>
+                    <div class="attach-list" id="matureAttachmentList"></div>
+                  </div>
+                  <div class="q-help" id="matureAttachHint">Varsa gerekli evrakları (sözleşme, resmi belge, kurum yazısı) ekleyebilirsiniz.</div>
                 </div>
               </div>
 
@@ -2990,7 +3166,10 @@
   <div class="img-lightbox" id="imgLightbox" role="dialog" aria-modal="true" aria-label="Görsel önizleme" aria-hidden="true">
     <button type="button" class="img-lightbox-close" id="imgLightboxClose" aria-label="Kapat">✕</button>
     <figure class="img-lightbox-figure">
-      <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
+      <span class="img-lightbox-media">
+        <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
+        <span class="img-lightbox-marker" id="imgLightboxMarker" aria-hidden="true" hidden></span>
+      </span>
       <figcaption class="img-lightbox-caption" id="imgLightboxCaption"></figcaption>
     </figure>
   </div>
@@ -3218,6 +3397,14 @@
     const FIELD_GUIDE_IMAGES = {
       mercan: 'https://atlas.fibabanka.local/jira/secure/attachment/205066/mercan.png?dowload=1', // TODO: Mercan ekran görseli linki
       omnia:  'https://atlas.fibabanka.local/jira/secure/attachment/205065/omnia.png?dowload=1'  // TODO: Omnia ekran görseli linki
+    };
+    // Ekran kodunun görsel ÜZERİNDEKİ konumunu işaretleyen kırmızı çerçeve.
+    // Değerler görselin yüzdesi (%) cinsindendir: top/left = sol-üst köşe, width/height = kutu boyutu.
+    // ⚠️ Bu değerler yaklaşıktır — gerçek görseller yüklendiğinde çerçeveyi kod alanının
+    //    tam üzerine oturtmak için 4 sayıyı ayarlayın. emphasis:'high' → ok etiketi + nabız animasyonu.
+    const FIELD_GUIDE_MARKERS = {
+      mercan: { top: 6, left: 4, width: 26, height: 13, emphasis: 'high', label: 'Ekran kodu' },
+      omnia:  { top: 6, left: 4, width: 24, height: 12, label: 'Ekran kodu' }
     };
     const CALLS_THREAD_FIELD = '';
     const CALLS_CUSTOM_FIELDS = [];
@@ -5137,42 +5324,104 @@ function renderMarkdown(text) {
     function matureAttachmentsTotalBytes(){
       return matureAttachmentFiles.reduce((sum, f) => sum + (Number(f?.size) || 0), 0);
     }
+    // Dosya türünü uzantı/MIME'den çıkarıp renk sınıfı + rozet + etiket döndürür.
+    function matureAttachKind(file){
+      const name = (file?.name || '').toLowerCase();
+      const ext = name.slice(name.lastIndexOf('.') + 1);
+      const type = file?.type || '';
+      if(type.startsWith('image/') || ['png','jpg','jpeg','gif','webp','bmp','svg'].includes(ext))
+        return { cls:'kind-img', label:'Görsel', badge:'IMG', isImage:true };
+      if(ext === 'pdf' || type === 'application/pdf')
+        return { cls:'kind-pdf', label:'PDF', badge:'PDF' };
+      if(['doc','docx'].includes(ext))
+        return { cls:'kind-doc', label:'Word', badge:'DOC' };
+      if(['xls','xlsx','csv'].includes(ext))
+        return { cls:'kind-xls', label:'Excel', badge:'XLS' };
+      return { cls:'', label:'Dosya', badge:'' };
+    }
+    const _MF_SVG_FILE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>';
+    const _MF_SVG_TRASH = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/></svg>';
+    const _MF_SVG_CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>';
+    const _MF_SVG_WARN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L2 18a1.5 1.5 0 0 0 1.3 2.2h17.4A1.5 1.5 0 0 0 22 18L13.7 3.9a1.5 1.5 0 0 0-2.6 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+    // Görsel önizlemeleri için üretilen object URL'leri her render'da geri veririz (bellek sızıntısı olmasın).
+    let _matureThumbUrls = [];
     function renderMatureAttachmentList(){
       const list = document.getElementById('matureAttachmentList');
       if(!list) return;
+      _matureThumbUrls.forEach(u => { try{ URL.revokeObjectURL(u); }catch(e){} });
+      _matureThumbUrls = [];
       list.innerHTML = '';
       matureAttachmentFiles.forEach((file, idx) => {
+        const kind = matureAttachKind(file);
         const row = document.createElement('div');
-        row.className = 'mature-file-row';
-        const icon = document.createElement('span'); icon.className = 'mf-icon'; icon.textContent = '📄';
-        const name = document.createElement('span'); name.className = 'mf-name'; name.textContent = file.name || 'dosya';
-        const size = document.createElement('span'); size.className = 'mf-size'; size.textContent = formatFileSize(file.size);
+        row.className = 'attach-file';
+
+        const ico = document.createElement('span');
+        ico.className = 'attach-file-ico ' + kind.cls;
+        if(kind.isImage){
+          const url = URL.createObjectURL(file);
+          _matureThumbUrls.push(url);
+          const im = document.createElement('img');
+          im.src = url; im.alt = ''; im.loading = 'lazy';
+          ico.appendChild(im);
+        } else if(kind.badge){
+          ico.textContent = kind.badge;
+        } else {
+          ico.innerHTML = _MF_SVG_FILE;
+        }
+
+        const info = document.createElement('span'); info.className = 'attach-file-info';
+        const name = document.createElement('span'); name.className = 'attach-file-name';
+        name.textContent = file.name || 'dosya'; name.title = file.name || '';
+        const meta = document.createElement('span'); meta.className = 'attach-file-meta';
+        meta.textContent = kind.label + ' · ' + formatFileSize(file.size);
+        info.appendChild(name); info.appendChild(meta);
+
         const remove = document.createElement('button');
-        remove.type = 'button'; remove.className = 'mf-remove'; remove.title = 'Kaldır'; remove.textContent = '✕';
+        remove.type = 'button'; remove.className = 'attach-file-remove';
+        remove.title = 'Kaldır'; remove.setAttribute('aria-label', (file.name || 'dosya') + ' kaldır');
+        remove.innerHTML = _MF_SVG_TRASH;
         remove.addEventListener('click', () => { matureAttachmentFiles.splice(idx, 1); renderMatureAttachmentList(); });
-        row.appendChild(icon); row.appendChild(name); row.appendChild(size); row.appendChild(remove);
+
+        row.appendChild(ico); row.appendChild(info); row.appendChild(remove);
         list.appendChild(row);
       });
       if(matureAttachmentFiles.length){
         const total = matureAttachmentsTotalBytes();
         const over = total > MATURE_ATTACH_WARN_BYTES;
         const summary = document.createElement('div');
-        summary.className = 'mature-file-total' + (over ? ' over' : '');
-        summary.textContent = over
+        summary.className = 'attach-total' + (over ? ' over' : '');
+        const txt = over
           ? `${matureAttachmentFiles.length} dosya · ${formatFileSize(total)} — toplam boyut yüksek, yükleme başarısız olabilir.`
           : `${matureAttachmentFiles.length} dosya · ${formatFileSize(total)}`;
+        summary.innerHTML = (over ? _MF_SVG_WARN : _MF_SVG_CHECK) + '<span></span>';
+        summary.querySelector('span').textContent = txt;
         list.appendChild(summary);
       }
     }
+    // input[accept] içindeki izinli uzantıları döndürür (nokta olmadan, küçük harf).
+    function matureAcceptedExts(){
+      const input = document.getElementById('matureAttachment');
+      const accept = (input?.getAttribute('accept') || '').toLowerCase();
+      return accept.split(',').map(s => s.trim().replace(/^\./, '')).filter(Boolean);
+    }
     function addMatureAttachmentFiles(fileList){
       const before = matureAttachmentsTotalBytes();
+      const accepted = matureAcceptedExts();
+      const rejected = [];
       Array.from(fileList || []).forEach(f => {
         if(!f) return;
+        // Sürükle-bırakta izinsiz türleri ele (göz-at zaten accept ile kısıtlı).
+        const ext = (f.name || '').toLowerCase().split('.').pop();
+        if(accepted.length && !accepted.includes(ext)){ rejected.push(f.name || 'dosya'); return; }
         // Aynı dosya (ad + boyut + değiştirilme zamanı) iki kez eklenmesin.
         const dup = matureAttachmentFiles.some(x => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified);
         if(!dup) matureAttachmentFiles.push(f);
       });
       renderMatureAttachmentList();
+      if(rejected.length){
+        showToast('Desteklenmeyen dosya türü: ' + rejected.join(', '), 'error');
+      }
       // Eşiği bu ekleme geçtiyse bir kez uyar.
       const after = matureAttachmentsTotalBytes();
       if(after > MATURE_ATTACH_WARN_BYTES && before <= MATURE_ATTACH_WARN_BYTES){
@@ -6660,6 +6909,33 @@ function renderMarkdown(text) {
         e.target.value = '';
       });
     }
+    // Dropzone: tıkla → dosya seç; sürükle-bırak desteği.
+    const matureAttachWrap = document.getElementById('matureAttach');
+    const matureAttachDrop = document.getElementById('matureAttachDrop');
+    if(matureAttachDrop && matureAttachmentInput){
+      matureAttachDrop.addEventListener('click', () => matureAttachmentInput.click());
+    }
+    if(matureAttachWrap){
+      // İç elemanlar üzerinde de dragenter/leave tetiklendiği için derinlik sayacı kullanıyoruz.
+      let dragDepth = 0;
+      const setDrag = (on) => matureAttachWrap.classList.toggle('is-dragover', on);
+      ['dragenter', 'dragover'].forEach(ev => matureAttachWrap.addEventListener(ev, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if(e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+        if(ev === 'dragenter') dragDepth++;
+        setDrag(true);
+      }));
+      matureAttachWrap.addEventListener('dragleave', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dragDepth = Math.max(0, dragDepth - 1);
+        if(dragDepth === 0) setDrag(false);
+      });
+      matureAttachWrap.addEventListener('drop', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dragDepth = 0; setDrag(false);
+        if(e.dataTransfer?.files?.length) addMatureAttachmentFiles(e.dataTransfer.files);
+      });
+    }
     if(btnToBusinessScore) btnToBusinessScore.addEventListener('click', () => {
       if(!validateMatureForm('form')) return;
       if(typeof window.setMatureStage === 'function') window.setMatureStage('business');
@@ -7100,16 +7376,35 @@ function renderMarkdown(text) {
     // Yeniden kullanılabilir görsel yardım bileşeni: accordion + paylaşımlı lightbox.
     (function initFieldGuides(){
       const IMAGES = (typeof FIELD_GUIDE_IMAGES === 'object' && FIELD_GUIDE_IMAGES) ? FIELD_GUIDE_IMAGES : {};
+      const MARKERS = (typeof FIELD_GUIDE_MARKERS === 'object' && FIELD_GUIDE_MARKERS) ? FIELD_GUIDE_MARKERS : {};
       const lightbox = document.getElementById('imgLightbox');
       const lightboxImg = document.getElementById('imgLightboxImg');
       const lightboxCaption = document.getElementById('imgLightboxCaption');
       const lightboxClose = document.getElementById('imgLightboxClose');
+      const lightboxMarker = document.getElementById('imgLightboxMarker');
 
-      function openLightbox(src, caption){
+      // Markör kutusunu yüzde (%) koordinatlarına göre konumlandırır; opsiyonel ok/etiket ekler.
+      function placeMarker(el, mk, withLabel){
+        if(!el) return;
+        el.style.top = mk.top + '%';
+        el.style.left = mk.left + '%';
+        el.style.width = mk.width + '%';
+        el.style.height = mk.height + '%';
+        el.classList.toggle('high', mk.emphasis === 'high');
+        el.innerHTML = (withLabel && mk.label)
+          ? '<span class="fg-marker-label"></span>' : '';
+        if(withLabel && mk.label){ el.querySelector('.fg-marker-label').textContent = mk.label; }
+      }
+
+      function openLightbox(src, caption, mk){
         if(!lightbox || !src) return;
         lightboxImg.src = src;
         lightboxImg.alt = caption || '';
         lightboxCaption.textContent = caption || '';
+        if(lightboxMarker){
+          if(mk){ placeMarker(lightboxMarker, mk, true); lightboxMarker.hidden = false; }
+          else { lightboxMarker.hidden = true; lightboxMarker.innerHTML = ''; }
+        }
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden', 'false');
       }
@@ -7118,6 +7413,7 @@ function renderMarkdown(text) {
         lightbox.classList.remove('open');
         lightbox.setAttribute('aria-hidden', 'true');
         lightboxImg.src = '';
+        if(lightboxMarker){ lightboxMarker.hidden = true; lightboxMarker.innerHTML = ''; }
       }
       if(lightbox){
         lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
@@ -7134,7 +7430,7 @@ function renderMarkdown(text) {
 
       function markEmpty(thumb){
         thumb.classList.add('is-empty');
-        thumb.innerHTML = '<span aria-hidden="true">🖼️</span><span>Görsel eklenecek</span>';
+        thumb.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-4.5-4.5L6 21"/></svg><span>Görsel eklenecek</span>';
       }
 
       document.querySelectorAll('[data-field-guide]').forEach(guide => {
@@ -7151,10 +7447,19 @@ function renderMarkdown(text) {
           const key = thumb.getAttribute('data-guide-img') || '';
           const src = (thumb.getAttribute('data-full') || IMAGES[key] || '').trim();
           const caption = thumb.getAttribute('data-caption') || '';
+          const mk = MARKERS[key] || null;
           const img = thumb.querySelector('img');
           if(src){
             if(img){ img.src = src; img.addEventListener('error', () => markEmpty(thumb)); }
-            thumb.addEventListener('click', () => openLightbox(src, caption));
+            // Küçük görselin üzerine de kırmızı çerçeveyi bindir (etiket yalnızca vurgulu olanda).
+            if(mk){
+              const tm = document.createElement('span');
+              tm.className = 'fg-marker';
+              tm.setAttribute('aria-hidden', 'true');
+              placeMarker(tm, mk, mk.emphasis === 'high');
+              thumb.appendChild(tm);
+            }
+            thumb.addEventListener('click', () => openLightbox(src, caption, mk));
           } else {
             markEmpty(thumb);
           }
