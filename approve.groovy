@@ -522,39 +522,61 @@ fibarprIdeaApprove(
     return null
   }
 
-  // Tarihi, GERÇEK validateUpdate'in kabul ettiği string'e çevir. ÖNEMLİ: Alanın converter'ının
-  // getTimestamp'i ile validateUpdate'in kullandığı doğrulayıcı FARKLI davranıyor — converter
-  // "14/Tem/26 12:00 AM"'i kabul ederken validateUpdate reddedip Türkçe "ÖÖ" bekliyor (v6 diag ile
-  // kanıtlandı). Bu yüzden converter'ı oracle olarak kullanmıyoruz. Bunun yerine adayları TEK
-  // BAŞINA bu alan için validateUpdate'e verip, customfield hatası ÇIKMAYAN ilk adayı seçiyoruz —
-  // yani gerçek doğrulamanın kabul ettiği formatı doğrudan buluyoruz (profil dili ne olursa olsun).
+  // TEŞHİS + SEÇİM: validateUpdate hiçbir denenen tarih formatını kabul etmedi (v7). Bu yüzden
+  // ÇOK sayıda aday format üretip her birini TEK BAŞINA bu alan için deneme-validateUpdate'e veriyoruz
+  // ve hem kabul/ret durumunu hem de ret mesajını kaydediyoruz. Kabul edilen İLK adayı seçiyoruz;
+  // hiçbiri geçmezse mesajlardan gerçek beklentiyi çıkaracağız. (validateUpdate salt-doğrulama;
+  // kalıcılık yapmaz, yan etkisiz.)  _diagDateTrials yanıta konur.
+  def _diagDateTrials = [:]
   def formatDateForField = { cf, ts, dt ->
     def fid = cf.id?.toString()
-    def candidates = []
-    try {
-      def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
-      def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey)
-      if (fmt) {
-        def loc = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
-        candidates << new java.text.SimpleDateFormat(fmt, loc).format(ts)          // giriş yapan locale (TR => "ÖÖ")
-        candidates << new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts) // İngilizce ("AM")
-      }
-    } catch (ignored) {}
-    // Son çare adayı: alanın kendi getString'i
-    try { candidates << (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
+    def candidates = [:]   // label -> string
+    def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
+    def fmt = null
+    try { fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) } catch (ignored) {}
+    def authLoc = null
+    try { authLoc = ComponentAccessor.jiraAuthenticationContext?.locale } catch (ignored) {}
+    _diagDateTrials["_pickerFormat"] = (fmt ?: "<null>").toString()
+    _diagDateTrials["_authLocale"]   = (authLoc ?: "<null>").toString()
 
-    // Her adayı yalnız bu alan için deneme-validateUpdate'e ver; bu alan için hata yoksa kabul edilir.
-    // (validateUpdate salt-doğrulama; kalıcılık yapmaz, yan etkisizdir.)
-    for (c in candidates.findAll { it }.unique()) {
+    if (fmt) {
+      try { candidates["sdf_authLocale"] = new java.text.SimpleDateFormat(fmt, authLoc ?: Locale.getDefault()).format(ts) } catch (ignored) {}
+      try { candidates["sdf_tr"]         = new java.text.SimpleDateFormat(fmt, new Locale("tr","TR")).format(ts) } catch (ignored) {}
+      try { candidates["sdf_en"]         = new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts) } catch (ignored) {}
+      try { candidates["sdf_root"]       = new java.text.SimpleDateFormat(fmt, Locale.ROOT).format(ts) } catch (ignored) {}
+    }
+    try { candidates["converter"]     = (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
+    try {
+      def dtff = ComponentAccessor.getComponent(com.atlassian.jira.datetime.DateTimeFormatterFactory)
+      def style = dt ? com.atlassian.jira.datetime.DateTimeStyle.DATE_TIME_PICKER : com.atlassian.jira.datetime.DateTimeStyle.DATE_PICKER
+      candidates["dtff_loggedIn"] = dtff.formatter().forLoggedInUser().withStyle(style).format(ts)
+    } catch (ignored) {}
+    try { candidates["iso_dateTime"] = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(ts) } catch (ignored) {}
+    try { candidates["iso_full"]     = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ts) } catch (ignored) {}
+    try { candidates["iso_date"]     = new java.text.SimpleDateFormat("yyyy-MM-dd").format(ts) } catch (ignored) {}
+
+    def accepted = null
+    candidates.each { label, c ->
+      if (!c) return
+      def rec = [value: c.toString(), ok: false, error: null]
       try {
         def tp = issueService.newIssueInputParameters()
         tp.setSkipScreenCheck(true)
-        tp.addCustomFieldValue(cf.idAsLong, c)
+        tp.addCustomFieldValue(cf.idAsLong, c.toString())
         def vr = issueService.validateUpdate(adminUser, issue.id, tp)
-        if (!(vr?.errorCollection?.errors?.containsKey(fid))) return c
-      } catch (ignored) {}
+        def errs = vr?.errorCollection?.errors
+        if (errs?.containsKey(fid)) {
+          rec.error = errs[fid]?.toString()
+        } else {
+          rec.ok = true
+          if (accepted == null) accepted = c.toString()
+        }
+      } catch (e) {
+        rec.error = "EXC: ${e.message}"
+      }
+      _diagDateTrials[label] = rec
     }
-    return null
+    return accepted
   }
 
   // TEŞHİS: inputParams'a eklenen alan id'leri + tarih alanları için gönderilen (parser'ın kabul
@@ -872,10 +894,11 @@ fibarprIdeaApprove(
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
       issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v7-validateverified",
+      codeVersion: "date-fix-v8-trialmatrix",
       diag: diagFields,
       inputAdded: _diagInputAdded,
-      dateProvided: _diagDateProvided
+      dateProvided: _diagDateProvided,
+      dateTrials: _diagDateTrials
     ]).build()
   }
 
