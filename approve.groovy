@@ -497,16 +497,16 @@ fibarprIdeaApprove(
   def inputParams = issueService.newIssueInputParameters()
   inputParams.setSkipScreenCheck(true)
 
-  // Date/datetime alanları: değeri IssueInputParameters'a, PARSER'IN (getTimestamp) kabul ettiği
-  // doğrulanmış bir string olarak ekliyoruz (bkz. formatDateForField). validateUpdate bu string'i
-  // aynı getTimestamp ile doğruladığından, geçmesi garanti olur → profil dili ne olursa olsun.
+  // Date/datetime alanları: değeri IssueInputParameters'a, alanın kendi converter'ıyla
+  // biçimlendirilmiş string olarak ekliyoruz (bkz. formatDateForField).
   //
-  // KÖK NEDEN (HC-40996 diag ile kanıtlandı): customfield_10405 ZORUNLU bir alan; değeri hiç
-  // göndermezsek Jira mevcut değeri retain edip giriş yapan kullanıcının locale'iyle yeniden
-  // doğruluyor ve Türkçe profilde "dd/MMM/yy h:mm a" hatası veriyordu. Değeri sağlayınca Jira bizim
-  // değerimizi doğruluyor; ANCAK alanın kendi getString'i tutarsız string üretebiliyor (ör.
-  // "14/Tem/26 12:00 AM": ay Türkçe ama AM/PM İngilizce), parser ise "ÖÖ" bekliyor. Bu yüzden tek
-  // formata güvenmek yerine, parser'ın geri-parse edebildiği adayı seçiyoruz (formatDateForField).
+  // KÖK NEDEN (HC-40996 diag ile kanıtlandı): Jira'nın datetime custom field doğrulaması, GİRİŞ
+  // YAPAN kullanıcının locale'iyle çalışıyor ve Türkçe (tr_TR) profilde fiilen BOZUK — "dd/MMM/yy
+  // h:mm a" formatını ilan edip üretilebilir hiçbir string'i (Türkçe/İngilizce/ISO/kendi converter
+  // çıktısı dahil) kabul etmiyordu. customfield_10405 zorunlu olduğu için değeri sağlamamak da
+  // çözmüyordu (Jira mevcut değeri aynı bozuk yolla yeniden doğruluyordu). ÇÖZÜM: güncellemenin
+  // tamamı zaten adminUser adına yapıldığından, en başta auth context'i adminUser'a alıyoruz (bkz.
+  // setLoggedInUser); doğrulama böylece çalışan bir locale'de yapılıyor ve converter string'i geçiyor.
   def dateTimeConverter = ComponentAccessor.getComponent(com.atlassian.jira.issue.customfields.converters.DateTimeConverter)
   def dateConverter     = ComponentAccessor.getComponent(com.atlassian.jira.issue.customfields.converters.DateConverter)
   def isDateTimeField = { cf ->
@@ -531,86 +531,37 @@ fibarprIdeaApprove(
     return null
   }
 
-  // TEŞHİS + SEÇİM: validateUpdate hiçbir denenen tarih formatını kabul etmedi (v7). Bu yüzden
-  // ÇOK sayıda aday format üretip her birini TEK BAŞINA bu alan için deneme-validateUpdate'e veriyoruz
-  // ve hem kabul/ret durumunu hem de ret mesajını kaydediyoruz. Kabul edilen İLK adayı seçiyoruz;
-  // hiçbiri geçmezse mesajlardan gerçek beklentiyi çıkaracağız. (validateUpdate salt-doğrulama;
-  // kalıcılık yapmaz, yan etkisiz.)  _diagDateTrials yanıta konur.
-  def _diagDateTrials = [:]
-  def formatDateForField = { cf, ts, dt ->
-    def fid = cf.id?.toString()
-    def candidates = [:]   // label -> string
-    def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
-    def fmt = null
-    try { fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) } catch (ignored) {}
-    def authLoc = null
-    try { authLoc = ComponentAccessor.jiraAuthenticationContext?.locale } catch (ignored) {}
-    _diagDateTrials["_pickerFormat"] = (fmt ?: "<null>").toString()
-    _diagDateTrials["_authLocale"]   = (authLoc ?: "<null>").toString()
-
-    if (fmt) {
-      try { candidates["sdf_authLocale"] = new java.text.SimpleDateFormat(fmt, authLoc ?: Locale.getDefault()).format(ts) } catch (ignored) {}
-      try { candidates["sdf_tr"]         = new java.text.SimpleDateFormat(fmt, new Locale("tr","TR")).format(ts) } catch (ignored) {}
-      try { candidates["sdf_en"]         = new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts) } catch (ignored) {}
-      try { candidates["sdf_root"]       = new java.text.SimpleDateFormat(fmt, Locale.ROOT).format(ts) } catch (ignored) {}
-    }
-    try { candidates["converter"]     = (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
+  // Tarihi, alanın kendi converter'ıyla (DateTimeConverter/DateConverter) biçimlendirilmiş string'e
+  // çevir. Güncelleme adminUser bağlamında çalıştığından (bkz. baştaki setLoggedInUser), datetime
+  // doğrulaması çalışan bir locale'de yapılır ve converter'ın ürettiği string validateUpdate'ten
+  // sorunsuz geçer. NOT: Bu impersonation olmadan, Jira'nın datetime doğrulaması Türkçe (tr_TR)
+  // profillerde bozuk olduğu için ÜRETİLEBİLİR HİÇBİR format kabul edilmiyordu (bkz. commit geçmişi).
+  def formatDateForField = { ts, dt ->
     try {
-      def dtff = ComponentAccessor.getComponent(com.atlassian.jira.datetime.DateTimeFormatterFactory)
-      def style = dt ? com.atlassian.jira.datetime.DateTimeStyle.DATE_TIME_PICKER : com.atlassian.jira.datetime.DateTimeStyle.DATE_PICKER
-      candidates["dtff_loggedIn"] = dtff.formatter().forLoggedInUser().withStyle(style).format(ts)
+      def s = dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)
+      if (s) return s
     } catch (ignored) {}
-    try { candidates["iso_dateTime"] = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(ts) } catch (ignored) {}
-    try { candidates["iso_full"]     = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(ts) } catch (ignored) {}
-    try { candidates["iso_date"]     = new java.text.SimpleDateFormat("yyyy-MM-dd").format(ts) } catch (ignored) {}
-
-    def accepted = null
-    candidates.each { label, c ->
-      if (!c) return
-      def rec = [value: c.toString(), ok: false, error: null]
-      try {
-        def tp = issueService.newIssueInputParameters()
-        tp.setSkipScreenCheck(true)
-        tp.addCustomFieldValue(cf.idAsLong, c.toString())
-        def vr = issueService.validateUpdate(adminUser, issue.id, tp)
-        def errs = vr?.errorCollection?.errors
-        if (errs?.containsKey(fid)) {
-          rec.error = errs[fid]?.toString()
-        } else {
-          rec.ok = true
-          if (accepted == null) accepted = c.toString()
-        }
-      } catch (e) {
-        rec.error = "EXC: ${e.message}"
-      }
-      _diagDateTrials[label] = rec
-    }
-    return accepted
+    // Yedek: picker format property + geçerli locale ile biçimlendir.
+    try {
+      def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
+      def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey)
+      def loc = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
+      if (fmt) return new java.text.SimpleDateFormat(fmt, loc).format(ts)
+    } catch (ignored) {}
+    return null
   }
-
-  // TEŞHİS: inputParams'a eklenen alan id'leri + tarih alanları için gönderilen (parser'ın kabul
-  // ettiği) string. Hiçbir aday parse edilemezse "<<NO ACCEPTED FORMAT>>" yazılır.
-  def _diagInputAdded = []
-  def _diagDateProvided = [:]
 
   fields.each { k, v ->
     def cf = resolveCf(k?.toString())
     if (!cf) return
 
-    // Date/datetime alanları: parser'ın (getTimestamp) kabul ettiği bir string üretip inputParams'a
-    // ekleniyor (bkz. formatDateForField) — validateUpdate aynı parser'ı kullandığı için her dilde geçer.
+    // Date/datetime alanları: converter ile biçimlendirilmiş string olarak inputParams'a ekleniyor
+    // (bkz. formatDateForField). Değer yoksa/parse edilemezse alan gönderilmez.
     if (isDateCustomField(cf)) {
       def ts = parseIsoToTimestamp(v)
-      if (ts == null) return  // değer yok / parse edilemedi → alanı gönderme
-      def dateStr = formatDateForField(cf, ts, isDateTimeField(cf))
-      if (dateStr) {
-        inputParams.addCustomFieldValue(cf.idAsLong, dateStr)
-        _diagInputAdded << (cf.id?.toString())
-        _diagDateProvided[(cf.id?.toString())] = dateStr
-      } else {
-        // Hiçbir aday validateUpdate'ce kabul edilmedi — teşhis için işaretle (alanı gönderme).
-        _diagDateProvided[(cf.id?.toString())] = "<<NO ACCEPTED FORMAT>>"
-      }
+      if (ts == null) return
+      def dateStr = formatDateForField(ts, isDateTimeField(cf))
+      if (dateStr) inputParams.addCustomFieldValue(cf.idAsLong, dateStr)
       return
     }
 
@@ -680,7 +631,6 @@ fibarprIdeaApprove(
     def converted = convertForCustomField(cf, v)
     if (converted == null) return
 
-    _diagInputAdded << (cf.id?.toString())
     if (converted instanceof Collection) {
       inputParams.addCustomFieldValue(cf.idAsLong, (converted.collect { it.toString() } as String[]))
     } else {
@@ -879,22 +829,6 @@ fibarprIdeaApprove(
       }
     }
     def errorText = errorMessages ? errorMessages.join("; ") : "Update validation failed"
-    // TEŞHİS: Hataya düşen her custom field'ın gerçek tipini ve tarih-alanı olarak algılanıp
-    // algılanmadığını yanıta ekle. Bu bölümün yanıtta GÖRÜNMESİ, güncel kodun canlı olduğunu da
-    // kanıtlar (codeVersion). Bir tarih alanı buraya kadar geldiyse detectedAsDate=false demektir
-    // ve tespit mantığının neden kaçırdığını (tip anahtarı/sınıf) buradan anlarız.
-    def diagFields = [:]
-    try {
-      updateValidation.errorCollection?.errors?.each { fid, msg ->
-        def dcf = resolveCf(fid?.toString())
-        def cft = dcf?.customFieldType
-        diagFields[fid?.toString()] = [
-          typeKey       : (cft?.key ?: "").toString(),
-          typeClass     : (cft?.getClass()?.name ?: "").toString(),
-          detectedAsDate: isDateCustomField(dcf)
-        ]
-      }
-    } catch (ignored) {}
     return Response.status(400).entity([
       ok: false,
       error: errorText,
@@ -902,12 +836,7 @@ fibarprIdeaApprove(
       messages: updateValidation.errorCollection?.errorMessages,
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
-      issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v9-adminlocale",
-      diag: diagFields,
-      inputAdded: _diagInputAdded,
-      dateProvided: _diagDateProvided,
-      dateTrials: _diagDateTrials
+      issueKey: issue.key?.toString()
     ]).build()
   }
 
