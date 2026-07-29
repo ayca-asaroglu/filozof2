@@ -1253,6 +1253,31 @@
     .q-detail.open{ display:block; }
     .q-item.is-hidden{ display:none; }
     .q-help{ margin-top:6px; font-size:12px; color:var(--text-subtle); line-height:1.4; }
+    .mature-file-list{ margin-top:8px; display:flex; flex-direction:column; gap:6px; }
+    .mature-file-row{
+      display:flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      border-radius:var(--radius-md);
+      background:var(--bg);
+      font-size:12.5px;
+    }
+    .mature-file-row .mf-icon{
+      width:22px; height:22px; border-radius:6px; flex-shrink:0;
+      display:grid; place-items:center;
+      background:rgba(47,93,169,0.1); color:var(--primary); font-size:12px;
+    }
+    .mature-file-row .mf-name{
+      flex:1; min-width:0; color:var(--text); font-weight:600;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .mature-file-row .mf-size{ color:var(--text-subtle); flex-shrink:0; }
+    .mature-file-row .mf-remove{
+      flex-shrink:0; width:22px; height:22px; border:none; background:transparent;
+      color:var(--text-subtle); cursor:pointer; border-radius:6px; font-size:15px; line-height:1;
+      display:grid; place-items:center; transition:background .15s, color .15s;
+    }
+    .mature-file-row .mf-remove:hover{ background:rgba(222,53,11,0.1); color:var(--danger); }
 
     .q-warn{
       margin-top:6px;
@@ -2612,7 +2637,8 @@
                 <div class="q-item" id="matureAttachmentItem">
                   <label>Ek Belgeler</label>
                   <input class="q-input" id="matureAttachment" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.xls,.xlsx">
-                  <div class="q-help">Varsa gerekli evrakları (sözleşme, resmi belge, kurum yazısı) ekleyebilirsiniz.</div>
+                  <div class="q-help">Varsa gerekli evrakları (sözleşme, resmi belge, kurum yazısı) ekleyebilirsiniz. Birden fazla dosya ekleyebilirsiniz.</div>
+                  <div class="mature-file-list" id="matureAttachmentList"></div>
                 </div>
               </div>
 
@@ -4548,7 +4574,7 @@ function renderMarkdown(text) {
       });
       const file = document.getElementById('q8Attachment');
       if(file){ file.value = ''; file.classList.remove('open'); }
-      const matureAtt = document.getElementById('matureAttachment'); if(matureAtt) matureAtt.value = '';
+      if(typeof resetMatureAttachments === 'function') resetMatureAttachments();
       const q7 = document.getElementById('q7Code'); if(q7) q7.value = '';
       if(typeof window.resetStakeholdersSelection === 'function') window.resetStakeholdersSelection();
       // Talep Tipi sıfırlandı → yasal zorunluluk alanlarını gizle ve temizle.
@@ -4979,6 +5005,43 @@ function renderMarkdown(text) {
       });
     }
 
+    // ===== Ek Belgeler: biriken çoklu dosya listesi =====
+    // Native <input type="file"> her seçimde önceki listeyi ezdiği için seçilen dosyaları
+    // ayrı bir dizide biriktiriyoruz; kullanıcı teker teker ekleyip tek tek kaldırabilsin.
+    let matureAttachmentFiles = [];
+    function renderMatureAttachmentList(){
+      const list = document.getElementById('matureAttachmentList');
+      if(!list) return;
+      list.innerHTML = '';
+      matureAttachmentFiles.forEach((file, idx) => {
+        const row = document.createElement('div');
+        row.className = 'mature-file-row';
+        const icon = document.createElement('span'); icon.className = 'mf-icon'; icon.textContent = '📄';
+        const name = document.createElement('span'); name.className = 'mf-name'; name.textContent = file.name || 'dosya';
+        const size = document.createElement('span'); size.className = 'mf-size'; size.textContent = formatFileSize(file.size);
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'mf-remove'; remove.title = 'Kaldır'; remove.textContent = '✕';
+        remove.addEventListener('click', () => { matureAttachmentFiles.splice(idx, 1); renderMatureAttachmentList(); });
+        row.appendChild(icon); row.appendChild(name); row.appendChild(size); row.appendChild(remove);
+        list.appendChild(row);
+      });
+    }
+    function addMatureAttachmentFiles(fileList){
+      Array.from(fileList || []).forEach(f => {
+        if(!f) return;
+        // Aynı dosya (ad + boyut + değiştirilme zamanı) iki kez eklenmesin.
+        const dup = matureAttachmentFiles.some(x => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified);
+        if(!dup) matureAttachmentFiles.push(f);
+      });
+      renderMatureAttachmentList();
+    }
+    function resetMatureAttachments(){
+      matureAttachmentFiles = [];
+      const input = document.getElementById('matureAttachment');
+      if(input) input.value = '';
+      renderMatureAttachmentList();
+    }
+
     async function collectApproveAttachments(){
       const fileInputIds = ['q5Attachment', 'q8Attachment'];
       const files = [];
@@ -4988,9 +5051,8 @@ function renderMarkdown(text) {
         if(f) files.push(f);
       });
 
-      // Ek Belgeler alanı çoklu dosya destekler — tüm seçilenleri ekle.
-      const matureFiles = document.getElementById('matureAttachment')?.files;
-      if(matureFiles) Array.from(matureFiles).forEach(f => { if(f) files.push(f); });
+      // Ek Belgeler alanı — biriken çoklu dosya listesindeki tüm dosyaları ekle.
+      matureAttachmentFiles.forEach(f => { if(f) files.push(f); });
 
       const attachments = [];
       for(const file of files){
@@ -6437,6 +6499,15 @@ function renderMarkdown(text) {
     }
     matureOverlay.addEventListener('click', closeMatureModal);
     matureClose.addEventListener('click', closeMatureModal);
+    const matureAttachmentInput = document.getElementById('matureAttachment');
+    if(matureAttachmentInput){
+      matureAttachmentInput.addEventListener('change', (e) => {
+        addMatureAttachmentFiles(e.target.files);
+        // input'u sıfırla ki aynı dosya tekrar seçilince change yine tetiklensin ve
+        // yeni seçimler öncekileri ezmesin (biriktirme).
+        e.target.value = '';
+      });
+    }
     if(btnToBusinessScore) btnToBusinessScore.addEventListener('click', () => {
       if(!validateMatureForm('form')) return;
       if(typeof window.setMatureStage === 'function') window.setMatureStage('business');
