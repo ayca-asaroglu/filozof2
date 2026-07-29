@@ -99,36 +99,43 @@ fibarprIdeaCalls(
     }
 
     def customFields = cfKeys.collect { key ->
-      def cf = resolveCf(key)
-      def val = cf ? i.getCustomFieldValue(cf) : null
-      boolean isCascade = cf?.customFieldType?.key?.toLowerCase()?.contains("cascadingselect")
+      // Tek bir alanın değer çıkarımı patlarsa (ör. beklenmeyen tip, eksik alan) tüm liste
+      // düşmesin; o alan için boş değer dönüp devam et.
+      try {
+        def cf = resolveCf(key)
+        def val = cf ? i.getCustomFieldValue(cf) : null
+        boolean isCascade = cf?.customFieldType?.key?.toLowerCase()?.contains("cascadingselect")
 
-      def out
-      if (isCascade && val instanceof Map) {
-        // Cascading select değeri Jira'da Map<String, Option> olarak gelir: null anahtarı
-        // ebeveyn (parent), "1" anahtarı çocuk (child) option'ını taşır. Bunu frontend'in
-        // beklediği {value, child:{value}} şekline dönüştürüyoruz; aksi halde JSON.toString()
-        // ile düz metne çevrilip select'teki hiçbir option ile eşleşmeyen bir string olurdu.
-        def parentOpt = val[null]
-        def childOpt = val["1"]
-        out = [
-          value: parentOpt?.value,
-          id   : parentOpt?.optionId?.toString(),
-          child: childOpt ? [value: childOpt.value, id: childOpt.optionId?.toString()] : null
+        def out
+        if (isCascade && val instanceof Map) {
+          // Cascading select değeri Jira'da Map<String, Option> olarak gelir: null anahtarı
+          // ebeveyn (parent), "1" anahtarı çocuk (child) option'ını taşır. Bunu frontend'in
+          // beklediği {value, child:{value}} şekline dönüştürüyoruz; aksi halde JSON.toString()
+          // ile düz metne çevrilip select'teki hiçbir option ile eşleşmeyen bir string olurdu.
+          def parentOpt = val[null]
+          def childOpt = val["1"]
+          out = [
+            value: parentOpt?.value,
+            id   : parentOpt?.optionId?.toString(),
+            child: childOpt ? [value: childOpt.value, id: childOpt.optionId?.toString()] : null
+          ]
+        } else if (val instanceof Collection) {
+          out = val.collect { it?.toString() }.join(", ")
+        } else if (val instanceof Map) {
+          out = JsonOutput.toJson(val)
+        } else {
+          out = (val != null ? val.toString() : "")
+        }
+
+        return [
+          id: key,
+          name: (cf?.name ?: key),
+          value: out
         ]
-      } else if (val instanceof Collection) {
-        out = val.collect { it?.toString() }.join(", ")
-      } else if (val instanceof Map) {
-        out = JsonOutput.toJson(val)
-      } else {
-        out = (val != null ? val.toString() : "")
+      } catch (fieldErr) {
+        log.warn("fibarprIdeaCalls: '${key}' alanı okunamadı (${i?.key}): ${fieldErr?.message}")
+        return [id: key, name: key, value: ""]
       }
-
-      return [
-        id: key,
-        name: (cf?.name ?: key),
-        value: out
-      ]
     }
     [
       key: i.key,
