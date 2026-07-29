@@ -5132,8 +5132,9 @@ function renderMarkdown(text) {
       const q2Warn = document.getElementById('q2Warn');
       if(!q2Select || !q2Warn) return;
       const isYes = q2Select.value === 'Evet';
-      const show = isYes && !hasRequiredNpsUnit();
-      q2Warn.classList.toggle('open', show);
+      // NPS ölçümü "Evet" ise "Müşteri Deneyimi Yönetimi" birimini iş birimlerine otomatik ekle.
+      if(isYes && !hasRequiredNpsUnit()){ window.ensureStakeholderSelected?.(REQUIRED_NPS_UNIT); }
+      q2Warn.classList.remove('open');
     }
 
     function isAffirmative(val){ return val === 'Evet' || val === 'Var'; }
@@ -5149,7 +5150,7 @@ function renderMarkdown(text) {
       const opinionTextareas = Array.from(document.querySelectorAll('#stakeholderOpinions .op-text'));
       if(stVal && opinionTextareas.length === 0) markError(msControl);
       if(stVal) opinionTextareas.forEach(ta => { if(!(ta.value||'').trim()) markError(ta); });
-      if(document.getElementById('q2Select')?.value === 'Evet' && !hasRequiredNpsUnit()){ markError(msControl); updateNpsWarning(); }
+      if(document.getElementById('q2Select')?.value === 'Evet'){ window.ensureStakeholderSelected?.(REQUIRED_NPS_UNIT); }
       const qTalepTipiSelect = document.getElementById('qTalepTipiSelect');
       if(qTalepTipiSelect && !qTalepTipiSelect.value) markError(qTalepTipiSelect);
       // Yasal Zorunluluk seçiliyse açıklama ve son tarih zorunlu.
@@ -6940,6 +6941,14 @@ function renderMarkdown(text) {
         Object.keys(op).forEach(k => { opinions[k] = normalizeOpinionEntry(op[k]); });
         render();
       }
+      function ensureStakeholder(name){
+        const clean = String(name || '').trim();
+        if(!clean || selected.has(clean)) return;
+        selected.add(clean);
+        opinions[clean] = normalizeOpinionEntry(opinions[clean]);
+        render();
+      }
+      window.ensureStakeholderSelected = ensureStakeholder;
 
       async function loadStakeholders(){
         if(isLoadingStakeholders) return;
