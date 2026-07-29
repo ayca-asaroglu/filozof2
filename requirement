@@ -1,8 +1,20 @@
-"codeVersion": "date-fix-v3-classdetect",
+    "codeVersion": "date-fix-v4-routediag",
     "diag": {
         "customfield_10405": {
             "typeKey": "com.atlassian.jira.plugin.system.customfieldtypes:datetime",
             "typeClass": "com.atlassian.jira.issue.customfields.impl.DateTimeCFType",
             "detectedAsDate": true
         }
-    }
+    },
+    "dateRouted": [
+        "customfield_10405"
+    ],
+    "inputAdded": [
+        "customfield_10406",
+        "customfield_19801",
+        "customfield_10427",
+        "customfield_10722",
+        "customfield_16503",
+        "customfield_10927",
+        "customfield_10930"
+    ]
