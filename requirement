@@ -1,70 +1,151 @@
-requirement
+{issueKey: "HC-40996", issueId: "627630", threadId: "862D1924-EBD8-4732-9EB0-93D757425A0F",…}
+answers
+: 
+[{label: "Talep Tipi", value: "Yasal Zorunluluk", group: "maturation"},…]
+attachments
+: 
+[]
+form
+: 
+{talepTipi: {parent: "Business (İş Birimi) Talepleri", child: "Yasal Zorunluluk"},…}
+amac
+: 
+"Ticari bankacılıkta karlı büyüme"
+bs1a
+: 
+{parent: "Default", parentId: "38564", child: "1.001-10.000", childId: "38566"}
+bs1b
+: 
+""
+bs1cCount
+: 
+""
+bs1cDuration
+: 
+""
+bs2a
+: 
+{parent: "Default", parentId: "38588", child: "7,5 M - 25 M", childId: "38592"}
+bs2b
+: 
+""
+bs2c
+: 
+""
+bs3CustomerImpact
+: 
+{parent: "Default", parentId: "41706", child: "5% - 15%", childId: "41709"}
+bs4OperationalFinancialRisk
+: 
+{parent: "Default", parentId: "41712", child: "Yüksek", childId: "41716"}
+bulguKodu
+: 
+""
+kanallar
+: 
+"ATM"
+q2
+: 
+"Hayır"
+q2Detail
+: 
+""
+q3
+: 
+"Hayır"
+q3Detail
+: 
+""
+q4
+: 
+""
+q4Attachment
+: 
+""
+q4Detail
+: 
+""
+q5
+: 
+"Hayır"
+q5Attachment
+: 
+""
+q6
+: 
+"Hayır"
+q6Detail
+: 
+""
+q7Code
+: 
+""
+stakeholderOpinions
+: 
+"{}"
+stakeholders
+: 
+""
+talepTipi
+: 
+{parent: "Business (İş Birimi) Talepleri", child: "Yasal Zorunluluk"}
+yasalAciklama
+: 
+"hth"
+yasalTarih
+: 
+"2026-07-16"
+issueId
+: 
+"627630"
+issueKey
+: 
+"HC-40996"
+skipValidation
+: 
+true
+threadId
+: 
+"862D1924-EBD8-4732-9EB0-93D757425A0F"
 
-HC talep tipi ve alt seçeneğinin  iş biriminden alınması ve olgunluk kontrolü kısmında alınan bilgilerin set edilerek görüntülenmesi. Deadline: 28/07
-*** Yazılım Geliştirme seçildiğinde; "İş İhtiyacı" / "Stratejik Geliştirme" / "Yasal Zorunluluk" / "Denetim Bulgusu" seçenekleri çıksın.
-
-*** Yasal zorunluluk seçildiğinde; "Yasal zorunluluk açıklaması" ve "Yasal zorunluluk tarihi". Her iki kısımda zorunlu alan. Tarih ksımı takvim açılarak s
-
-customFieldId=10400
-Business (İş Birimi) Talepleri
-Stratejik geliştirme,Yasal zorunluluk,Denetim bulgusu,İş ihtiyacı
-
-yasal zorunluluk açıklaması : customFieldId=10406
-yasal zorunluluk tarihi : customFieldId=10405
-
-
-I want to improve the UX of the "Ekran Kodu" field in this form.
-
-Goal
-
-Users often don't know where to find the screen code (e.g. MOB-001). I want to provide contextual help without cluttering the form.
-
-Requirements
-Keep the existing input field.
-Add a subtle helper text below the input:
-
-Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında tarih bilgisinin sol kısmında yer almaktadır.
-
-Below the helper text, add a collapsible section (accordion or expandable panel) titled:
-
-📷 Ekran kodunun bulunduğu yeri göster
-
-When expanded, display two image thumbnails side by side:
-Mercan screen
-Omnia screen
-Each image should have a small caption:
-Mercan ekranında konumu
-Omnia ekranında konumu
-Clicking an image should open it in a larger modal/lightbox so users can clearly see where the screen code is located.
-Design Guidelines
-Use a modern enterprise UI style similar to Atlassian, Material Design, or Ant Design.
-Keep the helper text lightweight (secondary text color).
-Use a subtle info icon (ℹ️) before the helper text.
-The expandable section should not distract users who already know the screen code.
-The form should remain clean and compact when the section is collapsed.
-Use spacing and typography consistent with the rest of the form.
-Layout
-EKRAN KODU *
-
-┌──────────────────────────────────────────────┐
-│ Örn: MOB-001                                 │
-└──────────────────────────────────────────────┘
-
-ℹ️ Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında
-tarih bilgisinin sol kısmında yer almaktadır.
-
-▼ 📷 Ekran kodunun bulunduğu yeri göster
-
-┌──────────────────────┐   ┌──────────────────────┐
-│     Mercan Image     │   │      Omnia Image     │
-└──────────────────────┘   └──────────────────────┘
-
-Mercan ekranında konumu     Omnia ekranında konumu
-UX Principles
-Prioritize discoverability without increasing cognitive load.
-Keep the default state minimal.
-Use progressive disclosure (expand only when needed).
-Ensure the layout is responsive for desktop and mobile.
-Images should have rounded corners and a subtle border/shadow to match the application's design system.
-
-Implement this as a reusable component so it can be used for other form fields that require visual guidance in the future.
+{
+    "ok": false,
+    "error": "customfield_10405: Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\".",
+    "details": {
+        "customfield_10405": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+    },
+    "messages": [],
+    "fieldsCount": 13,
+    "formKeys": [
+        "talepTipi",
+        "yasalAciklama",
+        "yasalTarih",
+        "bulguKodu",
+        "amac",
+        "kanallar",
+        "stakeholders",
+        "stakeholderOpinions",
+        "q2",
+        "q2Detail",
+        "q3",
+        "q3Detail",
+        "q4",
+        "q4Detail",
+        "q4Attachment",
+        "q5",
+        "q5Attachment",
+        "q6",
+        "q6Detail",
+        "q7Code",
+        "bs1a",
+        "bs1b",
+        "bs1cCount",
+        "bs1cDuration",
+        "bs2a",
+        "bs2b",
+        "bs2c",
+        "bs3CustomerImpact",
+        "bs4OperationalFinancialRisk"
+    ],
+    "issueKey": "HC-40996"
+}
