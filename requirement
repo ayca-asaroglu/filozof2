@@ -1,6 +1,96 @@
 2. Kapsam
-Sistemin hangi fonksiyonları sağlayacağı açıkça belirtilmeli. Talep alma, AI destekli netleştirme, kurumsal bilgiyle zenginleştirme, JSON, FR, NFR, kabul kriterleri, BPMN ve UML üretimi gibi fonksiyonların hangi seviyede ele alınacağı netleştirilmeli.
+
+Filozof; kullanıcıdan gelen ham/serbest metin talepleri, alan bilgisi olmayan bir
+geliştirici, analist veya başka bir yapay zekâ tarafından dahi anlaşılabilecek,
+geliştirilebilir ve test edilebilir iş gereksinimine dönüştüren LLM destekli bir
+fikir olgunlaştırma ve talep zenginleştirme platformudur. Sistem; bir web portalı
+(portal.html), Jira/ScriptRunner üzerinde çalışan REST servisleri
+(promptflowchat, fibarprIdeaApprove, fibarprIdeaCalls, getCascadingChildOptionsForFields),
+Azure OpenAI ve Azure Speech entegrasyonları ile bir vektör (pgvector) benzerlik
+servisinden oluşur.
+
+Aşağıdaki tablo sistemin sağladığı fonksiyonları ve her birinin bu sürümde hangi
+seviyede ele alındığını gösterir.
+
+Seviye tanımları:
+- Mevcut     : Kodda tam olarak uygulanmış ve çalışır durumda.
+- Kısmi      : Uygulanmış ancak sınırlı; ayrı/yapısal bir çıktı olarak değil, mevcut
+               alanların içinde ele alınıyor.
+- Planlanan  : Yol haritasında; bu sürümde henüz uygulanmadı.
+
+| # | Fonksiyon                              | Kapsam / Ele alınış biçimi                                                                                                                                      | Seviye    |
+|---|----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| 1 | Talep alma                             | Web portalında serbest metin sohbet ve olgunlaştırma formu; sesli giriş (Azure Speech). Sohbet başlıkları/mesajları MSSQL'de (fibarpr_chat_thread/message) tutulur. | Mevcut    |
+| 2 | AI destekli netleştirme                | "Filozof" sistem promptu ile olgunluk kontrolleri (problem, kavram, mevcut süreç, kök neden/etki, istenen davranış, kapsam dışı, hedef kullanıcı); her adımda tek soru + en az iki örnek. Azure OpenAI (gpt-5.4) function-calling ile yürütülür. | Mevcut    |
+| 3 | Kurumsal bilgiyle zenginleştirme       | Fikirler llama-embed-nemotron-8b ile embed edilip pgvector'e yazılır; kosinüs benzerliğiyle "Benzer Fikirler" araması yapılır. Mevcut Jira kayıtları JQL ile çekilip bilgi tabanına indekslenir. | Mevcut    |
+| 4 | Yapılandırılmış JSON üretimi           | Tüm zorunlu alanlar toplandığında `submit_idea_form` function-call ile tek bir yapılandırılmış JSON üretilir; hiçbir kullanıcı bilgisi kaybedilmez (eşleşmeyenler unmapped_context'e). | Mevcut    |
+| 5 | Kompleksite / efor tahmini             | `score_complexity` (gpt-4.1) ile ağırlıklı puanlama motoru; Talep_Tipi (Development / Development Değil), Analiz_Notu ve T-Shirt Size (XS/S/M/L) üretir.          | Mevcut    |
+| 6 | Jira kaydı oluşturma/güncelleme        | Onay sonrası `fibarprIdeaApprove`; form alanları Jira custom field'larına eşlenir, Business Score cascade alanları doldurulur, ek belgeler eklenir, workflow transition tetiklenir. | Mevcut    |
+| 7 | Kabul kriterleri                       | Talep "developer-ready" sayılmadan önce test edilebilir kabul kriterleri netleştirilir (pozitif/negatif/kapsam dışı senaryo + veri/statü sonucu). Ayrı bir alan değil, `fikrin_aciklamasi` içinde maddeler olarak korunur. | Kısmi     |
+| 8 | FR (Fonksiyonel Gereksinim)            | Netleştirme çıktısı FR'ye temel oluşturur ancak numaralandırılmış, ayrı bir FR listesi olarak üretilmez.                                                        | Planlanan |
+| 9 | NFR (Fonksiyonel Olmayan Gereksinim)   | Performans, güvenlik, erişilebilirlik vb. NFR'ler ayrı yapılandırılmış çıktı olarak üretilmez.                                                                  | Planlanan |
+| 10| BPMN üretimi                           | Süreç akış diyagramı (BPMN) üretimi bu sürümde yer almaz.                                                                                                        | Planlanan |
+| 11| UML üretimi                            | Sequence/class/use-case gibi UML diyagramı üretimi bu sürümde yer almaz.                                                                                         | Planlanan |
+| 12| Güvenlik / gizlilik                    | Prompt injection'a direnç, rol dışına çıkmama; TCKN, kart no, CVV, şifre, OTP, PIN gibi hassas verilerin istenmemesi/maskelenmesi sistem promptunda zorunlu kılınır. | Mevcut    |
+| 13| Sesli etkileşim                        | Azure Speech ile konuşmadan-metne (token akışı) ve metinden-konuşmaya (TTS, tr-TR-EmelNeural). SPEECH_ENABLED ile kapatılabilir. | Mevcut    |
+
+Kapsam dışı (bu sürüm):
+- Otomatik kod/otomasyon üretimi yapılmaz; sistem yalnızca gereksinimi olgunlaştırır ve Jira kaydına dönüştürür.
+- Efor tahmini karar-destek amaçlıdır; ekip planlaması/atama yapmaz.
+- Mevzuat/bankacılık konularında model kesin bilgi üretmez; emin olunmayan noktalarda kullanıcı doğrulaması istenir (halüsinasyon yasağı).
+
 
 4. Input / Output Tanımı
-Sistemin aldığı girdiler ve ürettiği çıktılar örnekleriyle gösterilmeli. Örneğin serbest metin talep, Filozof çıktısı, Jira kaydı ve kurumsal dokümanlar input; yapılandırılmış JSON, FR, NFR, kabul kriterleri, BPMN ve UML ise output olarak tanımlanabilir.
 
+Sistemin girdileri ve çıktıları, uçtan uca akışıyla birlikte aşağıda örneklenmiştir.
+
+GİRDİLER (INPUT)
+
+| Girdi                          | Kaynak / Kanal                                  | Örnek                                                                                                   |
+|--------------------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| Serbest metin talep            | Portal sohbet kutusu (promptflowchat, action=MESSAGE) | "Karşılıksız çek işleminde imha sonrası müşteriye uyarı gitmiyor, bunu engellemek istiyorum."           |
+| Sohbet geçmişi (chat_history)  | promptflowchat isteği içinde                    | Önceki soru-cevap turlarının listesi (bağlamın korunması için)                                          |
+| Sesli girdi                    | Mikrofon → Azure Speech (fibarprSpeechToken)    | Kullanıcının sesli anlattığı talebin metne dönüşmüş hali                                                 |
+| Önceki Filozof çıktısı / özet  | Sohbet akışında saklanan asistan özeti          | Onaya sunulan yapılandırılmış özet (revize/onay turlarında yeniden girdi olur)                          |
+| Onay/revizyon aksiyonu         | promptflowchat (action=APPROVE / REVISE)        | "Onaylıyorum." → Jira kaydı üretimini tetikler                                                          |
+| Kurumsal Jira kayıtları        | jira-vector-test.py (JQL) → vektör deposu       | Mevcut Fikir/Talep kayıtları; benzerlik araması ve zenginleştirme için indekslenir                      |
+| Kurumsal doküman / ek belge    | Portal "Ek Belgeler" → fibarprIdeaApprove (base64) | Gizlilik taahhüdü, teknik spesifikasyon vb. dosyalar                                                     |
+| Olgunlaştırma formu alanları   | Portal formu → fibarprIdeaApprove               | Amaç, kanallar, paydaş görüşleri, NPS/UI/entegrasyon/raporlama soruları, Business Score cevapları        |
+
+ÇIKTILAR (OUTPUT)
+
+| Çıktı                          | Üretim noktası                                  | İçerik                                                                                                   |
+|--------------------------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| Netleştirici sorular + örnekler| promptflowchat / gpt-5.4                        | Tek soru + en az iki [Örnek] satırı; eksik alanı tamamlatmaya yönelik                                    |
+| Yapılandırılmış JSON           | submit_idea_form function-call                  | talep_tipi, fikrin_ozeti, fikrin_aciklamasi, problem, cozum_tipi, mevcut_durum, hedef_kitle, kpi, amac, kanallar, unmapped_context |
+| Kabul kriterleri               | fikrin_aciklamasi içinde                        | Pozitif / negatif / kapsam dışı senaryo + veri/statü sonucu (maddeler halinde)                          |
+| Kompleksite / efor             | score_complexity function-call                  | Talep_Tipi, Analiz_Notu, T-Shirt Size (XS/S/M/L)                                                        |
+| Jira kaydı                     | fibarprIdeaApprove                              | Custom field'ları doldurulmuş, Business Score'lu, ek belgeli, workflow'u ilerletilmiş Jira issue        |
+| Benzer fikirler listesi        | fibarprIdeaVectorSearch                         | Skorlu (kosinüs benzerliği) benzer kayıtlar — mükerrerlik/zenginleştirme                                 |
+| Sesli çıktı                    | fibarprSpeechTts                                | Asistan cevabının seslendirilmiş (MP3) hali                                                             |
+| FR / NFR                       | (Planlanan)                                     | Numaralandırılmış fonksiyonel ve fonksiyonel olmayan gereksinim listeleri                               |
+| BPMN / UML                     | (Planlanan)                                     | Süreç akış (BPMN) ve UML diyagramları                                                                    |
+
+Örnek — submit_idea_form yapılandırılmış JSON çıktısı:
+
+{
+  "talep_tipi": "Yazılım Geliştirme",
+  "fikrin_ozeti": "Karşılıksız çek imhasında müşteri uyarısı ve işlem engeli",
+  "problem": "İmha edilmiş karşılıksız çekte, şube işlemi tamamlayabiliyor ve müşteriye uyarı gitmiyor.",
+  "mevcut_durum": "Şube personeli imha ekranından işlemi başlatıyor; sistem statü kontrolü yapmadan işlemi tamamlıyor.",
+  "cozum_tipi": "Otomasyon + kontrol: imha statüsündeki çekte işlem öncesi kontrol ve engelleme.",
+  "hedef_kitle": "Şube çalışanı (iç kullanıcı); müşteri dolaylı etkilenen taraf.",
+  "fikrin_aciklamasi": "... Kabul kriterleri: [Pozitif] İmha statüsünde işlem denenirse engellenir ve açıklayıcı uyarı gösterilir. [Negatif] Aktif statüde işlem eskisi gibi tamamlanır. [Kapsam dışı] Çağrı merkezi kanalı bu sürümde kapsam dışıdır. [Veri/Statü] İşlem loglanır, statü değişmez.",
+  "kpi": "Belirtilmedi",
+  "amac": "Operasyonel verimlilik için manuel olan süreçlerin teknoloji ile yeniden tasarlanması",
+  "kanallar": ["Şube"],
+  "unmapped_context": []
+}
+
+Örnek — score_complexity çıktısı:
+
+{
+  "Talep_Tipi": "Development",
+  "Analiz_Notu": "Core bankacılıkta statü kontrolü ve engelleme; tek sistem, orta derinlik.",
+  "T_Shirt_Size": "M"
+}
