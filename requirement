@@ -1,4 +1,44 @@
-    "codeVersion": "date-fix-v7-validateverified",
+{
+    "ok": false,
+    "error": "customfield_10405: Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\".",
+    "details": {
+        "customfield_10405": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+    },
+    "messages": [],
+    "fieldsCount": 13,
+    "formKeys": [
+        "talepTipi",
+        "yasalAciklama",
+        "yasalTarih",
+        "bulguKodu",
+        "amac",
+        "kanallar",
+        "stakeholders",
+        "stakeholderOpinions",
+        "q2",
+        "q2Detail",
+        "q3",
+        "q3Detail",
+        "q4",
+        "q4Detail",
+        "q4Attachment",
+        "q5",
+        "q5Attachment",
+        "q6",
+        "q6Detail",
+        "q7Code",
+        "bs1a",
+        "bs1b",
+        "bs1cCount",
+        "bs1cDuration",
+        "bs2a",
+        "bs2b",
+        "bs2c",
+        "bs3CustomerImpact",
+        "bs4OperationalFinancialRisk"
+    ],
+    "issueKey": "HC-40996",
+    "codeVersion": "date-fix-v8-trialmatrix",
     "diag": {
         "customfield_10405": {
             "typeKey": "com.atlassian.jira.plugin.system.customfieldtypes:datetime",
@@ -17,5 +57,76 @@
     ],
     "dateProvided": {
         "customfield_10405": "<<NO ACCEPTED FORMAT>>"
+    },
+    "dateTrials": {
+        "_pickerFormat": "dd/MMM/yy h:mm a",
+        "_authLocale": "tr_TR",
+        "sdf_authLocale": {
+            "value": "14/Tem/26 12:00 AM",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "sdf_tr": {
+            "value": "14/Tem/26 12:00 AM",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "sdf_en": {
+            "value": "14/Jul/26 12:00 AM",
+            "ok": false,
+            "error": {
+                "values": [
+                    "com.atlassian.jira.issue.customfields.impl.FieldValidationException: Geçersiz tarih formatı. Lütfen tarihi \"dd/MMM/yy h:mm a\" biçiminde girin."
+                ],
+                "strings": [
+                    "EXC: ",
+                    ""
+                ],
+                "empty": false,
+                "bytes": "RVhDOiBjb20uYXRsYXNzaWFuLmppcmEuaXNzdWUuY3VzdG9tZmllbGRzLmltcGwuRmllbGRWYWxpZGF0aW9uRXhjZXB0aW9uOiBHZcOnZXJzaXogdGFyaWggZm9ybWF0xLEuIEzDvHRmZW4gdGFyaWhpICJkZC9NTU0veXkgaDptbSBhIiBiacOnaW1pbmRlIGdpcmluLg==",
+                "valueCount": 1
+            }
+        },
+        "sdf_root": {
+            "value": "14/Jul/26 12:00 AM",
+            "ok": false,
+            "error": {
+                "values": [
+                    "com.atlassian.jira.issue.customfields.impl.FieldValidationException: Geçersiz tarih formatı. Lütfen tarihi \"dd/MMM/yy h:mm a\" biçiminde girin."
+                ],
+                "strings": [
+                    "EXC: ",
+                    ""
+                ],
+                "empty": false,
+                "bytes": "RVhDOiBjb20uYXRsYXNzaWFuLmppcmEuaXNzdWUuY3VzdG9tZmllbGRzLmltcGwuRmllbGRWYWxpZGF0aW9uRXhjZXB0aW9uOiBHZcOnZXJzaXogdGFyaWggZm9ybWF0xLEuIEzDvHRmZW4gdGFyaWhpICJkZC9NTU0veXkgaDptbSBhIiBiacOnaW1pbmRlIGdpcmluLg==",
+                "valueCount": 1
+            }
+        },
+        "converter": {
+            "value": "14/Tem/26 12:00 AM",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "dtff_loggedIn": {
+            "value": "14/Tem/26 12:00 AM",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "iso_dateTime": {
+            "value": "2026-07-14 00:00",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "iso_full": {
+            "value": "2026-07-14 00:00:00.0",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        },
+        "iso_date": {
+            "value": "2026-07-14",
+            "ok": false,
+            "error": "Invalid date format. Please enter the date in the format \"dd/MMM/yy h:mm a\"."
+        }
     }
 }
