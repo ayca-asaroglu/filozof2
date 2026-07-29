@@ -415,39 +415,14 @@ fibarprIdeaApprove(
 
     def typeKey = cf?.customFieldType?.key ?: ""
 
-    // Tarih alanları: frontend <input type="date"> her zaman ISO (yyyy-MM-dd) gönderir; Jira
-    // datepicker alanı IssueInputParameters üzerinden gelen string'i GİRİŞ YAPAN kullanıcının
-    // locale'i + jira.date.picker.java.format ile parse eder. Bu yüzden string'i de aynı kullanıcı
-    // bağlamıyla üretmeliyiz. Ay adı locale'e bağlı olan formatlarda (ör. "dd/MMM/yy") sabit/JVM
-    // varsayılan locale'i ile üretilen "15/Aug/26", Türkçe kullanıcının "15/Ağu/26" beklemesi
-    // nedeniyle "geçersiz tarih formatı" hatasına yol açıyordu. forLoggedInUser() ile Jira'nın
-    // parse ettiği formatın birebir aynısı üretilir → her dilde sorunsuz round-trip.
-    if (typeKey.contains("datepicker") || typeKey.contains("datetime")) {
-      if (!str) return null
-      def dateObj
-      try {
-        dateObj = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
-      } catch (ignored) {
-        // ISO değilse (ör. değer zaten Jira formatındaysa) olduğu gibi bırak.
-        return str
-      }
-      def isDateTime = typeKey.contains("datetime")
-      try {
-        def style = isDateTime
-          ? com.atlassian.jira.datetime.DateTimeStyle.DATE_TIME_PICKER
-          : com.atlassian.jira.datetime.DateTimeStyle.DATE_PICKER
-        return ComponentAccessor
-          .getComponent(com.atlassian.jira.datetime.DateTimeFormatterFactory)
-          .formatter().forLoggedInUser().withStyle(style).format(dateObj)
-      } catch (ignored) {
-        // DateTimeFormatter kullanılamazsa: format property + giriş yapan kullanıcının locale'i
-        // (en kötü ihtimalle JVM varsayılan locale'i) ile aynı round-trip'i taklit et.
-        def fmtKey = isDateTime ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
-        def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) ?: "dd/MMM/yy"
-        def userLocale = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
-        return new java.text.SimpleDateFormat(fmt, userLocale).format(dateObj)
-      }
-    }
+    // NOT: Date/datetime custom field'ları burada ELE ALINMAZ. IssueInputParameters string'i
+    // olarak gönderildiğinde Jira, değeri giriş yapan kullanıcının locale'i + tarih formatı ile
+    // (ör. "dd/MMM/yy h:mm a") parse ediyor; ay adı (MMM) ve AM/PM (a) locale'e bağlı olduğundan
+    // İngilizce dışı profillerde (ör. Türkçe: "Ağu", "ÖÖ") "invalid date format" hatası çıkıyordu.
+    // (İngilizce profilde sunucu locale'i ile eşleştiği için sorun görünmüyordu.) Bu alanlar artık
+    // fields.each döngüsünde yakalanıp gerçek bir Timestamp olarak doğrudan set ediliyor
+    // (bkz. dateFieldUpdates) — string/locale parse hiç devreye girmediği için profil dili ne
+    // olursa olsun sorunsuz çalışır.
 
     def isSelect = typeKey.contains("select")
     if (!isSelect) return str
@@ -494,9 +469,42 @@ fibarprIdeaApprove(
   def inputParams = issueService.newIssueInputParameters()
   inputParams.setSkipScreenCheck(true)
 
+  // Date/datetime alanları IssueInputParameters string'i olarak DEĞİL, gerçek Timestamp olarak
+  // doğrudan set edilir (locale'e bağlı "invalid date format" hatasını tamamen ortadan kaldırmak
+  // için). Burada toplanır, update sonrası uygulanır (aşağı bkz.).
+  def dateFieldUpdates = []
+  def parseIsoToTimestamp = { rawVal ->
+    def s = normalizeText(rawVal)
+    if (!s) return null
+    // Frontend <input type="date"> => "yyyy-MM-dd"; datetime-local => "yyyy-MM-dd'T'HH:mm".
+    // Locale'den bağımsız kalıcı desenlerle parse et; hiçbiri tutmazsa null (alanı bozma).
+    for (p in ["yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd"]) {
+      try {
+        def sdf = new java.text.SimpleDateFormat(p)
+        sdf.setLenient(false)
+        return new java.sql.Timestamp(sdf.parse(s).time)
+      } catch (ignored) {}
+    }
+    return null
+  }
+
   fields.each { k, v ->
     def cf = resolveCf(k?.toString())
     if (!cf) return
+
+    // Date/datetime alanları: string parse (locale) yerine gerçek Timestamp olarak doğrudan set
+    // edilmek üzere toplanır. Boş değer alanı temizler; parse edilemeyen dolu değer atlanır.
+    def cfTypeKey = cf?.customFieldType?.key ?: ""
+    if (cfTypeKey.contains("datepicker") || cfTypeKey.contains("datetime")) {
+      def isoStr = normalizeText(v)
+      if (!isoStr) {
+        dateFieldUpdates << [cf: cf, value: null]
+      } else {
+        def ts = parseIsoToTimestamp(isoStr)
+        if (ts != null) dateFieldUpdates << [cf: cf, value: ts]
+      }
+      return
+    }
 
     // Cascade select list: parent/child olarak gönder
     if (CASCADE_FIELDS.contains(k?.toString())) {
@@ -774,6 +782,21 @@ fibarprIdeaApprove(
   }
 
   issueService.update(adminUser, updateValidation)
+
+  // Date/datetime alanlarını locale'den bağımsız olarak doğrudan Timestamp yaz. IssueInputParameters
+  // string parse'ı devreye girmediği için profil dili (Türkçe, İngilizce, vb.) ne olursa olsun
+  // "invalid date format" hatası oluşmaz. Transition'dan önce yazılıyor ki geçiş koşulları/
+  // post-function'lar güncel değeri görsün.
+  if (!dateFieldUpdates.isEmpty()) {
+    try {
+      def dateIssue = issueManager.getIssueObject(issue.id)
+      dateFieldUpdates.each { du -> dateIssue.setCustomFieldValue(du.cf, du.value) }
+      issueManager.updateIssue(adminUser, dateIssue,
+        com.atlassian.jira.event.type.EventDispatchOption.DO_NOT_DISPATCH, false)
+    } catch (e) {
+      log.warn("Date custom field doğrudan güncellenemedi: ${e.message}", e)
+    }
+  }
 
   // update sonrası issue refresh
   issue = issueManager.getIssueObject(issue.id)
