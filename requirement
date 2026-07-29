@@ -1,4 +1,4 @@
-"codeVersion": "date-fix-v6-parserverified",
+    "codeVersion": "date-fix-v7-validateverified",
     "diag": {
         "customfield_10405": {
             "typeKey": "com.atlassian.jira.plugin.system.customfieldtypes:datetime",
@@ -8,7 +8,6 @@
     },
     "inputAdded": [
         "customfield_10406",
-        "customfield_10405",
         "customfield_19801",
         "customfield_10427",
         "customfield_10722",
@@ -17,6 +16,6 @@
         "customfield_10930"
     ],
     "dateProvided": {
-        "customfield_10405": "14/Tem/26 12:00 AM"
+        "customfield_10405": "<<NO ACCEPTED FORMAT>>"
     }
 }
