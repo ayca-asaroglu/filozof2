@@ -1,9 +1,6 @@
-Bilgi metnini düz metin yerine hafif mavi/gri arka planlı, ince kenarlıklı bir info card içinde gösterin. Böylece yardım içeriği daha kolay fark edilir.
-Accordion başlığını daha kullanıcı odaklı bir ifadeyle değiştirin. Örneğin: "📷 Ekran kodunu nerede bulabilirim?" veya "📷 Örnek ekran görüntülerini göster". Mevcut ifade biraz teknik kalıyor.
-Görsellerin altındaki açıklamaları biraz daha belirgin hale getirin; tercihen görsel kartının içinde veya başlığında yer alsın.
-Görsellere tıklayınca büyük boyutta modal/lightbox açılması sağlanmalı. Mevcut boyutta bazı kullanıcılar ekran kodunu seçmekte zorlanabilir.
-Mercan ve Omnia görsellerinde ekran kodunun bulunduğu alanı kırmızı çerçeve veya ok ile daha belirgin işaretleyin. Özellikle Mercan ekranında işaretleme daha görünür olabilir.
-Bilgi metni, accordion ve görseller arasında biraz daha fazla dikey boşluk bırakılması arayüzün daha ferah görünmesini sağlar.
-Yardım ikonları ve görsel ikonlarının aynı ikon setinden seçilmesi tasarım bütünlüğünü artıracaktır.
+2. Kapsam
+Sistemin hangi fonksiyonları sağlayacağı açıkça belirtilmeli. Talep alma, AI destekli netleştirme, kurumsal bilgiyle zenginleştirme, JSON, FR, NFR, kabul kriterleri, BPMN ve UML üretimi gibi fonksiyonların hangi seviyede ele alınacağı netleştirilmeli.
 
-Bu küçük dokunuşlarla tasarım, güncel kurumsal tasarım sistemleri (Material Design, Ant Design, Atlassian Design System vb.) seviyesinde, daha modern ve kullanıcı dostu bir görünüme ulaşacaktır.
+4. Input / Output Tanımı
+Sistemin aldığı girdiler ve ürettiği çıktılar örnekleriyle gösterilmeli. Örneğin serbest metin talep, Filozof çıktısı, Jira kaydı ve kurumsal dokümanlar input; yapılandırılmış JSON, FR, NFR, kabul kriterleri, BPMN ve UML ise output olarak tanımlanabilir.
+
