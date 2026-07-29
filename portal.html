@@ -1253,6 +1253,57 @@
     .q-select[multiple]{ height:auto; min-height:120px; }
     .q-detail{ display:none; margin-top:6px; }
     .q-detail.open{ display:block; }
+
+    /* Kompakt tek-dosya alanı (koşullu ekler: q5 / q8) — tek satır yüksekliğinde kalır */
+    .q-file-input{
+      position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+      overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+    }
+    .q-file-trigger{
+      display:inline-flex; align-items:center; gap:8px;
+      height:36px; padding:0 14px;
+      background:var(--surface); color:var(--primary);
+      border:1px dashed var(--border); border-radius:var(--radius-md);
+      font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
+      transition:border-color .15s, background .15s, box-shadow .15s;
+    }
+    .q-file-trigger[hidden]{ display:none; }
+    .q-file-trigger:hover{ border-color:var(--primary-light); background:rgba(76,154,255,0.06); }
+    .q-file-trigger:focus-visible{ outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px var(--focus-ring); }
+    .q-file-trigger svg{ display:block; }
+    .q-file-chip{
+      display:flex; align-items:center; gap:10px;
+      min-height:36px; padding:5px 6px 5px 8px;
+      border:1px solid var(--border); border-radius:var(--radius-md);
+      background:var(--surface); box-shadow:var(--shadow-sm);
+    }
+    .q-file-chip[hidden]{ display:none; }
+    .q-file-ico{
+      flex-shrink:0; width:28px; height:28px; border-radius:7px;
+      display:grid; place-items:center; overflow:hidden;
+      font-size:9px; font-weight:800; letter-spacing:.3px;
+      background:var(--border-light); color:var(--text-muted);
+    }
+    .q-file-ico svg{ display:block; }
+    .q-file-ico img{ width:100%; height:100%; object-fit:cover; }
+    .q-file-ico.kind-pdf{ background:rgba(222,53,11,0.10); color:#DE350B; }
+    .q-file-ico.kind-doc{ background:rgba(47,93,169,0.10); color:#2F5DA9; }
+    .q-file-ico.kind-xls{ background:rgba(54,179,126,0.14); color:#2F9E6B; }
+    .q-file-ico.kind-img{ background:rgba(101,84,192,0.12); color:#6554C0; }
+    .q-file-name{
+      flex:1; min-width:0; font-size:12.5px; font-weight:600; color:var(--text);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .q-file-size{ flex-shrink:0; font-size:11.5px; color:var(--text-subtle); }
+    .q-file-remove{
+      flex-shrink:0; width:26px; height:26px; border:none; background:transparent;
+      color:var(--text-subtle); cursor:pointer; border-radius:6px;
+      display:grid; place-items:center; transition:background .15s, color .15s;
+    }
+    .q-file-remove:hover{ background:rgba(222,53,11,0.10); color:var(--danger); }
+    .q-file-remove:focus-visible{ outline:2px solid var(--primary-light); outline-offset:1px; }
+    .q-file-remove svg{ display:block; }
+    @media (prefers-reduced-motion: reduce){ .q-file-trigger{ transition:none; } }
     .q-item.is-hidden{ display:none; }
     .q-help{ margin-top:6px; font-size:12px; color:var(--text-subtle); line-height:1.4; }
 
@@ -2789,7 +2840,21 @@
                     <option value="Yok">Yok</option>
                   </select>
                   <textarea class="q-input q-detail" id="q5Detail" rows="2" placeholder="Detay yazınız..."></textarea>
-                  <input class="q-input q-detail" id="q5Attachment" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                  <div class="q-file q-detail" id="q5AttachmentField" data-file-field>
+                    <input class="q-file-input" id="q5Attachment" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                    <button type="button" class="q-file-trigger">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05l-8.5 8.5a5 5 0 0 1-7.07-7.07l8.49-8.49a3.33 3.33 0 0 1 4.71 4.71l-8.5 8.49a1.67 1.67 0 0 1-2.35-2.35l7.78-7.78"/></svg>
+                      <span>Dosya seç</span>
+                    </button>
+                    <div class="q-file-chip" hidden>
+                      <span class="q-file-ico" aria-hidden="true"></span>
+                      <span class="q-file-name"></span>
+                      <span class="q-file-size"></span>
+                      <button type="button" class="q-file-remove" title="Kaldır" aria-label="Dosyayı kaldır">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  </div>
                   <div class="q-warn" id="q4AiWarn" style="display:none;"></div>
                 </div>
 
@@ -2800,7 +2865,21 @@
                     <option value="Evet">Evet</option>
                     <option value="Hayır">Hayır</option>
                   </select>
-                  <input class="q-input q-detail" id="q8Attachment" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                  <div class="q-file q-detail" id="q8AttachmentField" data-file-field>
+                    <input class="q-file-input" id="q8Attachment" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+                    <button type="button" class="q-file-trigger">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05l-8.5 8.5a5 5 0 0 1-7.07-7.07l8.49-8.49a3.33 3.33 0 0 1 4.71 4.71l-8.5 8.49a1.67 1.67 0 0 1-2.35-2.35l7.78-7.78"/></svg>
+                      <span>Dosya seç</span>
+                    </button>
+                    <div class="q-file-chip" hidden>
+                      <span class="q-file-ico" aria-hidden="true"></span>
+                      <span class="q-file-name"></span>
+                      <span class="q-file-size"></span>
+                      <button type="button" class="q-file-remove" title="Kaldır" aria-label="Dosyayı kaldır">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  </div>
                   <div class="q-warn" id="q5AiWarn" style="display:none;"></div>
                 </div>
 
@@ -4830,8 +4909,14 @@ function renderMarkdown(text) {
       ['q2Detail','q3Detail','q5Detail','q10Detail'].forEach(id => {
         const el = document.getElementById(id); if(el){ el.value = ''; el.classList.remove('open'); }
       });
-      const file = document.getElementById('q8Attachment');
-      if(file){ file.value = ''; file.classList.remove('open'); }
+      ['q5AttachmentField', 'q8AttachmentField'].forEach(id => {
+        const wrap = document.getElementById(id);
+        if(!wrap) return;
+        const inp = wrap.querySelector('.q-file-input');
+        if(inp) inp.value = '';
+        wrap.classList.remove('open');
+        if(typeof wrap._renderQFile === 'function') wrap._renderQFile();
+      });
       if(typeof resetMatureAttachments === 'function') resetMatureAttachments();
       const q7 = document.getElementById('q7Code'); if(q7) q7.value = '';
       if(typeof window.resetStakeholdersSelection === 'function') window.resetStakeholdersSelection();
@@ -5191,7 +5276,10 @@ function renderMarkdown(text) {
         const detail = item.querySelector('.q-detail');
         if(detail && detail.classList.contains('open')){
           let dv = '';
-          if(detail.type === 'file'){ const f = detail.files && detail.files[0]; dv = f ? f.name : ''; }
+          // Kompakt .q-file sarmalayıcıda dosya input'u içeride; ham file input ise kendisidir.
+          const fileInput = detail.matches('input[type="file"]')
+            ? detail : detail.querySelector('input[type="file"]');
+          if(fileInput){ const f = fileInput.files && fileInput.files[0]; dv = f ? f.name : ''; }
           else { dv = (detail.value || '').trim(); }
           if(dv) answers.push({ label: label + ' (Detay)', value: dv, group });
         }
@@ -6910,7 +6998,6 @@ function renderMarkdown(text) {
     const q10Select = document.getElementById('q10Select');
     const q10Detail = document.getElementById('q10Detail');
     const q8Select = document.getElementById('q8Select');
-    const q8Attachment = document.getElementById('q8Attachment');
 
     function setMatureStepVisual(stage){
       const stepForm = document.getElementById('stepForm');
@@ -6952,29 +7039,85 @@ function renderMarkdown(text) {
 
     function bindYesNoDetail(selectEl, detailEl){
       if(!selectEl || !detailEl) return;
+      // detailEl bir textarea, ham file input veya kompakt .q-file sarmalayıcı olabilir.
+      const fileInput = (detailEl.matches && detailEl.matches('input[type="file"]'))
+        ? detailEl
+        : (detailEl.querySelector ? detailEl.querySelector('input[type="file"]') : null);
       const sync = () => {
         const isYes = isAffirmative(selectEl.value);
         detailEl.classList.toggle('open', isYes);
-        if(!isYes && detailEl.type === 'file') detailEl.value = '';
+        if(!isYes && fileInput){
+          fileInput.value = '';
+          if(typeof detailEl._renderQFile === 'function') detailEl._renderQFile();
+        }
       };
       selectEl.addEventListener('change', sync); sync();
     }
 
     function syncYesNoDetails(){
-      const q5Attachment = document.getElementById('q5Attachment');
-      if(q5Select && q5Detail && q5Attachment){
+      const q5AttachmentField = document.getElementById('q5AttachmentField');
+      if(q5Select && q5Detail && q5AttachmentField){
         const syncQ5 = () => {
           const isVar = q5Select.value === 'Var';
-          q5Detail.classList.toggle('open', isVar); q5Attachment.classList.toggle('open', isVar);
-          if(!isVar){ q5Detail.value=''; q5Attachment.value=''; }
+          q5Detail.classList.toggle('open', isVar);
+          q5AttachmentField.classList.toggle('open', isVar);
+          if(!isVar){
+            q5Detail.value = '';
+            const inp = q5AttachmentField.querySelector('.q-file-input');
+            if(inp) inp.value = '';
+            if(typeof q5AttachmentField._renderQFile === 'function') q5AttachmentField._renderQFile();
+          }
         };
         q5Select.addEventListener('change', syncQ5); syncQ5();
       }
       bindYesNoDetail(q3Select, q3Detail);
       bindYesNoDetail(q2Select, q2Detail);
-      bindYesNoDetail(q8Select, q8Attachment);
+      bindYesNoDetail(q8Select, document.getElementById('q8AttachmentField'));
       bindYesNoDetail(q10Select, q10Detail);
     }
+    // Kompakt tek-dosya alanları (q5 / q8): native input gizli kalır, chip UI ile gösterilir.
+    (function initQFileFields(){
+      const thumbs = new WeakMap();
+      function render(wrap){
+        const input = wrap.querySelector('.q-file-input');
+        const trigger = wrap.querySelector('.q-file-trigger');
+        const chip = wrap.querySelector('.q-file-chip');
+        if(!input || !trigger || !chip) return;
+        const prev = thumbs.get(input);
+        if(prev){ try{ URL.revokeObjectURL(prev); }catch(e){} thumbs.delete(input); }
+        const file = input.files && input.files[0];
+        if(file){
+          const kind = (typeof matureAttachKind === 'function')
+            ? matureAttachKind(file) : { cls:'', badge:'', label:'Dosya' };
+          const ico = chip.querySelector('.q-file-ico');
+          ico.className = 'q-file-ico ' + (kind.cls || '');
+          if(kind.isImage){
+            const url = URL.createObjectURL(file); thumbs.set(input, url);
+            ico.innerHTML = '';
+            const im = document.createElement('img'); im.src = url; im.alt = ''; ico.appendChild(im);
+          } else if(kind.badge){ ico.textContent = kind.badge; }
+          else { ico.innerHTML = (typeof _MF_SVG_FILE === 'string') ? _MF_SVG_FILE : ''; }
+          const nm = chip.querySelector('.q-file-name');
+          nm.textContent = file.name || 'dosya'; nm.title = file.name || '';
+          chip.querySelector('.q-file-size').textContent =
+            (typeof formatFileSize === 'function') ? formatFileSize(file.size) : '';
+          chip.hidden = false; trigger.hidden = true;
+        } else {
+          chip.hidden = true; trigger.hidden = false;
+        }
+      }
+      document.querySelectorAll('[data-file-field]').forEach(wrap => {
+        const input = wrap.querySelector('.q-file-input');
+        const trigger = wrap.querySelector('.q-file-trigger');
+        const remove = wrap.querySelector('.q-file-remove');
+        if(!input || !trigger) return;
+        trigger.addEventListener('click', () => input.click());
+        input.addEventListener('change', () => render(wrap));
+        if(remove) remove.addEventListener('click', () => { input.value = ''; render(wrap); });
+        wrap._renderQFile = () => render(wrap);
+        render(wrap);
+      });
+    })();
     syncYesNoDetails();
     window.syncYesNoDetails = syncYesNoDetails;
     if(q2Select && q2Warn){ q2Select.addEventListener('change', updateNpsWarning); updateNpsWarning(); }
