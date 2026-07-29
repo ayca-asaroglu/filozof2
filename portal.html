@@ -1253,6 +1253,79 @@
     .q-detail.open{ display:block; }
     .q-item.is-hidden{ display:none; }
     .q-help{ margin-top:6px; font-size:12px; color:var(--text-subtle); line-height:1.4; }
+
+    /* ── Field guide: yeniden kullanılabilir görsel yardım bileşeni ── */
+    .field-hint{
+      margin-top:6px;
+      display:flex; align-items:flex-start; gap:6px;
+      font-size:12px; line-height:1.45; color:var(--text-subtle);
+    }
+    .field-hint-icon{ flex-shrink:0; line-height:1.45; }
+
+    .field-guide{ margin-top:8px; }
+    .field-guide-toggle{
+      display:inline-flex; align-items:center; gap:6px;
+      margin-left:-8px; padding:6px 8px;
+      background:transparent; border:none; border-radius:var(--radius-md);
+      color:var(--primary); font-size:12.5px; font-weight:600; cursor:pointer;
+      transition:background .15s;
+    }
+    .field-guide-toggle:hover{ background:rgba(47,93,169,0.08); }
+    .field-guide-toggle:focus-visible{ outline:2px solid var(--primary-light); outline-offset:2px; }
+    .field-guide-chevron{ font-size:10px; transition:transform .2s ease; }
+    .field-guide-toggle[aria-expanded="true"] .field-guide-chevron{ transform:rotate(180deg); }
+
+    .field-guide-panel{ margin-top:8px; animation:fieldGuideIn .18s ease; }
+    .field-guide-panel[hidden]{ display:none; }
+    @keyframes fieldGuideIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+
+    .field-guide-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; }
+    @media (max-width:560px){ .field-guide-grid{ grid-template-columns:1fr; } }
+
+    .field-guide-item{ margin:0; display:flex; flex-direction:column; gap:6px; }
+    .field-guide-thumb{
+      width:100%; padding:0;
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:var(--radius-lg); overflow:hidden; cursor:zoom-in;
+      box-shadow:var(--shadow-sm);
+      transition:box-shadow .15s, border-color .15s, transform .15s;
+    }
+    .field-guide-thumb:hover{ box-shadow:var(--shadow-md); border-color:var(--primary-light); transform:translateY(-1px); }
+    .field-guide-thumb:focus-visible{ outline:2px solid var(--primary-light); outline-offset:2px; }
+    .field-guide-thumb img{ display:block; width:100%; height:auto; aspect-ratio:16/10; object-fit:cover; }
+    .field-guide-thumb.is-empty{
+      cursor:default; box-shadow:none; border-style:dashed;
+      aspect-ratio:16/10; display:grid; place-items:center; gap:4px;
+      padding:12px; text-align:center; color:var(--text-subtle); font-size:12px;
+    }
+    .field-guide-thumb.is-empty:hover{ transform:none; box-shadow:none; border-color:var(--border); }
+    .field-guide-caption{ font-size:12px; color:var(--text-subtle); text-align:center; }
+
+    /* Görsel lightbox */
+    .img-lightbox{
+      position:fixed; inset:0; z-index:200;
+      display:none; align-items:center; justify-content:center;
+      padding:24px; background:rgba(9,30,66,0.72);
+    }
+    .img-lightbox.open{ display:flex; }
+    .img-lightbox-figure{
+      margin:0; max-width:min(1100px, 100%); max-height:100%;
+      display:flex; flex-direction:column; gap:12px; align-items:center;
+    }
+    .img-lightbox-img{
+      max-width:100%; max-height:80vh; object-fit:contain;
+      border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,0.2);
+      box-shadow:var(--shadow-lg); background:var(--surface);
+    }
+    .img-lightbox-caption{ color:#fff; font-size:13px; text-align:center; }
+    .img-lightbox-close{
+      position:absolute; top:16px; right:16px;
+      width:36px; height:36px; border-radius:var(--radius-md);
+      border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.12);
+      color:#fff; font-size:18px; cursor:pointer; display:grid; place-items:center;
+      transition:background .15s;
+    }
+    .img-lightbox-close:hover{ background:rgba(255,255,255,0.24); }
     .mature-file-list{ margin-top:8px; display:flex; flex-direction:column; gap:6px; }
     .mature-file-row{
       display:flex; align-items:center; gap:8px;
@@ -2634,6 +2707,32 @@
                 <div class="q-item is-hidden required" id="q7Item">
                   <label>Ekran Kodu</label>
                   <input class="q-input" id="q7Code" type="text" placeholder="Örn: MOB-001">
+                  <div class="field-hint">
+                    <span class="field-hint-icon" aria-hidden="true">ℹ️</span>
+                    <span>Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında tarih bilgisinin sol kısmında yer almaktadır.</span>
+                  </div>
+                  <div class="field-guide" data-field-guide>
+                    <button type="button" class="field-guide-toggle" aria-expanded="false">
+                      <span class="field-guide-chevron" aria-hidden="true">▾</span>
+                      <span class="field-guide-toggle-label">📷 Ekran kodunun bulunduğu yeri göster</span>
+                    </button>
+                    <div class="field-guide-panel" hidden>
+                      <div class="field-guide-grid">
+                        <figure class="field-guide-item">
+                          <button type="button" class="field-guide-thumb" data-guide-img="mercan" data-caption="Mercan ekranında konumu">
+                            <img alt="Mercan ekranında ekran kodunun konumu" loading="lazy">
+                          </button>
+                          <figcaption class="field-guide-caption">Mercan ekranında konumu</figcaption>
+                        </figure>
+                        <figure class="field-guide-item">
+                          <button type="button" class="field-guide-thumb" data-guide-img="omnia" data-caption="Omnia ekranında konumu">
+                            <img alt="Omnia ekranında ekran kodunun konumu" loading="lazy">
+                          </button>
+                          <figcaption class="field-guide-caption">Omnia ekranında konumu</figcaption>
+                        </figure>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="q-item" id="matureAttachmentItem">
@@ -2880,6 +2979,15 @@
     </div>
   </div>
 
+  <!-- Görsel rehber lightbox (yeniden kullanılabilir) -->
+  <div class="img-lightbox" id="imgLightbox" role="dialog" aria-modal="true" aria-label="Görsel önizleme" aria-hidden="true">
+    <button type="button" class="img-lightbox-close" id="imgLightboxClose" aria-label="Kapat">✕</button>
+    <figure class="img-lightbox-figure">
+      <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
+      <figcaption class="img-lightbox-caption" id="imgLightboxCaption"></figcaption>
+    </figure>
+  </div>
+
   <!-- Context menu -->
   <div class="ctx" id="ctxMenu" role="menu" aria-hidden="true">
     <button class="ctx-item" id="ctxRename">Yeniden adlandır</button>
@@ -3099,6 +3207,11 @@
     // kill-switch: false => Azure Speech tamamen kapali, browser STT/TTS kullanilir
     const AZURE_SPEECH_ENABLED = true;
     const FILOZOF_AVATAR = 'https://atlas.fibabanka.local/jira/secure/attachment/198597/fi.png?dowload=1';
+    // Field guide görselleri — Filozof ikonu gibi link olarak buraya ekleyin (data-guide-img değeriyle eşleşir).
+    const FIELD_GUIDE_IMAGES = {
+      mercan: '', // TODO: Mercan ekran görseli linki
+      omnia:  ''  // TODO: Omnia ekran görseli linki
+    };
     const CALLS_THREAD_FIELD = '';
     const CALLS_CUSTOM_FIELDS = [];
     const REQUEST_TYPE_OPTIONS = [
@@ -6975,6 +7088,71 @@ function renderMarkdown(text) {
       window.getStakeholdersState = function(){
         return { stakeholdersValue: Array.from(selected).join(", "), stakeholderOpinionsValue: JSON.stringify(opinions) };
       };
+    })();
+
+    // Yeniden kullanılabilir görsel yardım bileşeni: accordion + paylaşımlı lightbox.
+    (function initFieldGuides(){
+      const IMAGES = (typeof FIELD_GUIDE_IMAGES === 'object' && FIELD_GUIDE_IMAGES) ? FIELD_GUIDE_IMAGES : {};
+      const lightbox = document.getElementById('imgLightbox');
+      const lightboxImg = document.getElementById('imgLightboxImg');
+      const lightboxCaption = document.getElementById('imgLightboxCaption');
+      const lightboxClose = document.getElementById('imgLightboxClose');
+
+      function openLightbox(src, caption){
+        if(!lightbox || !src) return;
+        lightboxImg.src = src;
+        lightboxImg.alt = caption || '';
+        lightboxCaption.textContent = caption || '';
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden', 'false');
+      }
+      function closeLightbox(){
+        if(!lightbox) return;
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImg.src = '';
+      }
+      if(lightbox){
+        lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+        lightboxClose?.addEventListener('click', closeLightbox);
+        // Capture fazında yakala: lightbox açıkken Escape yalnızca lightbox'ı kapatsın,
+        // arkadaki mature/preview modalını kapatmasın.
+        window.addEventListener('keydown', (e) => {
+          if(e.key === 'Escape' && lightbox.classList.contains('open')){
+            e.stopImmediatePropagation();
+            closeLightbox();
+          }
+        }, true);
+      }
+
+      function markEmpty(thumb){
+        thumb.classList.add('is-empty');
+        thumb.innerHTML = '<span aria-hidden="true">🖼️</span><span>Görsel eklenecek</span>';
+      }
+
+      document.querySelectorAll('[data-field-guide]').forEach(guide => {
+        const toggle = guide.querySelector('.field-guide-toggle');
+        const panel = guide.querySelector('.field-guide-panel');
+        if(toggle && panel){
+          toggle.addEventListener('click', () => {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!expanded));
+            panel.hidden = expanded;
+          });
+        }
+        guide.querySelectorAll('.field-guide-thumb').forEach(thumb => {
+          const key = thumb.getAttribute('data-guide-img') || '';
+          const src = (thumb.getAttribute('data-full') || IMAGES[key] || '').trim();
+          const caption = thumb.getAttribute('data-caption') || '';
+          const img = thumb.querySelector('img');
+          if(src){
+            if(img){ img.src = src; img.addEventListener('error', () => markEmpty(thumb)); }
+            thumb.addEventListener('click', () => openLightbox(src, caption));
+          } else {
+            markEmpty(thumb);
+          }
+        });
+      });
     })();
 
     (function initChannelsMultiSelect(){
