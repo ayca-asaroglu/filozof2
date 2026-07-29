@@ -1339,32 +1339,6 @@
     .field-guide-thumb:hover .field-guide-zoom,
     .field-guide-thumb:focus-visible .field-guide-zoom{ opacity:1; transform:translateY(0); }
 
-    /* Ekran kodunun konumunu işaretleyen kırmızı çerçeve (görsel üstünde) */
-    .fg-marker{
-      position:absolute; box-sizing:border-box;
-      border:2.5px solid var(--danger); border-radius:6px;
-      box-shadow:0 0 0 3px rgba(222,53,11,0.22), inset 0 0 0 1px rgba(255,255,255,0.65);
-      pointer-events:none;
-    }
-    .fg-marker.high{ animation:fgMarkerPulse 1.8s ease-out infinite; }
-    @keyframes fgMarkerPulse{
-      0%{ box-shadow:0 0 0 0 rgba(222,53,11,0.55), inset 0 0 0 1px rgba(255,255,255,0.65); }
-      70%{ box-shadow:0 0 0 9px rgba(222,53,11,0), inset 0 0 0 1px rgba(255,255,255,0.65); }
-      100%{ box-shadow:0 0 0 0 rgba(222,53,11,0), inset 0 0 0 1px rgba(255,255,255,0.65); }
-    }
-    .fg-marker-label{
-      position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
-      display:inline-flex; align-items:center; gap:4px;
-      background:var(--danger); color:#fff;
-      font-size:10.5px; font-weight:700; white-space:nowrap;
-      padding:3px 8px; border-radius:999px;
-      box-shadow:0 3px 8px rgba(222,53,11,0.38);
-    }
-    .fg-marker-label::after{
-      content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
-      border:5px solid transparent; border-top-color:var(--danger); border-bottom-width:0;
-    }
-
     .field-guide-thumb.is-empty{
       cursor:default;
       aspect-ratio:16/10; display:grid; place-items:center; gap:6px;
@@ -1372,7 +1346,6 @@
     }
     .field-guide-thumb.is-empty svg{ color:var(--text-disabled); }
     @media (prefers-reduced-motion: reduce){
-      .fg-marker.high, .img-lightbox-marker{ animation:none; }
       .field-guide-item{ transition:none; }
     }
 
@@ -1387,24 +1360,11 @@
       margin:0; max-width:min(1200px, 100%); max-height:100%;
       display:flex; flex-direction:column; gap:14px; align-items:center;
     }
-    .img-lightbox-media{
-      position:relative; display:inline-block;
-      max-width:100%; max-height:84vh; line-height:0;
-    }
     .img-lightbox-img{
       max-width:100%; max-height:84vh; object-fit:contain;
       border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,0.2);
       box-shadow:var(--shadow-lg); background:var(--surface);
     }
-    /* Lightbox içindeki kırmızı işaret — .fg-marker ile aynı görünüm */
-    .img-lightbox-marker{
-      position:absolute; box-sizing:border-box;
-      border:3px solid var(--danger); border-radius:8px;
-      box-shadow:0 0 0 4px rgba(222,53,11,0.22), inset 0 0 0 1px rgba(255,255,255,0.65);
-      pointer-events:none; animation:fgMarkerPulse 1.8s ease-out infinite;
-    }
-    .img-lightbox-marker[hidden]{ display:none; }
-    .img-lightbox-marker .fg-marker-label{ font-size:12px; padding:4px 10px; }
     .img-lightbox-caption{ color:#fff; font-size:13.5px; font-weight:600; text-align:center; }
     .img-lightbox-close{
       position:absolute; top:16px; right:16px;
@@ -3166,10 +3126,7 @@
   <div class="img-lightbox" id="imgLightbox" role="dialog" aria-modal="true" aria-label="Görsel önizleme" aria-hidden="true">
     <button type="button" class="img-lightbox-close" id="imgLightboxClose" aria-label="Kapat">✕</button>
     <figure class="img-lightbox-figure">
-      <span class="img-lightbox-media">
-        <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
-        <span class="img-lightbox-marker" id="imgLightboxMarker" aria-hidden="true" hidden></span>
-      </span>
+      <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
       <figcaption class="img-lightbox-caption" id="imgLightboxCaption"></figcaption>
     </figure>
   </div>
@@ -3397,14 +3354,6 @@
     const FIELD_GUIDE_IMAGES = {
       mercan: 'https://atlas.fibabanka.local/jira/secure/attachment/205066/mercan.png?dowload=1', // TODO: Mercan ekran görseli linki
       omnia:  'https://atlas.fibabanka.local/jira/secure/attachment/205065/omnia.png?dowload=1'  // TODO: Omnia ekran görseli linki
-    };
-    // Ekran kodunun görsel ÜZERİNDEKİ konumunu işaretleyen kırmızı çerçeve.
-    // Değerler görselin yüzdesi (%) cinsindendir: top/left = sol-üst köşe, width/height = kutu boyutu.
-    // ⚠️ Bu değerler yaklaşıktır — gerçek görseller yüklendiğinde çerçeveyi kod alanının
-    //    tam üzerine oturtmak için 4 sayıyı ayarlayın. emphasis:'high' → ok etiketi + nabız animasyonu.
-    const FIELD_GUIDE_MARKERS = {
-      mercan: { top: 6, left: 4, width: 26, height: 13, emphasis: 'high', label: 'Ekran kodu' },
-      omnia:  { top: 6, left: 4, width: 24, height: 12, label: 'Ekran kodu' }
     };
     const CALLS_THREAD_FIELD = '';
     const CALLS_CUSTOM_FIELDS = [];
@@ -7376,35 +7325,16 @@ function renderMarkdown(text) {
     // Yeniden kullanılabilir görsel yardım bileşeni: accordion + paylaşımlı lightbox.
     (function initFieldGuides(){
       const IMAGES = (typeof FIELD_GUIDE_IMAGES === 'object' && FIELD_GUIDE_IMAGES) ? FIELD_GUIDE_IMAGES : {};
-      const MARKERS = (typeof FIELD_GUIDE_MARKERS === 'object' && FIELD_GUIDE_MARKERS) ? FIELD_GUIDE_MARKERS : {};
       const lightbox = document.getElementById('imgLightbox');
       const lightboxImg = document.getElementById('imgLightboxImg');
       const lightboxCaption = document.getElementById('imgLightboxCaption');
       const lightboxClose = document.getElementById('imgLightboxClose');
-      const lightboxMarker = document.getElementById('imgLightboxMarker');
 
-      // Markör kutusunu yüzde (%) koordinatlarına göre konumlandırır; opsiyonel ok/etiket ekler.
-      function placeMarker(el, mk, withLabel){
-        if(!el) return;
-        el.style.top = mk.top + '%';
-        el.style.left = mk.left + '%';
-        el.style.width = mk.width + '%';
-        el.style.height = mk.height + '%';
-        el.classList.toggle('high', mk.emphasis === 'high');
-        el.innerHTML = (withLabel && mk.label)
-          ? '<span class="fg-marker-label"></span>' : '';
-        if(withLabel && mk.label){ el.querySelector('.fg-marker-label').textContent = mk.label; }
-      }
-
-      function openLightbox(src, caption, mk){
+      function openLightbox(src, caption){
         if(!lightbox || !src) return;
         lightboxImg.src = src;
         lightboxImg.alt = caption || '';
         lightboxCaption.textContent = caption || '';
-        if(lightboxMarker){
-          if(mk){ placeMarker(lightboxMarker, mk, true); lightboxMarker.hidden = false; }
-          else { lightboxMarker.hidden = true; lightboxMarker.innerHTML = ''; }
-        }
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden', 'false');
       }
@@ -7413,7 +7343,6 @@ function renderMarkdown(text) {
         lightbox.classList.remove('open');
         lightbox.setAttribute('aria-hidden', 'true');
         lightboxImg.src = '';
-        if(lightboxMarker){ lightboxMarker.hidden = true; lightboxMarker.innerHTML = ''; }
       }
       if(lightbox){
         lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
@@ -7447,19 +7376,10 @@ function renderMarkdown(text) {
           const key = thumb.getAttribute('data-guide-img') || '';
           const src = (thumb.getAttribute('data-full') || IMAGES[key] || '').trim();
           const caption = thumb.getAttribute('data-caption') || '';
-          const mk = MARKERS[key] || null;
           const img = thumb.querySelector('img');
           if(src){
             if(img){ img.src = src; img.addEventListener('error', () => markEmpty(thumb)); }
-            // Küçük görselin üzerine de kırmızı çerçeveyi bindir (etiket yalnızca vurgulu olanda).
-            if(mk){
-              const tm = document.createElement('span');
-              tm.className = 'fg-marker';
-              tm.setAttribute('aria-hidden', 'true');
-              placeMarker(tm, mk, mk.emphasis === 'high');
-              thumb.appendChild(tm);
-            }
-            thumb.addEventListener('click', () => openLightbox(src, caption, mk));
+            thumb.addEventListener('click', () => openLightbox(src, caption));
           } else {
             markEmpty(thumb);
           }
