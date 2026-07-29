@@ -2173,12 +2173,17 @@
       flex-direction:column;
       align-items:flex-end;
       gap:16px;
+      /* Konteyner tıklamaya şeffaf: kapalı popover layout'ta yer kaplasa da
+         alttaki butonları engellemesin. Tıklamayı yalnızca etkileşimli
+         çocuklar (fab / açık popover) yakalar. */
+      pointer-events:none;
     }
     .help-fab{
       width:60px; height:60px;
       border-radius:50%;
       border:none;
       cursor:pointer;
+      pointer-events:auto;
       background:linear-gradient(140deg, var(--primary-light) 0%, var(--primary) 52%, var(--primary-dark) 100%);
       color:#fff;
       box-shadow:0 8px 24px rgba(47,93,169,0.36), 0 2px 6px rgba(9,30,66,0.20);
