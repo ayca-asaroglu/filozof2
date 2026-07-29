@@ -522,33 +522,38 @@ fibarprIdeaApprove(
     return null
   }
 
-  // Tarihi, alanın converter'ının GERİ PARSE EDEBİLDİĞİ bir string'e çevir. Jira'nın datetime
-  // converter'ında getString() (ör. "14/Tem/26 12:00 AM") ile getTimestamp()'in beklediği locale
-  // sembolleri tutarsız olabiliyor (özellikle AM/PM: Türkçe'de "ÖÖ"/"ÖS"), bu yüzden tek formata
-  // güvenmiyoruz. Birden çok aday üretip converter'ın KENDİ getTimestamp'iyle round-trip'i GEÇEN ilk
-  // adayı seçiyoruz. validateUpdate de aynı getTimestamp'i kullandığından, seçilen string'in
-  // doğrulamayı geçmesi garanti olur — profil dili ne olursa olsun.
-  def formatDateForField = { ts, dt ->
-    def canParse = { s ->
-      if (!s) return false
-      try { return (dt ? dateTimeConverter.getTimestamp(s) : dateConverter.getDate(s)) != null }
-      catch (ignored) { return false }
-    }
+  // Tarihi, GERÇEK validateUpdate'in kabul ettiği string'e çevir. ÖNEMLİ: Alanın converter'ının
+  // getTimestamp'i ile validateUpdate'in kullandığı doğrulayıcı FARKLI davranıyor — converter
+  // "14/Tem/26 12:00 AM"'i kabul ederken validateUpdate reddedip Türkçe "ÖÖ" bekliyor (v6 diag ile
+  // kanıtlandı). Bu yüzden converter'ı oracle olarak kullanmıyoruz. Bunun yerine adayları TEK
+  // BAŞINA bu alan için validateUpdate'e verip, customfield hatası ÇIKMAYAN ilk adayı seçiyoruz —
+  // yani gerçek doğrulamanın kabul ettiği formatı doğrudan buluyoruz (profil dili ne olursa olsun).
+  def formatDateForField = { cf, ts, dt ->
+    def fid = cf.id?.toString()
     def candidates = []
-    // 1) Alanın kendi getString'i (Jira ile en tutarlı olması BEKLENEN — ama tutarsızsa elenecek)
-    try { candidates << (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
-    // 2/3) Picker format property'si + giriş yapan kullanıcı locale'i (TR standart sembolleri: "ÖÖ")
-    //      ve İngilizce locale ("AM") — parser hangisini bekliyorsa o seçilecek.
     try {
       def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
       def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey)
       if (fmt) {
         def loc = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
-        candidates << new java.text.SimpleDateFormat(fmt, loc).format(ts)
-        candidates << new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts)
+        candidates << new java.text.SimpleDateFormat(fmt, loc).format(ts)          // giriş yapan locale (TR => "ÖÖ")
+        candidates << new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts) // İngilizce ("AM")
       }
     } catch (ignored) {}
-    for (c in candidates) { if (canParse(c)) return c }
+    // Son çare adayı: alanın kendi getString'i
+    try { candidates << (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
+
+    // Her adayı yalnız bu alan için deneme-validateUpdate'e ver; bu alan için hata yoksa kabul edilir.
+    // (validateUpdate salt-doğrulama; kalıcılık yapmaz, yan etkisizdir.)
+    for (c in candidates.findAll { it }.unique()) {
+      try {
+        def tp = issueService.newIssueInputParameters()
+        tp.setSkipScreenCheck(true)
+        tp.addCustomFieldValue(cf.idAsLong, c)
+        def vr = issueService.validateUpdate(adminUser, issue.id, tp)
+        if (!(vr?.errorCollection?.errors?.containsKey(fid))) return c
+      } catch (ignored) {}
+    }
     return null
   }
 
@@ -566,13 +571,13 @@ fibarprIdeaApprove(
     if (isDateCustomField(cf)) {
       def ts = parseIsoToTimestamp(v)
       if (ts == null) return  // değer yok / parse edilemedi → alanı gönderme
-      def dateStr = formatDateForField(ts, isDateTimeField(cf))
+      def dateStr = formatDateForField(cf, ts, isDateTimeField(cf))
       if (dateStr) {
         inputParams.addCustomFieldValue(cf.idAsLong, dateStr)
         _diagInputAdded << (cf.id?.toString())
         _diagDateProvided[(cf.id?.toString())] = dateStr
       } else {
-        // Hiçbir aday converter'ca kabul edilmedi — teşhis için işaretle (alanı gönderme).
+        // Hiçbir aday validateUpdate'ce kabul edilmedi — teşhis için işaretle (alanı gönderme).
         _diagDateProvided[(cf.id?.toString())] = "<<NO ACCEPTED FORMAT>>"
       }
       return
@@ -867,7 +872,7 @@ fibarprIdeaApprove(
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
       issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v6-parserverified",
+      codeVersion: "date-fix-v7-validateverified",
       diag: diagFields,
       inputAdded: _diagInputAdded,
       dateProvided: _diagDateProvided
