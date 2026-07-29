@@ -488,18 +488,16 @@ fibarprIdeaApprove(
   def inputParams = issueService.newIssueInputParameters()
   inputParams.setSkipScreenCheck(true)
 
-  // Date/datetime alanları: değeri IssueInputParameters'a, alanın KENDİ converter'ıyla
-  // (DateTimeConverter/DateConverter) biçimlendirilmiş string olarak ekliyoruz. Bu converter'ların
-  // getString()'i ile getTimestamp()'i aynı format+locale'i kullandığından, gönderdiğimiz string
-  // Jira'nın aynı converter'ıyla birebir doğrulanır → profil dili ne olursa olsun "invalid date
-  // format" oluşmaz.
+  // Date/datetime alanları: değeri IssueInputParameters'a, PARSER'IN (getTimestamp) kabul ettiği
+  // doğrulanmış bir string olarak ekliyoruz (bkz. formatDateForField). validateUpdate bu string'i
+  // aynı getTimestamp ile doğruladığından, geçmesi garanti olur → profil dili ne olursa olsun.
   //
-  // KÖK NEDEN: Alanı hiç göndermezsek (önceki "doğrudan Timestamp" yaklaşımı), customfield_10405
-  // ZORUNLU bir alan olduğu için Jira mevcut değeri retain edip kendi (giriş yapan kullanıcının)
-  // locale'iyle yeniden doğruluyordu; ay adı/AM-PM locale'e bağlı olduğu için Türkçe profilde bu
-  // round-trip "dd/MMM/yy h:mm a" hatasıyla patlıyordu. Değeri converter-string olarak sağlayınca
-  // Jira retain edilen sorunlu değeri değil, bizim (kendi converter'ıyla üretilmiş) değerimizi
-  // doğruluyor ve geçiyor.
+  // KÖK NEDEN (HC-40996 diag ile kanıtlandı): customfield_10405 ZORUNLU bir alan; değeri hiç
+  // göndermezsek Jira mevcut değeri retain edip giriş yapan kullanıcının locale'iyle yeniden
+  // doğruluyor ve Türkçe profilde "dd/MMM/yy h:mm a" hatası veriyordu. Değeri sağlayınca Jira bizim
+  // değerimizi doğruluyor; ANCAK alanın kendi getString'i tutarsız string üretebiliyor (ör.
+  // "14/Tem/26 12:00 AM": ay Türkçe ama AM/PM İngilizce), parser ise "ÖÖ" bekliyor. Bu yüzden tek
+  // formata güvenmek yerine, parser'ın geri-parse edebildiği adayı seçiyoruz (formatDateForField).
   def dateTimeConverter = ComponentAccessor.getComponent(com.atlassian.jira.issue.customfields.converters.DateTimeConverter)
   def dateConverter     = ComponentAccessor.getComponent(com.atlassian.jira.issue.customfields.converters.DateConverter)
   def isDateTimeField = { cf ->
@@ -524,7 +522,38 @@ fibarprIdeaApprove(
     return null
   }
 
-  // TEŞHİS: inputParams'a eklenen alan id'leri + tarih alanları için gönderilen converter-string'i.
+  // Tarihi, alanın converter'ının GERİ PARSE EDEBİLDİĞİ bir string'e çevir. Jira'nın datetime
+  // converter'ında getString() (ör. "14/Tem/26 12:00 AM") ile getTimestamp()'in beklediği locale
+  // sembolleri tutarsız olabiliyor (özellikle AM/PM: Türkçe'de "ÖÖ"/"ÖS"), bu yüzden tek formata
+  // güvenmiyoruz. Birden çok aday üretip converter'ın KENDİ getTimestamp'iyle round-trip'i GEÇEN ilk
+  // adayı seçiyoruz. validateUpdate de aynı getTimestamp'i kullandığından, seçilen string'in
+  // doğrulamayı geçmesi garanti olur — profil dili ne olursa olsun.
+  def formatDateForField = { ts, dt ->
+    def canParse = { s ->
+      if (!s) return false
+      try { return (dt ? dateTimeConverter.getTimestamp(s) : dateConverter.getDate(s)) != null }
+      catch (ignored) { return false }
+    }
+    def candidates = []
+    // 1) Alanın kendi getString'i (Jira ile en tutarlı olması BEKLENEN — ama tutarsızsa elenecek)
+    try { candidates << (dt ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)) } catch (ignored) {}
+    // 2/3) Picker format property'si + giriş yapan kullanıcı locale'i (TR standart sembolleri: "ÖÖ")
+    //      ve İngilizce locale ("AM") — parser hangisini bekliyorsa o seçilecek.
+    try {
+      def fmtKey = dt ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
+      def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey)
+      if (fmt) {
+        def loc = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
+        candidates << new java.text.SimpleDateFormat(fmt, loc).format(ts)
+        candidates << new java.text.SimpleDateFormat(fmt, Locale.ENGLISH).format(ts)
+      }
+    } catch (ignored) {}
+    for (c in candidates) { if (canParse(c)) return c }
+    return null
+  }
+
+  // TEŞHİS: inputParams'a eklenen alan id'leri + tarih alanları için gönderilen (parser'ın kabul
+  // ettiği) string. Hiçbir aday parse edilemezse "<<NO ACCEPTED FORMAT>>" yazılır.
   def _diagInputAdded = []
   def _diagDateProvided = [:]
 
@@ -532,19 +561,19 @@ fibarprIdeaApprove(
     def cf = resolveCf(k?.toString())
     if (!cf) return
 
-    // Date/datetime alanları: alanın kendi converter'ıyla biçimlendirilip inputParams'a eklenir
-    // (yukarıdaki nota bkz.) — bu, Jira'nın aynı converter'la doğrulaması sayesinde her dilde geçer.
+    // Date/datetime alanları: parser'ın (getTimestamp) kabul ettiği bir string üretip inputParams'a
+    // ekleniyor (bkz. formatDateForField) — validateUpdate aynı parser'ı kullandığı için her dilde geçer.
     if (isDateCustomField(cf)) {
       def ts = parseIsoToTimestamp(v)
       if (ts == null) return  // değer yok / parse edilemedi → alanı gönderme
-      def dateStr = null
-      try {
-        dateStr = isDateTimeField(cf) ? dateTimeConverter.getString(ts) : dateConverter.getString(ts)
-      } catch (ignored) { dateStr = null }
+      def dateStr = formatDateForField(ts, isDateTimeField(cf))
       if (dateStr) {
         inputParams.addCustomFieldValue(cf.idAsLong, dateStr)
         _diagInputAdded << (cf.id?.toString())
         _diagDateProvided[(cf.id?.toString())] = dateStr
+      } else {
+        // Hiçbir aday converter'ca kabul edilmedi — teşhis için işaretle (alanı gönderme).
+        _diagDateProvided[(cf.id?.toString())] = "<<NO ACCEPTED FORMAT>>"
       }
       return
     }
@@ -838,7 +867,7 @@ fibarprIdeaApprove(
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
       issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v5-converter",
+      codeVersion: "date-fix-v6-parserverified",
       diag: diagFields,
       inputAdded: _diagInputAdded,
       dateProvided: _diagDateProvided
