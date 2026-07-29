@@ -423,6 +423,11 @@ fibarprIdeaApprove(
     // fields.each döngüsünde yakalanıp gerçek bir Timestamp olarak doğrudan set ediliyor
     // (bkz. dateFieldUpdates) — string/locale parse hiç devreye girmediği için profil dili ne
     // olursa olsun sorunsuz çalışır.
+    //
+    // GÜVENLİK AĞI: Herhangi bir date/datetime alanı (tespit kaçağı, beklenmedik tip anahtarı vb.)
+    // buraya kadar gelirse, ham ISO string'i ASLA inputParams'a gönderme — Jira onu locale formatıyla
+    // parse etmeye çalışıp "invalid date format" hatası verir. null döndürüp string yolunu kapatıyoruz.
+    if (typeKey.toLowerCase(Locale.ROOT).contains("date")) return null
 
     def isSelect = typeKey.contains("select")
     if (!isSelect) return str
@@ -494,8 +499,9 @@ fibarprIdeaApprove(
 
     // Date/datetime alanları: string parse (locale) yerine gerçek Timestamp olarak doğrudan set
     // edilmek üzere toplanır. Boş değer alanı temizler; parse edilemeyen dolu değer atlanır.
-    def cfTypeKey = cf?.customFieldType?.key ?: ""
-    if (cfTypeKey.contains("datepicker") || cfTypeKey.contains("datetime")) {
+    // Tespit "date" içeren TÜM tip anahtarlarını kapsar (datepicker, datetime, olası varyantlar).
+    def cfTypeKey = (cf?.customFieldType?.key ?: "").toLowerCase(Locale.ROOT)
+    if (cfTypeKey.contains("date")) {
       def isoStr = normalizeText(v)
       if (!isoStr) {
         dateFieldUpdates << [cf: cf, value: null]
