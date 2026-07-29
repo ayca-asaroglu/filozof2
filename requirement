@@ -1,4 +1,4 @@
-    "codeVersion": "date-fix-v5-converter",
+"codeVersion": "date-fix-v6-parserverified",
     "diag": {
         "customfield_10405": {
             "typeKey": "com.atlassian.jira.plugin.system.customfieldtypes:datetime",
