@@ -511,6 +511,11 @@ fibarprIdeaApprove(
     return null
   }
 
+  // TEŞHİS: Her cf'nin döngüde nereye gittiğini izle. customfield_10405 dateRouted'ta çıkarsa
+  // interception çalışıyor (sorun başka yerde); inputAdded'ta çıkarsa interception kaçırıyor demektir.
+  def _diagDateRouted = []
+  def _diagInputAdded = []
+
   fields.each { k, v ->
     def cf = resolveCf(k?.toString())
     if (!cf) return
@@ -519,6 +524,7 @@ fibarprIdeaApprove(
     // edilmek üzere toplanır. Boş değer alanı temizler; parse edilemeyen dolu değer atlanır.
     // Tespit hem tip anahtarını hem de Java sınıf hiyerarşisini kontrol eder (bkz. isDateCustomField).
     if (isDateCustomField(cf)) {
+      _diagDateRouted << (cf.id?.toString())
       def isoStr = normalizeText(v)
       if (!isoStr) {
         dateFieldUpdates << [cf: cf, value: null]
@@ -595,6 +601,7 @@ fibarprIdeaApprove(
     def converted = convertForCustomField(cf, v)
     if (converted == null) return
 
+    _diagInputAdded << (cf.id?.toString())
     if (converted instanceof Collection) {
       inputParams.addCustomFieldValue(cf.idAsLong, (converted.collect { it.toString() } as String[]))
     } else {
@@ -817,8 +824,10 @@ fibarprIdeaApprove(
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
       issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v3-classdetect",
-      diag: diagFields
+      codeVersion: "date-fix-v4-routediag",
+      diag: diagFields,
+      dateRouted: _diagDateRouted,
+      inputAdded: _diagInputAdded
     ]).build()
   }
 
