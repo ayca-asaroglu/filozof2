@@ -407,6 +407,24 @@ fibarprIdeaApprove(
     fields[cfKey] = str
   }
 
+  // Bir alanın date/datetime tipinde olup olmadığını KESİN belirle. Tip anahtarı ("...:datetime")
+  // beklenmedik olabileceğinden yalnızca ona güvenmiyoruz; customFieldType'ın Java sınıf hiyerarşisini
+  // de yürüyoruz — Jira'nın DateCFType/DateTimeCFType (ve türevleri) sınıf adında "Date" geçer.
+  // Bu sayede alan hangi tiple tanımlı olursa olsun tarih alanları yakalanır ve string olarak
+  // inputParams'a gönderilip locale parse hatasına ("dd/MMM/yy h:mm a") düşmeleri engellenir.
+  def isDateCustomField = { cf ->
+    if (!cf) return false
+    def cft = cf.customFieldType
+    if (!cft) return false
+    if ((cft.key ?: "").toLowerCase(Locale.ROOT).contains("date")) return true
+    def c = cft.getClass()
+    while (c != null) {
+      if ((c.name ?: "").contains("Date")) return true
+      c = c.superclass
+    }
+    return false
+  }
+
   // ===== Convert select/multiselect values =====
   def missingOptions = []
   def convertForCustomField = { cf, raw ->
@@ -427,7 +445,7 @@ fibarprIdeaApprove(
     // GÜVENLİK AĞI: Herhangi bir date/datetime alanı (tespit kaçağı, beklenmedik tip anahtarı vb.)
     // buraya kadar gelirse, ham ISO string'i ASLA inputParams'a gönderme — Jira onu locale formatıyla
     // parse etmeye çalışıp "invalid date format" hatası verir. null döndürüp string yolunu kapatıyoruz.
-    if (typeKey.toLowerCase(Locale.ROOT).contains("date")) return null
+    if (isDateCustomField(cf)) return null
 
     def isSelect = typeKey.contains("select")
     if (!isSelect) return str
@@ -499,9 +517,8 @@ fibarprIdeaApprove(
 
     // Date/datetime alanları: string parse (locale) yerine gerçek Timestamp olarak doğrudan set
     // edilmek üzere toplanır. Boş değer alanı temizler; parse edilemeyen dolu değer atlanır.
-    // Tespit "date" içeren TÜM tip anahtarlarını kapsar (datepicker, datetime, olası varyantlar).
-    def cfTypeKey = (cf?.customFieldType?.key ?: "").toLowerCase(Locale.ROOT)
-    if (cfTypeKey.contains("date")) {
+    // Tespit hem tip anahtarını hem de Java sınıf hiyerarşisini kontrol eder (bkz. isDateCustomField).
+    if (isDateCustomField(cf)) {
       def isoStr = normalizeText(v)
       if (!isoStr) {
         dateFieldUpdates << [cf: cf, value: null]
@@ -776,6 +793,22 @@ fibarprIdeaApprove(
       }
     }
     def errorText = errorMessages ? errorMessages.join("; ") : "Update validation failed"
+    // TEŞHİS: Hataya düşen her custom field'ın gerçek tipini ve tarih-alanı olarak algılanıp
+    // algılanmadığını yanıta ekle. Bu bölümün yanıtta GÖRÜNMESİ, güncel kodun canlı olduğunu da
+    // kanıtlar (codeVersion). Bir tarih alanı buraya kadar geldiyse detectedAsDate=false demektir
+    // ve tespit mantığının neden kaçırdığını (tip anahtarı/sınıf) buradan anlarız.
+    def diagFields = [:]
+    try {
+      updateValidation.errorCollection?.errors?.each { fid, msg ->
+        def dcf = resolveCf(fid?.toString())
+        def cft = dcf?.customFieldType
+        diagFields[fid?.toString()] = [
+          typeKey       : (cft?.key ?: "").toString(),
+          typeClass     : (cft?.getClass()?.name ?: "").toString(),
+          detectedAsDate: isDateCustomField(dcf)
+        ]
+      }
+    } catch (ignored) {}
     return Response.status(400).entity([
       ok: false,
       error: errorText,
@@ -783,7 +816,9 @@ fibarprIdeaApprove(
       messages: updateValidation.errorCollection?.errorMessages,
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
-      issueKey: issue.key?.toString()
+      issueKey: issue.key?.toString(),
+      codeVersion: "date-fix-v3-classdetect",
+      diag: diagFields
     ]).build()
   }
 
