@@ -11,3 +11,60 @@ Stratejik geliştirme,Yasal zorunluluk,Denetim bulgusu,İş ihtiyacı
 
 yasal zorunluluk açıklaması : customFieldId=10406
 yasal zorunluluk tarihi : customFieldId=10405
+
+
+I want to improve the UX of the "Ekran Kodu" field in this form.
+
+Goal
+
+Users often don't know where to find the screen code (e.g. MOB-001). I want to provide contextual help without cluttering the form.
+
+Requirements
+Keep the existing input field.
+Add a subtle helper text below the input:
+
+Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında tarih bilgisinin sol kısmında yer almaktadır.
+
+Below the helper text, add a collapsible section (accordion or expandable panel) titled:
+
+📷 Ekran kodunun bulunduğu yeri göster
+
+When expanded, display two image thumbnails side by side:
+Mercan screen
+Omnia screen
+Each image should have a small caption:
+Mercan ekranında konumu
+Omnia ekranında konumu
+Clicking an image should open it in a larger modal/lightbox so users can clearly see where the screen code is located.
+Design Guidelines
+Use a modern enterprise UI style similar to Atlassian, Material Design, or Ant Design.
+Keep the helper text lightweight (secondary text color).
+Use a subtle info icon (ℹ️) before the helper text.
+The expandable section should not distract users who already know the screen code.
+The form should remain clean and compact when the section is collapsed.
+Use spacing and typography consistent with the rest of the form.
+Layout
+EKRAN KODU *
+
+┌──────────────────────────────────────────────┐
+│ Örn: MOB-001                                 │
+└──────────────────────────────────────────────┘
+
+ℹ️ Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında
+tarih bilgisinin sol kısmında yer almaktadır.
+
+▼ 📷 Ekran kodunun bulunduğu yeri göster
+
+┌──────────────────────┐   ┌──────────────────────┐
+│     Mercan Image     │   │      Omnia Image     │
+└──────────────────────┘   └──────────────────────┘
+
+Mercan ekranında konumu     Omnia ekranında konumu
+UX Principles
+Prioritize discoverability without increasing cognitive load.
+Keep the default state minimal.
+Use progressive disclosure (expand only when needed).
+Ensure the layout is responsive for desktop and mobile.
+Images should have rounded corners and a subtle border/shadow to match the application's design system.
+
+Implement this as a reusable component so it can be used for other form fields that require visual guidance in the future.
