@@ -1278,6 +1278,8 @@
       display:grid; place-items:center; transition:background .15s, color .15s;
     }
     .mature-file-row .mf-remove:hover{ background:rgba(222,53,11,0.1); color:var(--danger); }
+    .mature-file-total{ font-size:11.5px; color:var(--text-subtle); padding:2px 2px 0; }
+    .mature-file-total.over{ color:var(--danger); font-weight:600; }
 
     .q-warn{
       margin-top:6px;
@@ -5009,6 +5011,12 @@ function renderMarkdown(text) {
     // Native <input type="file"> her seçimde önceki listeyi ezdiği için seçilen dosyaları
     // ayrı bir dizide biriktiriyoruz; kullanıcı teker teker ekleyip tek tek kaldırabilsin.
     let matureAttachmentFiles = [];
+    // Tüm ekler tek bir istekte base64 olarak gittiği için toplam boyutu yumuşak bir eşikle
+    // sınırlayıp kullanıcıyı uyarıyoruz (base64 ~%33 şişirir).
+    const MATURE_ATTACH_WARN_BYTES = 20 * 1024 * 1024; // 20 MB
+    function matureAttachmentsTotalBytes(){
+      return matureAttachmentFiles.reduce((sum, f) => sum + (Number(f?.size) || 0), 0);
+    }
     function renderMatureAttachmentList(){
       const list = document.getElementById('matureAttachmentList');
       if(!list) return;
@@ -5025,8 +5033,19 @@ function renderMarkdown(text) {
         row.appendChild(icon); row.appendChild(name); row.appendChild(size); row.appendChild(remove);
         list.appendChild(row);
       });
+      if(matureAttachmentFiles.length){
+        const total = matureAttachmentsTotalBytes();
+        const over = total > MATURE_ATTACH_WARN_BYTES;
+        const summary = document.createElement('div');
+        summary.className = 'mature-file-total' + (over ? ' over' : '');
+        summary.textContent = over
+          ? `${matureAttachmentFiles.length} dosya · ${formatFileSize(total)} — toplam boyut yüksek, yükleme başarısız olabilir.`
+          : `${matureAttachmentFiles.length} dosya · ${formatFileSize(total)}`;
+        list.appendChild(summary);
+      }
     }
     function addMatureAttachmentFiles(fileList){
+      const before = matureAttachmentsTotalBytes();
       Array.from(fileList || []).forEach(f => {
         if(!f) return;
         // Aynı dosya (ad + boyut + değiştirilme zamanı) iki kez eklenmesin.
@@ -5034,6 +5053,11 @@ function renderMarkdown(text) {
         if(!dup) matureAttachmentFiles.push(f);
       });
       renderMatureAttachmentList();
+      // Eşiği bu ekleme geçtiyse bir kez uyar.
+      const after = matureAttachmentsTotalBytes();
+      if(after > MATURE_ATTACH_WARN_BYTES && before <= MATURE_ATTACH_WARN_BYTES){
+        showToast('Eklerin toplam boyutu yüksek (' + formatFileSize(after) + '). Çok büyük dosyalar yüklenemeyebilir.', 'warning');
+      }
     }
     function resetMatureAttachments(){
       matureAttachmentFiles = [];
@@ -5457,6 +5481,13 @@ function renderMarkdown(text) {
           throw new Error(errMsg);
         }
         currentWarnings = [];
+        // Bazı ekler yüklenemediyse (boyut limiti, bozuk içerik vb.) kaydın kendisi
+        // yine de oluşur; kullanıcıyı hangi dosyaların eklenemediği konusunda uyar.
+        const attachmentWarnings = (json && Array.isArray(json.attachmentWarnings)) ? json.attachmentWarnings : [];
+        if(attachmentWarnings.length){
+          const names = attachmentWarnings.map(w => (w && w.name) ? w.name : '?').join(', ');
+          showToast('Bazı belgeler eklenemedi: ' + names, 'warning');
+        }
         closePreviewModal();
         loadCalls();
         setTimeout(() => openFeedbackModal('form'), 400);

@@ -762,6 +762,7 @@ fibarprIdeaApprove(
 
   // ===== Attachment (base64) =====
   def attachments = []
+  def failedAttachments = []
 
   def payloadAttachments = payload?.attachments
   boolean hasPayloadAttachments = (payloadAttachments instanceof Collection) && !payloadAttachments.isEmpty()
@@ -915,8 +916,10 @@ fibarprIdeaApprove(
       throw new RuntimeException("CreateAttachmentParamsBean oluşturulamadı")
     }
 
-    try {
-      attachments.each { a ->
+    // Her dosyayı ayrı ayrı yükle: biri hata verirse (bozuk içerik, boyut limiti vs.)
+    // diğerleri etkilenmesin. Başarısız olanlar failedAttachments'ta toplanıp yanıtta döner.
+    attachments.each { a ->
+      try {
         def b64 = a.content?.toString() ?: ""
         if (b64.startsWith("data:") && b64.contains(",")) {
           b64 = b64.substring(b64.indexOf(",") + 1)
@@ -926,7 +929,7 @@ fibarprIdeaApprove(
         try {
           bytes = Base64.decoder.decode(b64)
         } catch (e) {
-          throw new RuntimeException("Invalid attachment content (base64 decode failed) for ${a.name}")
+          throw new RuntimeException("İçerik çözümlenemedi (base64)")
         }
 
         File tmp = null
@@ -945,21 +948,15 @@ fibarprIdeaApprove(
         } finally {
           if (tmp && tmp.exists()) tmp.delete()
         }
+      } catch (e) {
+        def root = e
+        while (root?.cause) {
+          root = root.cause
+        }
+        def msg = e?.message ?: root?.message ?: "Bilinmeyen hata"
+        log.error("Attachment upload failed for ${a?.name}", e)
+        failedAttachments << [name: (a?.name?.toString() ?: "?"), error: msg]
       }
-    } catch (e) {
-      def root = e
-      while (root?.cause) {
-        root = root.cause
-      }
-      def msg = e?.message ?: root?.message ?: "Bilinmeyen hata"
-      log.error("Attachment create failed", e)
-      return Response.status(500).entity([
-        ok: false,
-        error: "Attachment create failed",
-        details: msg,
-        exception: e?.class?.name,
-        rootCause: root?.class?.name
-      ]).build()
     }
 
     issue = issueManager.getIssueObject(issue.id)
@@ -1013,6 +1010,7 @@ fibarprIdeaApprove(
   return Response.ok([
     ok: true,
     issueKey: issue.key?.toString(),
-    aiValidationSkipped: aiValidationSkipped
+    aiValidationSkipped: aiValidationSkipped,
+    attachmentWarnings: failedAttachments
   ]).build()
 }
