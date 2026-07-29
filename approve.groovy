@@ -415,19 +415,37 @@ fibarprIdeaApprove(
 
     def typeKey = cf?.customFieldType?.key ?: ""
 
-    // Tarih alanları: frontend <input type="date"> ISO (yyyy-MM-dd) gönderir; Jira datepicker
-    // alanı IssueInputParameters üzerinden kendi yapılandırılmış formatını bekler. Aynı format
-    // property'sini + varsayılan locale'i kullanarak round-trip yapıyoruz.
+    // Tarih alanları: frontend <input type="date"> her zaman ISO (yyyy-MM-dd) gönderir; Jira
+    // datepicker alanı IssueInputParameters üzerinden gelen string'i GİRİŞ YAPAN kullanıcının
+    // locale'i + jira.date.picker.java.format ile parse eder. Bu yüzden string'i de aynı kullanıcı
+    // bağlamıyla üretmeliyiz. Ay adı locale'e bağlı olan formatlarda (ör. "dd/MMM/yy") sabit/JVM
+    // varsayılan locale'i ile üretilen "15/Aug/26", Türkçe kullanıcının "15/Ağu/26" beklemesi
+    // nedeniyle "geçersiz tarih formatı" hatasına yol açıyordu. forLoggedInUser() ile Jira'nın
+    // parse ettiği formatın birebir aynısı üretilir → her dilde sorunsuz round-trip.
     if (typeKey.contains("datepicker") || typeKey.contains("datetime")) {
       if (!str) return null
+      def dateObj
       try {
-        def dateObj = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
-        def fmtKey = typeKey.contains("datetime") ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
-        def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) ?: "dd/MMM/yy"
-        return new java.text.SimpleDateFormat(fmt).format(dateObj)
+        dateObj = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
       } catch (ignored) {
-        // Zaten Jira formatındaysa (ISO değilse) olduğu gibi bırak.
+        // ISO değilse (ör. değer zaten Jira formatındaysa) olduğu gibi bırak.
         return str
+      }
+      def isDateTime = typeKey.contains("datetime")
+      try {
+        def style = isDateTime
+          ? com.atlassian.jira.datetime.DateTimeStyle.DATE_TIME_PICKER
+          : com.atlassian.jira.datetime.DateTimeStyle.DATE_PICKER
+        return ComponentAccessor
+          .getComponent(com.atlassian.jira.datetime.DateTimeFormatterFactory)
+          .formatter().forLoggedInUser().withStyle(style).format(dateObj)
+      } catch (ignored) {
+        // DateTimeFormatter kullanılamazsa: format property + giriş yapan kullanıcının locale'i
+        // (en kötü ihtimalle JVM varsayılan locale'i) ile aynı round-trip'i taklit et.
+        def fmtKey = isDateTime ? "jira.date.time.picker.java.format" : "jira.date.picker.java.format"
+        def fmt = ComponentAccessor.applicationProperties.getDefaultBackedString(fmtKey) ?: "dd/MMM/yy"
+        def userLocale = ComponentAccessor.jiraAuthenticationContext?.locale ?: Locale.getDefault()
+        return new java.text.SimpleDateFormat(fmt, userLocale).format(dateObj)
       }
     }
 
