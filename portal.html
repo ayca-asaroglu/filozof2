@@ -2594,11 +2594,7 @@
 
                 <div class="q-item required is-hidden" id="yasalTarihItem">
                   <label>Yasal Zorunluluk Son Tarih</label>
-                  <!-- Görünen alan Türkçe (gg.aa.yyyy); gizli #yasalTarih backend'e her zaman ISO
-                       (yyyy-MM-dd) gönderir. Dönüşüm initYasalTarihField() içinde yapılır. -->
-                  <input class="q-input" id="yasalTarihDisplay" type="text" inputmode="numeric"
-                         autocomplete="off" maxlength="10" placeholder="gg.aa.yyyy">
-                  <input type="hidden" id="yasalTarih">
+                  <input class="q-input" id="yasalTarih" type="date">
                 </div>
 
                 <div class="q-item required is-hidden" id="bulguKoduItem">
@@ -2710,7 +2706,7 @@
 
                 <div class="q-item is-hidden required" id="q7Item">
                   <label>Ekran Kodu</label>
-                  <input class="q-input" id="q7Code" type="text" placeholder="Örn: MOB-001">
+                  <input class="q-input" id="q7Code" type="text" placeholder="Örn: PRD10006">
                   <div class="field-hint">
                     <span class="field-hint-icon" aria-hidden="true">ℹ️</span>
                     <span>Ekran kodu, görüntülediğiniz Mercan / Omnia ekranlarında tarih bilgisinin sol kısmında yer almaktadır.</span>
@@ -3213,8 +3209,8 @@
     const FILOZOF_AVATAR = 'https://atlas.fibabanka.local/jira/secure/attachment/198597/fi.png?dowload=1';
     // Field guide görselleri — Filozof ikonu gibi link olarak buraya ekleyin (data-guide-img değeriyle eşleşir).
     const FIELD_GUIDE_IMAGES = {
-      mercan: '', // TODO: Mercan ekran görseli linki
-      omnia:  ''  // TODO: Omnia ekran görseli linki
+      mercan: 'https://atlas.fibabanka.local/jira/secure/attachment/205066/mercan.png?dowload=1', // TODO: Mercan ekran görseli linki
+      omnia:  'https://atlas.fibabanka.local/jira/secure/attachment/205065/omnia.png?dowload=1'  // TODO: Omnia ekran görseli linki
     };
     const CALLS_THREAD_FIELD = '';
     const CALLS_CUSTOM_FIELDS = [];
@@ -4451,58 +4447,8 @@ function renderMarkdown(text) {
       if(!isDenetim){
         const b = document.getElementById('bulguKodu'); if(b) b.value = '';
       }
-      // Gizli ISO değeri değişmiş olabilir → görünen Türkçe tarih alanını eşitle.
-      if(window.syncYasalTarihDisplay) window.syncYasalTarihDisplay();
     }
     window.syncTalepTipiDetails = syncTalepTipiDetails;
-
-    // Yasal Zorunluluk Son Tarih alanı: kullanıcıya Türkçe (gg.aa.yyyy) gösterilir, backend'e her
-    // zaman ISO (yyyy-MM-dd) gönderilir. Görünen alan #yasalTarihDisplay, gerçek/gizli değer
-    // #yasalTarih'tir; böylece gönderim/kayıt/doğrulama kodu ISO ile çalışmaya devam eder ve tarayıcı
-    // dili ne olursa olsun kullanıcı hep Türkçe format görür.
-    (function initYasalTarihField(){
-      const display = document.getElementById('yasalTarihDisplay');
-      const hidden  = document.getElementById('yasalTarih');
-      if(!display || !hidden) return;
-
-      const pad = n => String(n).padStart(2, '0');
-      // "yyyy-MM-dd" (opsiyonel saat) → "gg.aa.yyyy"
-      function isoToTr(iso){
-        const m = String(iso || '').match(/(\d{4})-(\d{2})-(\d{2})/);
-        return m ? `${m[3]}.${m[2]}.${m[1]}` : '';
-      }
-      // "gg.aa.yyyy" (. / veya - ayraç, 1-2 haneli gün/ay) → geçerliyse "yyyy-MM-dd", değilse ''
-      function trToIso(str){
-        const m = String(str || '').trim().match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
-        if(!m) return '';
-        const d = +m[1], mo = +m[2], y = +m[3];
-        if(mo < 1 || mo > 12 || d < 1 || d > 31) return '';
-        const dt = new Date(y, mo - 1, d);
-        // Gerçek tarih mi? (ör. 31.02.2026 ay taşmasını reddet)
-        if(dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return '';
-        return `${y}-${pad(mo)}-${pad(d)}`;
-      }
-
-      // Programatik değişikliklerden (prefill/restore/reset) sonra görünen alanı gizli ISO'dan tazele.
-      window.syncYasalTarihDisplay = function(){ display.value = isoToTr(hidden.value); };
-
-      // Kullanıcı yazdıkça: rakamları al, otomatik gg.aa.yyyy biçimine getir, ISO'yu güncelle.
-      display.addEventListener('input', () => {
-        const digits = display.value.replace(/\D/g, '').slice(0, 8);
-        let out = digits;
-        if(digits.length > 4)      out = digits.slice(0,2) + '.' + digits.slice(2,4) + '.' + digits.slice(4);
-        else if(digits.length > 2) out = digits.slice(0,2) + '.' + digits.slice(2);
-        display.value = out;
-        hidden.value = trToIso(out);
-        display.classList.remove('error');
-      });
-      // Alandan çıkınca geçerliyse kanonik biçime sabitle.
-      display.addEventListener('blur', () => {
-        const iso = trToIso(display.value);
-        hidden.value = iso;
-        if(iso) display.value = isoToTr(iso);
-      });
-    })();
 
     // Business Score başlıkları altında en fazla bir seçenek işaretlenebilir.
     // "1C) Operasyonel Verimlilik" iki alanı (İşlem Adedi + İşlem Süresi) birlikte tek bir seçenek sayılır.
@@ -4694,7 +4640,6 @@ function renderMarkdown(text) {
       setVal('qTalepTipiSelect', state.qTalepTipiSelect);
       setVal('yasalAciklama', state.yasalAciklama);
       setVal('yasalTarih', state.yasalTarih);
-      if(window.syncYasalTarihDisplay) window.syncYasalTarihDisplay();
       setVal('bulguKodu', state.bulguKodu);
       setVal('qAmacSelect', state.qAmacSelect);
       if(!mergeNonEmpty || (state.qChannelsValue || '').toString().trim()) {
@@ -5325,10 +5270,8 @@ function renderMarkdown(text) {
       if(qTalepTipiSelect && qTalepTipiSelect.value === 'Yasal Zorunluluk'){
         const ya = document.getElementById('yasalAciklama');
         if(ya && !isHidden(ya) && !(ya.value||'').trim()) markError(ya);
-        // Gerçek değer gizli #yasalTarih'te (ISO); hata görünen #yasalTarihDisplay'de gösterilir.
         const yt = document.getElementById('yasalTarih');
-        const ytDisplay = document.getElementById('yasalTarihDisplay');
-        if(yt && ytDisplay && !isHidden(ytDisplay) && !(yt.value||'').trim()) markError(ytDisplay);
+        if(yt && !isHidden(yt) && !(yt.value||'').trim()) markError(yt);
       }
       // Denetim Bulgusu seçiliyse bulgu kodu zorunlu.
       if(qTalepTipiSelect && qTalepTipiSelect.value === 'Denetim Bulgusu'){
