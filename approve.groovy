@@ -108,6 +108,15 @@ fibarprIdeaApprove(
     return Response.status(500).entity([ok: false, error: "admin user not found"]).build()
   }
 
+  // Datetime custom field doğrulaması GİRİŞ YAPAN kullanıcının locale'iyle yapılır; Türkçe (tr_TR)
+  // profilde Jira'nın datetime parse'ı fiilen bozuk olduğundan üretilebilir HİÇBİR string kabul
+  // edilmiyor (v8 trial-matrix: 9 farklı format da "Invalid date format" verdi). Güncellemenin
+  // kendisi zaten adminUser olarak yapıldığından, auth context'i de adminUser'a alıyoruz — böylece
+  // doğrulama adminUser'ın (varsayılan/İngilizce) locale'iyle çalışır ve datetime tutarlı biçimde
+  // parse edilir. REST isteği bitince JiraAuthenticationContext Jira tarafından sıfırlandığı için
+  // geri alma gerekmez; ayrıca tüm iş adminUser adına yapıldığından atıf da değişmez.
+  try { ComponentAccessor.jiraAuthenticationContext.setLoggedInUser(adminUser) } catch (ignored) {}
+
   // ===== Body parse =====
   def payload = [:]
   try {
@@ -894,7 +903,7 @@ fibarprIdeaApprove(
       fieldsCount: fields.size(),
       formKeys: form.keySet(),
       issueKey: issue.key?.toString(),
-      codeVersion: "date-fix-v8-trialmatrix",
+      codeVersion: "date-fix-v9-adminlocale",
       diag: diagFields,
       inputAdded: _diagInputAdded,
       dateProvided: _diagDateProvided,
