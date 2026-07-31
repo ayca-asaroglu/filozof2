@@ -3795,6 +3795,8 @@
     const CHAT_CATEGORY = 'filozof';
     const SR_CALLS_URL = SR_BASE + '/fibarprIdeaCalls';
     const SR_UNITS_URL = SR_BASE + '/fibarprIdeaUnits';
+    // Görüş Sahipleri: lisanstan bağımsız kullanıcı araması (ScriptRunner fibarprUserSearch).
+    const SR_USER_SEARCH_URL = SR_BASE + '/fibarprUserSearch';
     const SR_APPROVE_URL = SR_BASE + '/fibarprIdeaApprove';
     const SR_FEEDBACK_URL = SR_BASE + '/fibarprFeedback';
     const SR_SUPPORT_URL = SR_BASE + '/fibarprSupportTeams';
@@ -7624,26 +7626,40 @@ function renderMarkdown(text) {
         return { owners: [], text: String(entry || '').trim() };
       }
 
+      // Jira'nın döndürdüğü {users:[...]} gövdesini ortak şekle normalize eder.
+      // res yoksa/başarısızsa null döner ki çağıran fallback deneyebilsin.
+      async function fetchUsersFrom(url){
+        const res = await fetch(url, { credentials:'include' });
+        if(!res.ok) return null;
+        const json = await res.json().catch(() => null);
+        const users = Array.isArray(json?.users) ? json.users : [];
+        return users.map(user => ({
+          key: String(user.key || user.name || user.accountId || '').trim(),
+          name: String(user.name || user.key || user.accountId || '').trim(),
+          displayName: String(user.displayName || user.name || user.key || user.accountId || '').trim(),
+          emailAddress: String(user.emailAddress || '').trim()
+        })).filter(user => user.key || user.displayName);
+      }
+
       async function searchJiraUsers(query){
         const q = String(query || '').trim();
         if(q.length < 2) return [];
         if(userSearchCache.has(q)) return userSearchCache.get(q);
         const baseOrigin = getJiraBaseOrigin();
-        if(!baseOrigin) return [];
         try{
-          const url = new URL('/jira/rest/api/2/user/picker', baseOrigin);
-          url.searchParams.set('query', q);
-          url.searchParams.set('maxResults', '10');
-          const res = await fetch(url.toString(), { credentials:'include' });
-          if(!res.ok) return [];
-          const json = await res.json().catch(() => null);
-          const users = Array.isArray(json?.users) ? json.users : [];
-          const normalized = users.map(user => ({
-            key: String(user.key || user.name || user.accountId || '').trim(),
-            name: String(user.name || user.key || user.accountId || '').trim(),
-            displayName: String(user.displayName || user.name || user.key || user.accountId || '').trim(),
-            emailAddress: String(user.emailAddress || '').trim()
-          })).filter(user => user.key || user.displayName);
+          // Öncelik: lisanstan bağımsız TÜM kullanıcıları döndüren ScriptRunner endpoint'i.
+          const primary = new URL(SR_USER_SEARCH_URL, baseOrigin || location.origin);
+          primary.searchParams.set('query', q);
+          primary.searchParams.set('maxResults', '10');
+          let normalized = await fetchUsersFrom(primary.toString());
+          // Endpoint henüz deploy edilmemişse (404) Jira user picker'a düş (yalnızca lisanslılar).
+          if(normalized == null && baseOrigin){
+            const fallback = new URL('/jira/rest/api/2/user/picker', baseOrigin);
+            fallback.searchParams.set('query', q);
+            fallback.searchParams.set('maxResults', '10');
+            normalized = await fetchUsersFrom(fallback.toString());
+          }
+          normalized = normalized || [];
           userSearchCache.set(q, normalized);
           return normalized;
         }catch(e){
