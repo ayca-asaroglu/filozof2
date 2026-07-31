@@ -1047,6 +1047,80 @@
       padding:12px 14px;
       background:var(--bg);
     }
+
+    /* ============================================================
+       Talep Detayı — tek accordion (Özet + Açıklama alt alta).
+       Varsayılan açık; tek tıkla kapanır. Business Score ile aynı dil.
+       ============================================================ */
+    .request-detail{
+      border:1px solid #E5E7EB;
+      border-radius:14px;
+      background:var(--surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+    .request-detail-header{
+      width:100%;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      padding:14px 18px;
+      background:#F9FAFB;
+      border:none; cursor:pointer; font:inherit; text-align:left;
+      color:#172B4D;
+      transition:background .15s;
+    }
+    .request-detail-header:hover{ background:#F3F5F8; }
+    .request-detail-header:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px var(--focus-ring); }
+    .request-detail-title{ font-size:14px; font-weight:600; color:#172B4D; }
+    .request-detail-chevron{
+      display:flex; align-items:center; justify-content:center;
+      width:20px; height:20px; color:#8A94A6;
+      transition:transform .2s ease;
+    }
+    .request-detail-chevron svg{ width:18px; height:18px; }
+    /* Açıkken chevron yukarı (▲), kapalıyken aşağı (▼) */
+    .request-detail.open .request-detail-chevron{ transform:rotate(180deg); }
+
+    .request-detail-body{
+      display:grid;
+      grid-template-rows:0fr;
+      transition:grid-template-rows .22s ease;
+    }
+    .request-detail.open .request-detail-body{ grid-template-rows:1fr; }
+    .request-detail-inner{
+      min-height:0; overflow:hidden;
+      display:flex; flex-direction:column; gap:16px;
+      padding:0 18px;
+    }
+    .request-detail.open .request-detail-inner{ padding:16px 18px 18px; }
+
+    .detail-label{
+      font-size:12px; font-weight:700; letter-spacing:.4px;
+      text-transform:uppercase; color:#6B778C; margin-bottom:6px;
+    }
+    .detail-summary{
+      font-size:13.5px; line-height:1.55; color:var(--text);
+    }
+    /* Açıklama: ilk etapta 3-4 satır; "Devamını Gör" ile yerinde büyür (ayrı scroll yok) */
+    .detail-desc{
+      font-size:13px; line-height:1.6; color:var(--text);
+    }
+    .detail-desc.clamped{
+      display:-webkit-box;
+      -webkit-line-clamp:4;
+      line-clamp:4;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .detail-more{
+      margin-top:8px;
+      background:none; border:none; padding:0;
+      color:var(--primary); font-size:13px; font-weight:600;
+      cursor:pointer; font-family:inherit;
+    }
+    .detail-more:hover{ text-decoration:underline; }
+    .detail-more[hidden]{ display:none; }
     .block-title{
       font-size:11px; font-weight:700;
       color:var(--text-muted);
@@ -1353,6 +1427,95 @@
       .bs-info-cards{ grid-template-columns:1fr; }
     }
 
+    /* ============================================================
+       Olgunlaştırma Formu (#formStage) — Business Score ile aynı
+       modern kurumsal dil: her soru beyaz kart, geniş modern alanlar,
+       yumuşak gri (#E5E7EB) borderlar. Fonksiyon/id'ler korunur.
+       ============================================================ */
+    #formStage .question-grid{ gap:14px; }
+
+    /* Her soru temiz beyaz kart içinde */
+    #formStage .q-item{
+      background:var(--surface);
+      border:1px solid #E5E7EB;
+      border-radius:14px;
+      padding:16px 18px;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      transition:border-color .15s, box-shadow .15s;
+    }
+    #formStage .q-item:hover{ border-color:#DDE1E7; }
+    #formStage .q-item:focus-within{
+      border-color:#D5DBE4;
+      box-shadow:0 4px 16px rgba(16,24,40,.06);
+    }
+    #formStage .q-item.is-hidden{ display:none; }
+
+    /* Etiketler — okunur, kalın, düz (uppercase değil) */
+    #formStage .q-item label{
+      font-size:13px; font-weight:600; letter-spacing:0;
+      text-transform:none; color:#1F2A3D; margin-bottom:8px;
+    }
+
+    /* Geniş, rahat, modern form elemanları */
+    #formStage .q-input{
+      border:1px solid #E5E7EB;
+      border-radius:10px;
+      padding:11px 14px;
+      min-height:44px;
+      font-size:14px;
+      background:var(--surface);
+      box-shadow:none;
+    }
+    #formStage .q-select{ height:46px; min-height:46px; padding:0 14px; }
+    #formStage textarea.q-input{ min-height:84px; padding:12px 14px; }
+    #formStage .q-input:focus{
+      border-color:var(--primary-light);
+      box-shadow:0 0 0 3px rgba(47,93,169,.12);
+    }
+    /* Doğrulama (kırmızı) durumu korunur — id ile önceliklendir */
+    #formStage .q-input.error,
+    #formStage .op-text.error{
+      border-color:#DE350B;
+      box-shadow:0 0 0 3px rgba(222,53,11,.14);
+    }
+    #formStage .q-input:disabled{ background:var(--border-light); }
+
+    /* Çoklu seçim (paydaş / kanal) ve görüş alanları da aynı dilde */
+    #formStage .ms-control,
+    #formStage .op-owner-control{
+      border:1px solid #E5E7EB;
+      border-radius:10px;
+      padding:8px 12px;
+      min-height:44px;
+      box-shadow:none;
+    }
+    #formStage .ms-control:focus-within,
+    #formStage .op-owner-control:focus-within{
+      border-color:var(--primary-light);
+      box-shadow:0 0 0 3px rgba(47,93,169,.12);
+    }
+    #formStage .op-text{
+      border:1px solid #E5E7EB;
+      border-radius:10px;
+    }
+    #formStage .op-text:focus{
+      border-color:var(--primary-light);
+      box-shadow:0 0 0 3px rgba(47,93,169,.12);
+    }
+    #formStage .ms-dropdown,
+    #formStage .op-owner-dropdown{ border-radius:10px; }
+
+    /* İç kartlar (paydaş görüşü) — dış kart içinde daha yumuşak */
+    #formStage .op-card{
+      border:1px solid #EBEDF0;
+      border-radius:12px;
+      background:#FAFBFC;
+    }
+
+    /* Yardım metni + uyarı köşe yarıçapı BS ile uyumlu */
+    #formStage .q-help{ font-size:12.5px; }
+    #formStage .q-warn{ border-radius:10px; }
+
     .q-item label{
       font-size:12px;
       font-weight:700;
@@ -1380,8 +1543,8 @@
       box-shadow:0 0 0 2px rgba(255,139,0,.1);
     }
     #stakeholderOpinions .op-text{
-      border-color:#FF8B00;
-      box-shadow:0 0 0 2px rgba(255,139,0,.1);
+      border-color:#E5E7EB;
+      box-shadow:none;
     }
 
     .q-input{
@@ -2873,14 +3036,25 @@
             </div>
           </div>
 
-          <div class="issue-grid">
-            <div class="issue-block">
-              <div class="block-title">Özet</div>
-              <div class="block-body" id="matureSummary">—</div>
-            </div>
-            <div class="issue-block">
-              <div class="block-title">Açıklama</div>
-              <div class="block-body" id="matureDescription">—</div>
+          <div class="request-detail open" id="matureDetail">
+            <button type="button" class="request-detail-header" id="matureDetailToggle" aria-expanded="true" aria-controls="matureDetailBody">
+              <span class="request-detail-title">Talep Detayı</span>
+              <span class="request-detail-chevron" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </span>
+            </button>
+            <div class="request-detail-body" id="matureDetailBody">
+              <div class="request-detail-inner">
+                <div class="detail-field">
+                  <div class="detail-label">Özet</div>
+                  <div class="detail-summary" id="matureSummary">—</div>
+                </div>
+                <div class="detail-field">
+                  <div class="detail-label">Açıklama</div>
+                  <div class="block-body detail-desc clamped" id="matureDescription">—</div>
+                  <button type="button" class="detail-more" id="matureDescMore" hidden>Devamını Gör</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -5215,6 +5389,30 @@ function renderMarkdown(text) {
       if(typeof window.syncAllBusinessScoreGroups === 'function') window.syncAllBusinessScoreGroups();
     }
 
+    // "Talep Detayı" accordion'ı aç (varsayılan durum).
+    function openMatureDetail(){
+      const detail = document.getElementById('matureDetail');
+      const toggle = document.getElementById('matureDetailToggle');
+      if(detail) detail.classList.add('open');
+      if(toggle) toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    // Açıklama alanını 3-4 satırda kısaltıp yalnızca gerçekten taşıyorsa "Devamını Gör" göster.
+    function setupMatureDescriptionClamp(){
+      const desc = document.getElementById('matureDescription');
+      const moreBtn = document.getElementById('matureDescMore');
+      if(!desc || !moreBtn) return;
+      desc.classList.add('clamped');
+      moreBtn.textContent = 'Devamını Gör';
+      moreBtn.hidden = true;
+      // Layout oturduktan sonra taşma kontrolü (modal görünür olmalı).
+      requestAnimationFrame(() => {
+        const overflowing = desc.scrollHeight > desc.clientHeight + 4;
+        moreBtn.hidden = !overflowing;
+        if(!overflowing) desc.classList.remove('clamped');
+      });
+    }
+
     function openMatureModal(item, options = {}){
       const nextKey = getMatureStateKey(item);
       const isSameItem = !!lastMatureKey && lastMatureKey === nextKey;
@@ -5235,6 +5433,9 @@ function renderMarkdown(text) {
       if(matureTime) matureTime.textContent = item?.time || '';
       if(matureSummary) matureSummary.textContent = item?.summary || '—';
       if(matureDescription) matureDescription.innerHTML = renderWikiText(item?.description);
+      // "Talep Detayı" accordion'ı her açılışta açık başlasın; açıklama clamp'ini yeniden değerlendir.
+      openMatureDetail();
+      setupMatureDescriptionClamp();
       // Amaç/Kanallar customfield_19801 ve customfield_10427 prefillMatureFormFromCustomFields'ın
       // kapsamı dışında bırakıldığı için burada ayrıca dolduruluyor. restoreMatureFormState gibi
       // sadece Jira'da gerçek bir değer varsa uygula — yoksa az önce restore edilen oturum
@@ -7134,6 +7335,25 @@ function renderMarkdown(text) {
     const callsSearchEl = document.getElementById('callsSearch');
     if(callsSearchEl){
       callsSearchEl.addEventListener('input', () => _applyCallsFilter());
+    }
+    // "Talep Detayı" accordion aç/kapa + "Devamını Gör" ile açıklamayı yerinde genişlet.
+    const matureDetailToggle = document.getElementById('matureDetailToggle');
+    if(matureDetailToggle){
+      matureDetailToggle.addEventListener('click', () => {
+        const detail = document.getElementById('matureDetail');
+        if(!detail) return;
+        const isOpen = detail.classList.toggle('open');
+        matureDetailToggle.setAttribute('aria-expanded', String(isOpen));
+      });
+    }
+    const matureDescMore = document.getElementById('matureDescMore');
+    if(matureDescMore){
+      matureDescMore.addEventListener('click', () => {
+        const desc = document.getElementById('matureDescription');
+        if(!desc) return;
+        const clamped = desc.classList.toggle('clamped');
+        matureDescMore.textContent = clamped ? 'Devamını Gör' : 'Daha Az Göster';
+      });
     }
     matureOverlay.addEventListener('click', closeMatureModal);
     matureClose.addEventListener('click', closeMatureModal);
