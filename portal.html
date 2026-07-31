@@ -1197,6 +1197,162 @@
     }
     .business-group.open .business-group-body-inner{ padding:2px 14px 14px; }
 
+    /* ============================================================
+       Business Score — modern kurumsal (banka uygulaması) yeniden tasarım
+       Kapsam: yalnızca #businessScoreStage / #businessAccordion.
+       Fonksiyonel yapı (id'ler, data-group, select'ler) korunur.
+       ============================================================ */
+
+    /* Genel Bilgilendirme kartları */
+    .bs-info-cards{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:22px;
+    }
+    .bs-info-card{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:16px;
+      background:#F5F9FF;
+      border:1px solid #DCE7F7;
+      border-radius:14px;
+    }
+    .bs-info-card-icon{
+      flex:0 0 auto;
+      width:34px; height:34px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:10px;
+      background:#E7F0FE;
+      color:var(--primary);
+    }
+    .bs-info-card-icon svg{ width:18px; height:18px; }
+    .bs-info-card-text{ min-width:0; }
+    .bs-info-card-title{
+      font-size:13px; font-weight:600; line-height:1.45; color:#1F3A5F;
+    }
+    .bs-info-card-sub{
+      margin-top:6px; font-size:12px; line-height:1.5; color:#5B6B82;
+    }
+
+    /* Accordion — modern kart görünümü */
+    #businessScoreStage .business-accordion{ gap:14px; }
+    #businessScoreStage .business-group{
+      border:1px solid #E5E7EB;
+      border-radius:14px;
+      background:var(--surface);
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+      overflow:hidden;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    #businessScoreStage .business-group.open{
+      border-color:#D5DBE4;
+      box-shadow:0 4px 16px rgba(16,24,40,.07);
+    }
+    #businessScoreStage .business-group.has-error{ border-color:#DE350B; }
+    #businessScoreStage .business-group-header{
+      padding:16px 18px;
+      gap:12px;
+      background:#F9FAFB;
+      border-bottom:1px solid transparent;
+    }
+    #businessScoreStage .business-group-header:hover{ background:#F3F5F8; }
+    #businessScoreStage .business-group.open .business-group-header{
+      background:#FBFCFE;
+      border-bottom-color:#EEF1F5;
+    }
+    .bs-head-icon{
+      flex:0 0 auto;
+      width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:10px;
+      background:#EEF3FC;
+      color:var(--primary);
+    }
+    .bs-head-icon svg{ width:19px; height:19px; }
+    #businessScoreStage .business-group-header-title{
+      font-size:14px; font-weight:600; color:#172B4D;
+    }
+    #businessScoreStage .business-group-status{
+      font-size:12px; font-weight:600;
+      padding:4px 10px; border-radius:999px;
+      color:transparent; background:transparent;
+      display:inline-flex; align-items:center; gap:4px;
+    }
+    #businessScoreStage .business-group-status.filled{
+      color:#0F7A44; background:#E6F4EC;
+    }
+    #businessScoreStage .business-group-status.incomplete{
+      color:#B7791F; background:#FBF0DC;
+    }
+    #businessScoreStage .business-group-chevron{
+      width:20px; height:20px;
+      display:flex; align-items:center; justify-content:center;
+      color:#8A94A6; font-size:0;
+    }
+    #businessScoreStage .business-group-chevron svg{ width:18px; height:18px; }
+    #businessScoreStage .business-group-body-inner{
+      gap:14px; padding:0 18px;
+    }
+    #businessScoreStage .business-group.open .business-group-body-inner{
+      padding:18px;
+    }
+
+    /* Soru metni (kalın) + mavi info alert (Bilgilendirme) */
+    .bs-question{
+      margin:0;
+      font-size:14px; font-weight:600; line-height:1.5; color:#1F2A3D;
+    }
+    .bs-info-alert{
+      display:flex; gap:9px; align-items:flex-start;
+      padding:11px 13px;
+      border-radius:10px;
+      background:#EFF5FF;
+      border:1px solid #D7E5FB;
+      color:#345074;
+      font-size:13px; line-height:1.5;
+    }
+    .bs-info-alert svg{ flex:0 0 auto; width:16px; height:16px; margin-top:1px; color:var(--primary); }
+
+    /* Alt alan etiketleri + geniş modern select'ler */
+    #businessAccordion .q-item label{
+      font-size:12.5px; font-weight:600; letter-spacing:0;
+      text-transform:none; color:#42526E; margin-bottom:7px;
+    }
+    #businessAccordion .business-subgroup-title{
+      font-size:12px; letter-spacing:.4px; color:#5B6B82; margin-top:4px;
+    }
+    #businessAccordion .q-select{
+      height:46px; min-height:46px;
+      border-radius:10px; border:1px solid #E5E7EB;
+      padding:0 14px; font-size:14px; background:var(--surface);
+    }
+    #businessAccordion .q-select:focus{
+      border-color:var(--primary-light);
+      box-shadow:0 0 0 3px rgba(47,93,169,.12);
+    }
+    #businessAccordion .q-select:disabled{ background:#F3F4F6; opacity:.75; }
+    #businessAccordion .q-warn{ border-radius:10px; }
+
+    /* Opsiyonel: birim (suffix) gösterimi — TL / Adet / % */
+    .bs-suffix-field{ position:relative; }
+    .bs-suffix-field .q-input{ padding-right:56px; }
+    .bs-suffix-field .bs-suffix{
+      position:absolute; right:1px; top:1px; bottom:1px;
+      display:flex; align-items:center;
+      padding:0 14px;
+      font-size:13px; font-weight:600; color:#5B6B82;
+      background:#F3F5F8;
+      border-left:1px solid #E5E7EB;
+      border-radius:0 10px 10px 0;
+      pointer-events:none;
+    }
+
+    @media (max-width:640px){
+      .bs-info-cards{ grid-template-columns:1fr; }
+    }
+
     .q-item label{
       font-size:12px;
       font-weight:700;
@@ -2972,18 +3128,46 @@
             </div>
 
             <div class="mature-stage" id="businessScoreStage">
+              <div class="bs-info-cards">
+                <div class="bs-info-card">
+                  <span class="bs-info-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  </span>
+                  <div class="bs-info-card-text">
+                    <div class="bs-info-card-title">Business Score parametre girişlerini yaparken lütfen verilerin yıllık bazda olduğunu dikkate alınız.</div>
+                    <div class="bs-info-card-sub">Giriş yapacağınız değerleri (Adet veya TL) birimi ile belirttiğinizden emin olunuz.</div>
+                  </div>
+                </div>
+                <div class="bs-info-card">
+                  <span class="bs-info-card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  </span>
+                  <div class="bs-info-card-text">
+                    <div class="bs-info-card-title">Tüm parametreleri yıllık bazda (12 aylık toplam) girilmiş olarak dikkate alınız.</div>
+                    <div class="bs-info-card-sub">Etkilenen Kitle için adet, Finansal Etki için TL birimi kullanılır.</div>
+                  </div>
+                </div>
+              </div>
               <div class="question-title">Business Score Soruları</div>
               <div class="question-grid business-accordion" id="businessAccordion">
                 <div class="business-group" id="bsGroup1">
                   <button type="button" class="business-group-header" data-group="bsGroup1" aria-expanded="false">
+                    <span class="bs-head-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
                     <span class="business-group-header-title">1) Etkilenen Kitle</span>
                     <span class="business-group-status" id="bsGroup1Status"></span>
-                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                    <span class="business-group-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
                   <div class="business-group-body">
                     <div class="business-group-body-inner">
+                      <p class="bs-question">Bu talep toplamda kaç adet bireysel/tüzel müşteri veya operasyonel işlem/adım hacmini etkiliyor?</p>
+                      <div class="bs-info-alert">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>Lütfen yıllık bazda toplam hacmi giriniz.</span>
+                      </div>
                       <div class="q-item" id="bs1aItem">
-                        <label>1A) Gelir Artışı Bireysel Müşteri</label>
+                        <label>1A) Bireysel Müşteri Adedi</label>
                         <select class="q-input q-select" id="bs1aSelect">
                           <option value="" selected>Seçiniz</option>
                           <option value="Düşük">Düşük</option>
@@ -2993,7 +3177,7 @@
                       </div>
 
                       <div class="q-item" id="bs1bItem">
-                        <label>1B) Gelir Artışı Tüzel Müşteri</label>
+                        <label>1B) Tüzel Müşteri Adedi</label>
                         <select class="q-input q-select" id="bs1bSelect">
                           <option value="" selected>Seçiniz</option>
                           <option value="Düşük">Düşük</option>
@@ -3031,12 +3215,20 @@
 
                 <div class="business-group" id="bsGroup2">
                   <button type="button" class="business-group-header" data-group="bsGroup2" aria-expanded="false">
+                    <span class="bs-head-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </span>
                     <span class="business-group-header-title">2) Finansal Etki</span>
                     <span class="business-group-status" id="bsGroup2Status"></span>
-                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                    <span class="business-group-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
                   <div class="business-group-body">
                     <div class="business-group-body-inner">
+                      <p class="bs-question">Bu talep yıllık bazda toplam ne kadarlık bir gelir artışı veya operasyonel gider tasarrufu sağlıyor?</p>
+                      <div class="bs-info-alert">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        <span>Girişlerinizi TL bazında belirtiniz.</span>
+                      </div>
                       <div class="q-item" id="bs2aItem">
                         <label>2A) Gelir Artışı Bireysel Müşteri</label>
                         <select class="q-input q-select" id="bs2aSelect">
@@ -3074,12 +3266,16 @@
 
                 <div class="business-group" id="bsGroup3">
                   <button type="button" class="business-group-header" data-group="bsGroup3" aria-expanded="false">
+                    <span class="bs-head-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
                     <span class="business-group-header-title">3) Müşteri Etkisi</span>
                     <span class="business-group-status" id="bsGroup3Status"></span>
-                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                    <span class="business-group-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
                   <div class="business-group-body">
                     <div class="business-group-body-inner">
+                      <p class="bs-question">Bu talep; müşteri deneyimini, NPS skorları, hata oranları veya şikayet yönetimi üzerinde yüzde kaçlık bir iyileşme sağlıyor?</p>
                       <div class="q-item" id="bs3Item">
                         <label>3) Müşteri Etkisi</label>
                         <select class="q-input q-select" id="bs3Select">
@@ -3095,12 +3291,16 @@
 
                 <div class="business-group" id="bsGroup4">
                   <button type="button" class="business-group-header" data-group="bsGroup4" aria-expanded="false">
+                    <span class="bs-head-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </span>
                     <span class="business-group-header-title">4) Operasyonel ve Finansal Risk</span>
                     <span class="business-group-status" id="bsGroup4Status"></span>
-                    <span class="business-group-chevron" aria-hidden="true">▾</span>
+                    <span class="business-group-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
                   </button>
                   <div class="business-group-body">
                     <div class="business-group-body-inner">
+                      <p class="bs-question">Bu talebin hayata geçmemesi durumunda operasyonel süreklilik, muhasebe/mizan dengesi veya finansal raporlama süreçlerinde ne düzeyde risk oluşuyor?</p>
                       <div class="q-item" id="bs4Item">
                         <label>4) Operasyonel ve Finansal Risk</label>
                         <select class="q-input q-select" id="bs4Select">
