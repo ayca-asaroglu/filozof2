@@ -558,6 +558,52 @@
       text-transform:uppercase; letter-spacing:0.5px;
       margin-bottom:4px;
     }
+
+    /* ===== Örnek cevaplar — isteğe bağlı, açılır tetikleyici ===== */
+    .examples{ margin-top:12px; }
+    .examples-toggle{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 12px 7px 11px;
+      background:#F8FAFF;
+      border:1px solid #DCE7F7;
+      border-radius:999px;
+      color:#345074;
+      font-size:12.5px; font-weight:600; font-family:inherit;
+      cursor:pointer;
+      transition:background .15s, border-color .15s, box-shadow .15s;
+    }
+    .examples-toggle:hover{
+      background:#EEF4FF;
+      border-color:#BFD4F5;
+      box-shadow:0 2px 8px rgba(47,93,169,0.10);
+    }
+    .examples-toggle:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--focus-ring); }
+    .examples.open .examples-toggle{ background:#EEF4FF; border-color:#BFD4F5; }
+    .examples-toggle-icon{ display:grid; place-items:center; color:var(--primary); }
+    .examples-toggle-icon svg{ display:block; }
+    .examples-toggle-count{
+      display:inline-grid; place-items:center;
+      min-width:18px; height:18px; padding:0 5px;
+      border-radius:999px;
+      background:#E7F0FE; color:var(--primary);
+      font-size:11px; font-weight:700; line-height:1;
+    }
+    .examples-toggle-chevron{ display:grid; place-items:center; color:#8A94A6; transition:transform .2s ease; }
+    .examples-toggle-chevron svg{ display:block; }
+    .examples.open .examples-toggle-chevron{ transform:rotate(180deg); }
+
+    .examples-panel{
+      display:grid; grid-template-rows:0fr;
+      transition:grid-template-rows .22s ease;
+    }
+    .examples.open .examples-panel{ grid-template-rows:1fr; }
+    .examples-panel-inner{ min-height:0; overflow:hidden; }
+    .examples-panel-inner .example-cards{ margin-top:0; }
+    .examples.open .examples-panel-inner{ padding-top:10px; }
+    @media (prefers-reduced-motion: reduce){
+      .examples-panel{ transition:none; }
+      .examples-toggle-chevron{ transition:none; }
+    }
     .request-type-cards{
       display:grid;
       grid-template-columns:1fr;
@@ -6603,6 +6649,67 @@ function renderMarkdown(text) {
       return { cleanText: source.replace(/(?:\n)?\[Ek:\s*([^\]]+)\]\s*$/i, '').trim(), attachmentName: (m[1] || '').trim() };
     }
 
+    // ===== Örnek cevaplar (isteğe bağlı) =====
+    // Varsayılan kapalı; kullanıcı isterse tetikleyiciyle açar. Tercih hatırlanır,
+    // böylece örnekleri sürekli görmek isteyen kullanıcı her seferinde açmak zorunda kalmaz.
+    const EXAMPLES_PREF_KEY = 'examples_open_v1';
+    function getExamplesPref(){ try{ return localStorage.getItem(EXAMPLES_PREF_KEY) === '1'; }catch(e){ return false; } }
+    function setExamplesPref(open){ try{ localStorage.setItem(EXAMPLES_PREF_KEY, open ? '1' : '0'); }catch(e){} }
+    const EX_BULB_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg>';
+    const EX_CHEVRON_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+    function buildExamplesComponent(examples){
+      const box = document.createElement('div');
+      box.className = 'examples';
+      const startOpen = getExamplesPref();
+      if(startOpen) box.classList.add('open');
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'examples-toggle';
+      toggle.setAttribute('aria-expanded', String(startOpen));
+      toggle.innerHTML =
+        '<span class="examples-toggle-icon" aria-hidden="true">' + EX_BULB_SVG + '</span>'
+        + '<span class="examples-toggle-label">' + (startOpen ? 'Örnekleri gizle' : 'Örnek cevaplar') + '</span>'
+        + '<span class="examples-toggle-count">' + examples.length + '</span>'
+        + '<span class="examples-toggle-chevron" aria-hidden="true">' + EX_CHEVRON_SVG + '</span>';
+
+      const panel = document.createElement('div');
+      panel.className = 'examples-panel';
+      const inner = document.createElement('div');
+      inner.className = 'examples-panel-inner';
+      const cards = document.createElement('div');
+      cards.className = 'example-cards';
+      examples.forEach(ex => {
+        const card = document.createElement('button');
+        card.className = 'example-card';
+        card.type = 'button';
+        card.textContent = ex;
+        card.title = 'Tıklayarak kullan';
+        card.addEventListener('click', () => {
+          const inputEl = document.getElementById('input');
+          inputEl.value = ex;
+          autoResizeComposerInput();
+          inputEl.focus();
+        });
+        cards.appendChild(card);
+      });
+      inner.appendChild(cards);
+      panel.appendChild(inner);
+
+      toggle.addEventListener('click', () => {
+        const nowOpen = !box.classList.contains('open');
+        box.classList.toggle('open', nowOpen);
+        toggle.setAttribute('aria-expanded', String(nowOpen));
+        toggle.querySelector('.examples-toggle-label').textContent = nowOpen ? 'Örnekleri gizle' : 'Örnek cevaplar';
+        setExamplesPref(nowOpen);
+      });
+
+      box.appendChild(toggle);
+      box.appendChild(panel);
+      return box;
+    }
+
     function addMessageToDom(messageOrText, role, mid){
       const message = (messageOrText && typeof messageOrText === 'object' && !Array.isArray(messageOrText))
         ? messageOrText
@@ -6767,22 +6874,22 @@ function renderMarkdown(text) {
       wrap.appendChild(ts);
       wrap.appendChild(actions);
 
-      // Example cards: extracted examples rendered below the assistant card
+      // Asistan mesajının altındaki kartlar:
+      //  - Talep Tipi seçim kartları: zorunlu seçim, her zaman görünür.
+      //  - Örnek cevaplar: isteğe bağlı; kullanıcı "Örnek cevaplar" tetikleyicisiyle açar.
       if(!isUser){
         const isRequestTypePrompt = isRequestTypeSelectionPrompt(message);
-        const requestTypeExamples = REQUEST_TYPE_OPTIONS.map(option => option.title);
-        const cardItems = isRequestTypePrompt ? requestTypeExamples : examples;
-        if(cardItems.length){
+        if(isRequestTypePrompt){
           const cardsWrap = document.createElement('div');
-          cardsWrap.className = isRequestTypePrompt ? 'request-type-cards' : 'example-cards';
+          cardsWrap.className = 'request-type-cards';
           const label = document.createElement('div');
           label.className = 'example-cards-label';
-          label.textContent = isRequestTypePrompt ? 'Talep Tipi Seçenekleri' : ('Örnek' + (cardItems.length > 1 ? 'ler' : ''));
+          label.textContent = 'Talep Tipi Seçenekleri';
           cardsWrap.appendChild(label);
-          cardItems.forEach(ex => {
+          REQUEST_TYPE_OPTIONS.map(option => option.title).forEach(ex => {
+            const option = getRequestTypeOption(ex);
             const card = document.createElement('button');
-            const option = isRequestTypePrompt ? getRequestTypeOption(ex) : null;
-            card.className = isRequestTypePrompt ? 'request-type-card' : 'example-card';
+            card.className = 'request-type-card';
             card.type = 'button';
             if(option){
               card.innerHTML = `<div class="request-type-card-title">${option.title}</div><div class="request-type-card-desc">${option.description}</div>`;
@@ -6791,18 +6898,20 @@ function renderMarkdown(text) {
             }
             card.title = 'Tıklayarak kullan';
             card.addEventListener('click', () => {
-              if(isRequestTypePrompt && option){
+              if(option){
                 if(sendBtn.disabled) return;
                 submitMessage(option.title);
                 return;
               }
-              document.getElementById('input').value = option ? option.title : ex;
+              document.getElementById('input').value = ex;
               autoResizeComposerInput();
               document.getElementById('input').focus();
             });
             cardsWrap.appendChild(card);
           });
           wrap.appendChild(cardsWrap);
+        } else if(examples.length){
+          wrap.appendChild(buildExamplesComponent(examples));
         }
       }
 
