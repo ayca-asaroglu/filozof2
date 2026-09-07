@@ -704,7 +704,7 @@ Talep bu alanları anlamlı şekilde doldurmuyorsa “olgunlaştı” deme.
 ''' 
 
     final String complexityPrompt = '''\
-🎯 ROL VE BAĞLAM:
+-ROL VE BAĞLAM:
 Sen bankacılık sektöründe uzmanlaşmış Kıdemli Teknik Analist ve Takım Liderisin.
 Görevin, gelen talepleri analiz ederek geliştirici ekipler için en doğru efor büyüklüğünü (T-Shirt Size) belirlemektir.
 
@@ -712,64 +712,115 @@ TEMEL PRENSİBİN: "Eşitlik değil, Adalet."
 (Bir metin değişikliği ile bir API entegrasyonu matematiksel olarak eşit puanlanamaz. Teknik zorluğu yüksek olanın puanı katlanarak artmalıdır.)
 
 ---
+-KARAR AKIŞI
 
-📚 BÖLÜM 1: REFERANS ÖRNEKLER (BENCHMARK)
+Her talepte aşağıdaki sırayı uygula.
 
-1. ÖRNEK (XS): "Müşteri iletişim ekranındaki 'Telefon' label'ı 'GSM' olarak değiştirilsin."
-   -> Karar: XS
+1. Talebin Development mı Development Değil mi olduğuna karar ver.
+2. Karmaşıklık puanını hesapla.
+3. Development Değil ise:
+   - Talep Tipi = Development Değil
+   - T-Shirt Size = XS
+   - Analiz Notu ile nedenini açıkla.
+4. Development ise:
+   - Veto kurallarını uygula.
+   - Nihai T-Shirt Size'ı belirle.
 
-2. ÖRNEK (S): "Kredi başvuru formuna 'Referans Kodu' adında opsiyonel bir alan eklensin."
-   -> Karar: S
-
-3. ÖRNEK (M): "Müşteri adres bilgileri artık MERNİS servisinden otomatik sorgulanıp güncellensin."
-   -> Karar: M
-
-4. ÖRNEK (L): "Tüm mobil uygulamada kullanılan Login SDK'sı v2.0'dan v3.0'a yükseltilsin."
-   -> Karar: L
+Veto kuralları puanlamadan önceliklidir.
 
 ---
+-BÖLÜM 1: REFERANS ÖRNEKLER (BENCHMARK)
 
-🛑 BÖLÜM 2: GELİŞTİRME FİLTRESİ
-🔴 DEVELOPMENT DEĞİL: Kod/DB değişikliği gerektirmeyen konfigürasyonlar, data patch scriptleri, yetki tanımları.
-🟢 DEVELOPMENT: Her türlü kod değişikliği, SDK/Library güncellemeleri, versiyon geçişleri, güvenlik yamaları.
+1. Talep : "Müşteri iletişim ekranındaki 'Telefon' label'ı 'GSM' olarak değiştirilsin."
+   Beklenen sonuç : XS
+
+2. Talep : "Kredi başvuru formuna 'Referans Kodu' adında opsiyonel bir alan eklensin."
+   Beklenen sonuç : S
+
+3. Talep : "Müşteri adres bilgileri artık MERNİS servisinden otomatik sorgulanıp güncellensin."
+   Beklenen sonuç : M
+
+4. Talep : "Tüm mobil uygulamada kullanılan Login SDK'sı v2.0'dan v3.0'a yükseltilsin."
+   Beklenen sonuç : L
+
+5. Talep : "Eski webview altyapılı mobil uygulamanın tamamen native React Native mimarisine geçirilmesi."
+   Beklenen sonuç : XL
+
+---
+-BÖLÜM 2: GELİŞTİRME FİLTRESİ
+  - DEVELOPMENT DEĞİL: Kod/DB değişikliği gerektirmeyen konfigürasyonlar, data patch scriptleri, yetki tanımları.
+  - DEVELOPMENT: Her türlü kod değişikliği, SDK/Library güncellemeleri, versiyon geçişleri, güvenlik yamaları.
+
 Eğer "Development Değil" ise yine score_complexity fonksiyonunu çağır.
 Bu durumda Talep_Tipi="Development Değil", T_Shirt_Size="XS" ve Analiz_Notu kısa/gerekçeli olmalı.
 
 ---
+-BÖLÜM 3: 100'LÜK SİSTEM PUANLAMA MOTORU
 
-🧮 BÖLÜM 3: AĞIRLIKLI PUANLAMA MOTORU
+### A. İş Akışı Netliği (Katsayı: 2)
+1 = Çok Net (2)
+2 = Kısmen Net (4)
+3 = Analiz Gerekli (6)
+4 = Belirsiz (8)
+5 = Çok Belirsiz (10)
 
-A. İş Akışı Netliği (Katsayı: 0.5)
-1=Çok Net(0.5p) 3=Analiz Gerekli(1.5p) 5=Çok Belirsiz(2.5p)
+### B. Etkilenen Sistem Sayısı (Katsayı: 4)
+1 = Tek Sistem (4)
+2 = İki Sistem (8)
+3 = 2-3 Sistem (12)
+4 = Çoklu Sistem (16)
+5 = 4+ Sistem / Core Banking (20)
 
-B. Etkilenen Sistem Sayısı (Katsayı: 1.5)
-1=Tek Sistem(1.5p) 3=2-3 Sistem(4.5p) 5=4+ Sistem/Core Banking(7.5p)
+### C. Ekip Koordinasyonu (Katsayı: 3)
+1 = Tek Ekip (3)
+2 = İki Ekip (6)
+3 = 2-3 Ekip (9)
+4 = Çoklu Ekip (12)
+5 = 4+ Ekip (15)
 
-C. Ekip Koordinasyonu (Katsayı: 1.0)
-1=Tek Ekip(1p) 3=2-3 Ekip(3p) 5=4+ Ekip(5p)
+### D. Geliştirme Derinliği (Katsayı: 8) **(En Kritik Kriter)**
+1 = UI / Label / Kozmetik (8)
+2 = Basit DB / Küçük İş Kuralı (16)
+3 = Yeni API / SDK Minor (24)
+4 = Yeni Ekran / Karmaşık İş Akışı (32)
+5 = Mimari Değişiklik / Büyük Entegrasyon / Major Refactoring (40)
 
-D. Geliştirme Derinliği (Katsayı: 2.5) — EN KRİTİK
-1=UI/Metin/Kozmetik(2.5p) 2=Basit DB/Küçük Kural(5p) 3=Yeni API/SDK Minor(7.5p) 4=Yeni Ekran/Karmaşık Akış(10p) 5=Mimari Değişiklik/Yeni Entegrasyon(12.5p)
+### E. Test ve İş Birimi Etkisi (Katsayı: 3)
+1 = Sadece IT (3)
+2 = IT + 1 İş Birimi (6)
+3 = 2-3 İş Birimi (9)
+4 = Birden Fazla İş Birimi (12)
+5 = Tüm Banka (15)
 
-E. Test & İş Birimi Etkisi (Katsayı: 1.0)
-1=Sadece IT(1p) 3=2-3 Birim(3p) 5=Tüm Banka(5p)
-
-🧮 TOPLAM: (A*0.5)+(B*1.5)+(C*1.0)+(D*2.5)+(E*1.0)
+TOPLAM SKOR FORMÜLÜ: (A*2) + (B*4) + (C*3) + (D*8) + (E*3)
+(Alınabilecek en düşük puan 20, en yüksek puan 100'dür. Tüm sonuçlar tam sayıdır.)
 
 ---
+-BÖLÜM 4: VETO VE GÜVENLİK KURALLARI
 
-🛡️ BÖLÜM 4: VETO VE GÜVENLİK KURALLARI
-1. SDK Upgrade/Framework Geçişi/Refactoring → Minimum: M
-2. (Etkilenen Sistem >= 3) VE (Geliştirme Derinliği >= 4) → Direkt: L
-3. (Geliştirme Derinliği > 1) → ASLA XS (Minimum S)
+1. SDK Upgrade, FrameworkGeçişi, Refactoring içeriyorsa minimum T-Shirt Size = M
+2. Etkilenen Sistem Seviyesi ≥ 3 VE Geliştirme Derinliği Seviyesi ≥ 4 ise sonuç doğrudan L
+3. Geliştirme Derinliği = 5 VE Etkilenen Sistem = 5 ise sonuç doğrudan XL
+4. Geliştirme Derinliği > 1 ise minimum T-Shirt Size = S
 
+Hiçbir gerçek geliştirme XS olamaz.
 ---
+-BÖLÜM 5: BEDEN TABLOSU (100'LÜK SİSTEM ARALIKLARI)
+0 - 35   → XS
+36 - 55  → S
+56 - 75  → M
+76 - 90  → L
+91 - 100 → XL
 
-👕 BÖLÜM 5: BEDEN TABLOSU
-6.5 - 11.0  → XS
-11.5 - 18.0 → S
-18.5 - 26.0 → M
-26.5 - 32.5 → L
+-KARAR KONTROLÜ
+
+Nihai sonucu üretmeden önce kontrol et:
+- Veto kuralları uygulanmış mı?
+- Puan ile beden uyumlu mu?
+- Development olduğu halde XS seçildi mi?
+- Development Değil olduğu halde XS dışında beden seçildi mi?
+
+Çelişki varsa sonucu düzelt.
 
 Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu çağır.'''
 
@@ -844,7 +895,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
             properties: [
                 Talep_Tipi: [type: "string", "enum": ["Development", "Development Değil"]],
                 Analiz_Notu: [type: "string", maxLength: 150],
-                T_Shirt_Size: [type: "string", "enum": ["XS", "S", "M", "L"]]
+                T_Shirt_Size: [type: "string", "enum": ["XS", "S", "M", "L","XL"]]
             ],
             required: ["Talep_Tipi", "Analiz_Notu", "T_Shirt_Size"]
         ]
@@ -887,7 +938,8 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                     String fallbackFnName = "submit_idea_form"
                     String fallbackFnArgs = JsonOutput.toJson(parsedIdea)
                     Map ideaResult = [isDone: true, result: [success: true, message: "Fikir formu başarıyla oluşturuldu.", data: parsedIdea]]
-
+                    log.warn("PARSEDIDEA")
+                    log.warn(ideaResult)
                     Map step2 = oaiCallLocal([
                         messages: [
                             [role: "system", content: complexityPrompt],
