@@ -1,0 +1,517 @@
+Mevcut Fibabanka “FilozoF” chatbot ekranını referans alarak ekranı baştan sona yeniden tasarla.
+
+AMAÇ
+Mevcut klasik chatbot görünümünü, modern ve yenilikçi bir “AI destekli fikir geliştirme workspace” deneyimine dönüştür.
+
+Kullanıcı yalnızca AI ile mesajlaşmamalı; sohbet ilerledikçe fikrinin yapılandığını, hangi aşamada olduğunu ve hangi bilgilerin tamamlandığını gerçek zamanlı olarak görebilmeli.
+
+Tasarım kurumsal, sade, premium, güvenilir ve modern olmalı. Gereksiz futuristik efektlerden, aşırı gradient kullanımından, yoğun border kullanımından ve oyuncak görünümlü AI tasarımlarından kaçın.
+
+Fibabanka’nın mevcut mavi ağırlıklı kurumsal kimliğini koru fakat daha çağdaş bir SaaS / AI copilot deneyimine dönüştür.
+
+
+1. GENEL LAYOUT
+
+Desktop-first, responsive bir tasarım oluştur.
+
+Ana ekranı 3 temel bölgeye ayır:
+
+SOL PANEL
+- Fikir geçmişi ve navigasyon
+- Yaklaşık 240–280 px genişlik
+
+ORTA PANEL
+- AI ile fikir geliştirme sohbeti
+- Ana çalışma alanı
+- Yaklaşık 700–800 px maksimum içerik genişliği
+
+SAĞ PANEL
+- “Canlı Fikir Özeti”
+- Konuşma sırasında AI tarafından gerçek zamanlı güncellenen yapılandırılmış fikir özeti
+- Yaklaşık 320–380 px genişlik
+
+Ekrandaki mevcut gereksiz boş alanları azalt.
+İçeriğin ekranın ortasında kaybolmasını engelle.
+Layout ferah ancak bilgi yoğunluğu dengeli olsun.
+
+
+2. ÜST NAVİGASYON
+
+Mevcut Fibabanka / FilozoF marka kimliğini koru.
+
+Header sade ve minimal olsun.
+
+Sol:
+- FilozoF logo / ürün adı
+
+Sağ:
+- Anasayfa
+- Fikirlerim
+- Kullanıcı profili
+
+“Fikirlerim” alanındaki bildirim sayısını modern badge olarak göster.
+
+Header yüksekliğini kompakt tut.
+Ana çalışma alanından gereksiz yere dikkat çalmasın.
+
+
+3. SOL PANEL — FİKİRLER
+
+Mevcut sohbet geçmişini daha kullanışlı bir “Fikirler” alanına dönüştür.
+
+Panelin üst kısmında güçlü bir primary CTA:
+
+“+ Yeni Fikir”
+
+Altında arama:
+“Fikirlerde ara…”
+
+Konuşmaları “Bugün”, “Bu Hafta”, “Öncekiler” gibi Türkçe gruplar altında göster.
+
+“Today / Older” gibi İngilizce ifadeler kullanma.
+Arayüz tamamen Türkçe olmalı.
+
+Konuşmaları sürekli:
+“Nasıl fikir girişi yapabilirim?”
+şeklinde isimlendirme.
+
+AI konuşmanın içeriğine göre otomatik anlamlı başlık üretsin.
+
+Örnek:
+
+“Gelir Bilgisinin Başvuru Özetine Taşınması”
+Bugün · Taslak
+
+“İhtiyaç Kredisi Gelir Alanı Hatası”
+Dün · Gönderildi
+
+Her fikir kartında:
+- AI tarafından oluşturulmuş kısa başlık
+- Tarih
+- Durum
+
+Durum örnekleri:
+Taslak
+Hazırlanıyor
+Gönderildi
+
+Aktif fikir hafif bir surface/background değişikliği ile belirgin olsun.
+Yoğun border kullanma.
+
+
+4. FİKİR OLUŞTURMA PROGRESS BAR
+
+Orta panelin üst kısmına fikir oluşturma sürecini gösteren bir stepper ekle.
+
+Örnek:
+
+1. Problem ✓
+→
+2. Mevcut Süreç ✓
+→
+3. Beklenen Davranış ●
+→
+4. Etki
+→
+5. Özet
+
+Kullanıcı her zaman:
+- hangi aşamada olduğunu,
+- hangi aşamaları tamamladığını,
+- sırada ne olduğunu
+görebilsin.
+
+Tamamlanan adımlar check icon ile gösterilsin.
+Aktif adım Fibabanka mavisi ile vurgulansın.
+Gelecek adımlar nötr gri olsun.
+
+Stepper modern, kompakt ve kolay taranabilir olmalı.
+
+
+5. ORTA PANEL — AI SOHBET DENEYİMİ
+
+Chat ekranını klasik mesajlaşma uygulaması görünümünden çıkarıp modern AI copilot deneyimine dönüştür.
+
+AI mesajlarında:
+- FilozoF avatarı
+- “FilozoF” label
+- mesaj
+
+Kullanıcı mesajlarında:
+- sağ hizalama
+- “Sen” label kullanımı opsiyonel
+- AI mesajlarından belirgin şekilde farklı surface
+
+AI ve kullanıcı mesajları arasındaki görsel ayrımı artır.
+
+Mesaj balonlarında çok fazla border kullanma.
+Surface/background tonları, spacing ve typography ile hiyerarşi oluştur.
+
+Mesaj maksimum genişliği yaklaşık %70–80 olsun.
+
+Body text:
+15–16 px
+Line-height yaklaşık 1.5
+
+Mesajlar arasında yeterli whitespace bırak.
+
+
+6. AI’IN SORU SORMA BİÇİMİ
+
+AI yalnızca soru sormasın.
+Kullanıcıya neden bu bilgiyi istediğini de gerektiğinde kısa biçimde hissettirsin.
+
+Örnek:
+
+“Teşekkürler, problemi netleştirdik.”
+
+Ardından:
+
+“Şimdi beklenen davranışı tanımlayalım.”
+
+“Gelir bilgisi hangi koşulda sonraki adıma taşınmalı? Taşınamadığında kullanıcıya nasıl bir mesaj gösterilmeli?”
+
+AI mesajlarında uzun paragraflardan kaçın.
+Soruları kolay taranabilir hale getir.
+
+
+7. ÖNERİLEN CEVAPLAR
+
+Mevcut:
+“Örnekleri gizle / Örnek cevaplar”
+kutularını yeniden tasarla.
+
+Bunun yerine modern:
+
+✨ Önerilen cevaplar
+
+bileşeni kullan.
+
+Örnek:
+
+[ Gelir bilgisi sonraki adıma otomatik taşınmalı ]
+
+[ Başvuru özetinde gelir alanı dolu görünmeli ]
+
+[ Veri taşınamazsa kullanıcıya açıklayıcı hata gösterilmeli ]
+
+Bu öneriler tıklanabilir chip veya küçük card şeklinde olsun.
+
+Kullanıcı bir öneriye tıkladığında:
+- input alanına gelsin
+veya
+- doğrudan cevap olarak kullanılabilsin.
+
+Öneriler AI mesajlarından görsel olarak farklı olsun.
+
+“Önerileri gizle” seçeneği secondary/minimal control olarak kullanılabilir.
+
+
+8. INPUT ALANI
+
+Mesaj yazma alanını ekranın önemli etkileşim merkezi olarak yeniden tasarla.
+
+Input alanının üzerinde küçük bir context indicator göster:
+
+“Şimdi senden beklenen”
+
+“Beklenen davranışı anlat”
+
+Altında örnek yardımcı metin:
+
+“Örn. Gelir bilgisi uygunluk kontrolüne otomatik aktarılmalı…”
+
+Input placeholder:
+
+“Cevabını yaz veya önerilerden birini seç…”
+
+Input içerisinde:
+- mikrofon
+- gönder butonu
+
+Gönder butonu primary Fibabanka mavisi ve circular olabilir.
+
+Enter / Shift+Enter gibi klavye açıklamalarını sürekli görünür tutma.
+Tooltip veya ilk kullanım onboarding’ine taşı.
+
+
+9. TEK FİKİR KURALI
+
+Mevcut:
+
+“Her bir sohbet ekranında yalnızca tek bir fikir girişi yapılmalıdır.”
+
+uyarısını ekranın altında sürekli gösterme.
+
+Bu bilgiyi onboarding aşamasında kullanıcıya açıkla.
+
+AI kullanıcının farklı bir fikir anlatmaya başladığını algılarsa context-aware uyarı göster:
+
+“Bu, mevcut konudan farklı bir fikir gibi görünüyor.”
+
+Altında:
+
+[ Yeni fikir oluştur ]
+
+[ Bu fikirde devam et ]
+
+Böylece sistem kuralını statik uyarı yerine akıllı bir UX davranışına dönüştür.
+
+
+10. SAĞ PANEL — CANLI FİKİR ÖZETİ
+
+Ekranın sağındaki mevcut boş alanı kullan.
+
+Buraya:
+
+“Canlı Fikir Özeti”
+
+paneli ekle.
+
+AI konuşma sırasında bu alanı gerçek zamanlı güncellesin.
+
+Örnek içerik:
+
+CANLI FİKİR ÖZETİ
+
+Gelir Bilgisinin Başvuru Özetine Taşınması
+
+Problem ✓
+Başvuru özetinde gelir bilgisi kayboluyor.
+
+Mevcut Süreç ✓
+Finansal Bilgiler
+→ Başvuru Özeti
+→ Kredi Uygunluk
+
+Beklenen Davranış ●
+Gelir bilgisi adımlar arasında korunmalı.
+
+Kullanıcı Etkisi
+Henüz belirtilmedi.
+
+Çözüm Önerisi
+Henüz belirtilmedi.
+
+Tamamlanan bölümlerde check icon kullan.
+
+Aktif olarak konuşulan bölüm mavi accent ile vurgulansın.
+
+Eksik alanlarda:
+“Henüz belirtilmedi”
+kullan ve nötr bir görünüm ver.
+
+AI yeni bilgi çıkardığında ilgili alanın çok hafif bir transition/animation ile güncellendiği hissini ver.
+
+Panel sticky olabilir.
+
+
+11. FİKİR TAMAMLANDI DENEYİMİ
+
+Tüm gerekli bilgiler toplandığında AI:
+
+“Fikrin hazır 🎉”
+
+durumuna geçsin.
+
+Progress:
+5/5 tamamlandı.
+
+Sağ panelde final fikir özeti gösterilsin.
+
+Altında:
+
+[ Önizle ]
+
+[ Düzenle ]
+
+[ Fikri Gönder ]
+
+“Fikri Gönder” ana primary CTA olsun.
+
+Gönderim öncesinde kullanıcı tüm yapılandırılmış bilgileri kolayca kontrol edebilsin.
+
+
+12. GÖRSEL TASARIM SİSTEMİ
+
+Modern enterprise AI SaaS estetiği kullan.
+
+Tasarım özellikleri:
+
+- Fibabanka kurumsal mavisi primary accent
+- Çok açık gri / off-white ana background
+- Beyaz surface/card alanları
+- Yüksek kontrastlı koyu lacivert/gri typography
+- Minimal shadow
+- Minimal border
+- Bol fakat kontrollü whitespace
+- 8 px spacing grid
+- Tutarlı 8 / 12 / 16 px border radius sistemi
+- Modern icon set
+- WCAG erişilebilirlik standartlarına uygun contrast
+
+Border kullanarak hiyerarşi oluşturmaya çalışma.
+
+Öncelikle:
+- spacing
+- typography
+- surface
+- font weight
+- elevation
+kullan.
+
+
+13. TYPOGRAPHY
+
+Kurumsal ve modern sans-serif font kullan.
+
+Önerilen hiyerarşi:
+
+Page title:
+20–24 px / semibold
+
+Section title:
+16–18 px / semibold
+
+Chat body:
+15–16 px / regular
+
+Supporting text:
+12–13 px / regular
+
+CTA:
+14–15 px / medium/semibold
+
+Metinler çok küçük görünmemeli.
+
+
+14. MICRO INTERACTIONS
+
+AI yazarken:
+“FilozoF düşünüyor…”
+
+typing indicator göster.
+
+Bir fikir alanı tamamlandığında:
+- küçük check animasyonu
+- sağ panelde ilgili alanın güncellenmesi
+
+Önerilen cevap üzerine hover:
+- hafif elevation
+- accent border/background
+
+Progress tamamlandığında:
+- sade completion animation
+
+Gösterişli veya dikkat dağıtıcı animasyonlardan kaçın.
+
+
+15. EMPTY STATE
+
+Yeni fikir başlatıldığında boş chatbot ekranı gösterme.
+
+Warm welcome state oluştur:
+
+“Merhaba 👋
+Fikrini birlikte netleştirelim.”
+
+“Bir problemi, geliştirme önerisini veya yeni fikrini kendi cümlelerinle anlatabilirsin.”
+
+Altında başlangıç önerileri:
+
+[ Bir süreçte yaşadığım problemi anlatacağım ]
+
+[ Yeni bir ürün fikrim var ]
+
+[ Mevcut bir özelliği geliştirmek istiyorum ]
+
+Ve ana input alanı.
+
+
+16. UX PRENSİBİ
+
+Bu ürünün temel deneyimi:
+
+“AI ile mesajlaşıyorum”
+
+olmamalı.
+
+Kullanıcının hissetmesi gereken:
+
+“AI fikrimi benimle birlikte yapılandırıyor.”
+
+Konuşmanın her aşamasında kullanıcı:
+- nerede olduğunu,
+- neden bu sorunun sorulduğunu,
+- hangi bilgilerin tamamlandığını,
+- hangi bilgilerin eksik olduğunu,
+- fikrinin son halinin nasıl oluştuğunu
+anlayabilmeli.
+
+
+17. TASARIM HEDEFİ
+
+Sonuç ekranı şu özellikleri taşımalı:
+
+Modern
+Kurumsal
+Premium
+AI-native
+Minimal
+Kolay öğrenilebilir
+Düşük bilişsel yük
+Güçlü bilgi hiyerarşisi
+Yüksek erişilebilirlik
+Desktop enterprise uygulamasına uygun
+
+ChatGPT’nin doğrudan kopyası gibi görünmemeli.
+
+Slack veya klasik messenger UI gibi de görünmemeli.
+
+FilozoF’un kendine ait, Fibabanka markasıyla uyumlu bir “AI Idea Copilot” ürün kimliği oluşmalı.
+
+
+18. ÖNCELİKLENDİRME
+
+P0:
+- 3 panelli workspace yapısı
+- fikir oluşturma progress stepper
+- Canlı Fikir Özeti
+- tıklanabilir AI önerileri
+- güçlü conversation hierarchy
+
+P1:
+- sol fikir geçmişinin yeniden tasarlanması
+- context-aware input
+- kullanıcı / AI ayrımının iyileştirilmesi
+- fikir tamamlama ve gönderme flow’u
+
+P2:
+- typography refinement
+- spacing
+- border azaltılması
+- micro interactions
+- Türkçe microcopy tutarlılığı
+
+
+ÇIKTI
+
+Mevcut ekranın aynı işlevlerini koruyarak tamamen yeniden tasarlanmış, yüksek kaliteli bir desktop UI mockup üret.
+
+1440 px desktop viewport üzerinden tasarla.
+
+Öncelikle ana “fikir geliştirme sırasında” ekranını göster.
+
+Ekranda örnek senaryo olarak şu fikri kullan:
+
+“Gelir Bilgisinin Başvuru Özetine Taşınması”
+
+Kullanıcı şu anda “Beklenen Davranış” aşamasında olsun.
+
+Problem ve Mevcut Süreç tamamlanmış olsun.
+
+Sağdaki Canlı Fikir Özeti panelinde bu bilgiler gerçek verilerle doldurulmuş görünsün.
+
+Tasarımdaki bütün metinler Türkçe olsun.
+
+Pixel-perfect, production-ready, modern enterprise AI product UI kalitesinde tasarla.
