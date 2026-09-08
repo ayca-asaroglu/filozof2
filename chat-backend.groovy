@@ -343,6 +343,41 @@ List<String> findMissingRequiredFieldsLocal(Map idea) {
     return missing
 }
 
+// Canlı Fikir Özeti / stepper için ilerleme nesnesi. Portal'ın sağ panelini ve
+// sohbet üstündeki stepper'ı BESLER — sahte veri yok, tümü toplanan gerçek alanlardan
+// türetilir. Aşama sırası submit_idea_form zorunlu alanlarıyla birebir hizalıdır.
+// `currentKey`: state COLLECTING iken sırada doldurulacak ilk boş aşama (prompt_key
+// varsa onu önceler); READY/COMPLETED iken null.
+Map buildIdeaProgressLocal(Map idea, String promptKey, String state) {
+    Map safeIdea = (idea instanceof Map) ? idea : [:]
+    List<List<String>> defs = [
+        ["talep_tipi",        "Talep Tipi"],
+        ["problem",           "Problem"],
+        ["mevcut_durum",      "Mevcut Durum"],
+        ["cozum_tipi",        "Çözüm Tipi"],
+        ["hedef_kitle",       "Hedef Kitle"],
+        ["fikrin_aciklamasi", "Özet & Açıklama"]
+    ]
+    List<Map> steps = []
+    int filled = 0
+    String firstEmptyKey = null
+    defs.each { d ->
+        String key = d[0]
+        boolean isFilled = !isMissingRequiredValueLocal(safeIdea[key])
+        if (isFilled) filled++
+        else if (firstEmptyKey == null) firstEmptyKey = key
+        String rawVal = asTrimmedString(safeIdea[key]) ?: ""
+        String value = rawVal.length() > 240 ? (rawVal.substring(0, 240) + "…") : rawVal
+        steps << [key: key, label: d[1], filled: isFilled, value: value]
+    }
+    // prompt_key özel istemleri (talep tipi / kpi) sıradaki aşamayı netleştirir.
+    String currentKey = firstEmptyKey
+    if (promptKey == PROMPT_KEY_REQUEST_TYPE) currentKey = "talep_tipi"
+    boolean done = (state == STATE_READY_FOR_APPROVAL || state == "APPROVED" || state == "COMPLETED")
+    if (done) { filled = steps.size(); currentKey = null; steps.each { it.filled = true } }
+    return [steps: steps, filled: filled, total: steps.size(), currentKey: currentKey]
+}
+
 String buildTalepTipiPromptLocal() {
     return """Sohbete başlamadan önce ilk olarak talep tipini belirlememiz gerekiyor. Aşağıdaki talep tiplerinden senin fikrine en uygun tipini seçebilir misin? Bunun üzerine fikrini oluşturmak için gerekli yönlendirmeleri yapacağım.
 [Örnek]: Yazılım Geliştirme
@@ -965,10 +1000,10 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                         String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
                         String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
-                        return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL"]]
+                        return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL", idea: parsedIdea]]
                     }
 
-                    return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY"]]
+                    return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fallbackFnName, arguments: fallbackFnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY", idea: parsedIdea]]
                 }
 
                 Map partialIdea = extractIdeaFieldsFromSummaryLocal(latestAnswer)
@@ -977,7 +1012,7 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                     ? "Onay alındı ancak son özet verisi bulunamadı. Lütfen özeti tekrar isteyin."
                     : buildMissingFieldPromptLocal(missingFields)
                 String promptKey = missingFields.isEmpty() ? null : promptKeyForMissingFieldLocal(missingFields[0])
-                return [status: 200, body: [ok: true, answer: missingAnswer, prompt_key: promptKey, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK"]]
+                return [status: 200, body: [ok: true, answer: missingAnswer, prompt_key: promptKey, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK", idea: partialIdea]]
             }
             return [status: 200, body: [ok: true, answer: content, prompt_key: null, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK"]]
         }
@@ -1003,15 +1038,15 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
         List<String> missingFields = findMissingRequiredFieldsLocal(ideaMap)
         if (!missingFields.isEmpty()) {
             String promptKey = promptKeyForMissingFieldLocal(missingFields[0])
-            return [status: 200, body: [ok: true, answer: buildMissingFieldPromptLocal(missingFields), prompt_key: promptKey, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK"]]
+            return [status: 200, body: [ok: true, answer: buildMissingFieldPromptLocal(missingFields), prompt_key: promptKey, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK", idea: ideaMap]]
         }
 
         if (!hasKpiValueLocal(ideaMap)) {
-            return [status: 200, body: [ok: true, answer: buildKpiPromptLocal(), prompt_key: PROMPT_KEY_KPI, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK"]]
+            return [status: 200, body: [ok: true, answer: buildKpiPromptLocal(), prompt_key: PROMPT_KEY_KPI, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK", idea: ideaMap]]
         }
 
         if (!isApprove) {
-            return [status: 200, body: [ok: true, answer: buildIdeaSummaryLocal(ideaMap), prompt_key: null, isDone: false, args: [name: fnName, arguments: fnArgs], complexity: null, state: "READY_FOR_APPROVAL", mode: "SUMMARY"]]
+            return [status: 200, body: [ok: true, answer: buildIdeaSummaryLocal(ideaMap), prompt_key: null, isDone: false, args: [name: fnName, arguments: fnArgs], complexity: null, state: "READY_FOR_APPROVAL", mode: "SUMMARY", idea: ideaMap]]
         }
 
         Map ideaResult = [isDone: true, result: [success: true, message: "Fikir formu başarıyla oluşturuldu.", data: ideaMap]]
@@ -1041,10 +1076,10 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
             String referenceText = referenceUrl ? "\n\n**Referans URL**: ${referenceUrl}" : ""
             String finalAnswer = "**Analiz Notu**: ${analiz}${referenceText}\n\n**Tahmini kompleksite**: ${tshirtSize}"
 
-            return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL"]]
+            return [status: 200, body: [ok: true, answer: finalAnswer, prompt_key: null, isDone: true, args: [name: fnName, arguments: fnArgs], complexity: tshirtSize, analysis_note: analiz, state: "COMPLETED", mode: "FINAL", idea: ideaMap]]
         }
 
-        return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fnName, arguments: fnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY"]]
+        return [status: 200, body: [ok: true, answer: "Özet onaylandı ancak kompleksite hesaplaması tamamlanamadı. Lütfen tekrar onaylayın.", prompt_key: null, isDone: false, args: [name: fnName, arguments: fnArgs], complexity: null, state: "APPROVED", mode: "SUMMARY", idea: ideaMap]]
     } catch (Throwable t) {
         return [status: 500, body: [ok: false, error: errorContract(ERR_UPSTREAM, STAGE_UPSTREAM, true, "Local agent error", t.message ?: "Bilinmeyen hata")]]
     }
@@ -1154,6 +1189,7 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
         state = firstNonNull(j["state"], jOutputs["state"])
         mode = firstNonNull(j["mode"], jOutputs["mode"])
         promptKey = firstNonNull(j["prompt_key"], jOutputs["prompt_key"])
+        def ideaSnapshot = firstNonNull(j["idea"], jOutputs["idea"])
         log.warn("size")
         log.warn(size)
         if (size == null) size = false
@@ -1232,6 +1268,10 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
             }
         }
 
+        // Canlı Fikir Özeti / stepper verisi: son state (processJiraStep sonrası) baz alınır.
+        Map ideaSnap = (ideaSnapshot instanceof Map) ? (Map) ideaSnapshot : [:]
+        Map progress = buildIdeaProgressLocal(ideaSnap, promptKey?.toString(), state?.toString())
+
         return jsonUtf8(200, [
             ok            : true,
             answer        : (answer instanceof String ? answer : JSON_GEN.toJson(answer)),
@@ -1242,6 +1282,7 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
             prompt_key    : promptKey,
             isDone        : isDone,
             complexity    : size,
+            progress      : progress,
             jira_ok       : jiraOk,
             jira_issue_key: jiraIssueKey
         ])
