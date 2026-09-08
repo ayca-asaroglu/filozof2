@@ -2943,6 +2943,80 @@
 
     .brand-with-icon{ display:flex; align-items:center; gap:8px; }
     .brand-with-icon img{ width:22px; height:22px; border-radius:50%; object-fit:cover; }
+
+    /* ===== Fikir olgunlaşma stepper (sohbet üstü) ===== */
+    .idea-stepper-wrap{
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:12px 30px; flex:0 0 auto;
+    }
+    .idea-stepper[hidden]{ display:none; }
+    .idea-stepper{ display:flex; align-items:center; max-width:860px; margin:0 auto; }
+    .st-step{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .st-num{
+      width:24px; height:24px; border-radius:50%; display:grid; place-items:center; flex-shrink:0;
+      font-size:11px; font-weight:700; background:var(--surface);
+      border:1.5px solid var(--border); color:var(--text-disabled); transition:.2s;
+    }
+    .st-num svg{ display:block; }
+    .st-label{ font-size:12px; font-weight:600; color:var(--text-disabled); white-space:nowrap; }
+    .st-step.done .st-num{ background:var(--success); border-color:var(--success); color:#fff; }
+    .st-step.done .st-label{ color:var(--text-muted); }
+    .st-step.active .st-num{ background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 0 0 4px var(--accent); }
+    .st-step.active .st-label{ color:var(--primary); font-weight:700; }
+    .st-line{ flex:1; height:1.5px; margin:0 8px; background:var(--border); border-radius:2px; min-width:10px; }
+    .st-line.done{ background:var(--success); }
+
+    /* ===== Canlı Fikir Özeti (sağ panel) ===== */
+    .summary-panel{
+      flex:0 0 340px; width:340px;
+      background:var(--surface); border-left:1px solid var(--border);
+      display:flex; flex-direction:column; min-height:0;
+    }
+    .summary-head{
+      height:65px; flex:0 0 65px; display:flex; align-items:center;
+      padding:0 20px; background:var(--primary); border-bottom:1px solid var(--primary-dark);
+    }
+    .summary-eyebrow{
+      font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff;
+      display:flex; align-items:center; gap:8px;
+    }
+    .live-dot{ width:8px; height:8px; border-radius:50%; background:#fff; position:relative; }
+    .live-dot::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid #fff; opacity:0; animation:livepulse 2s ease-out infinite; }
+    @keyframes livepulse{ 0%{transform:scale(.7);opacity:.6} 100%{transform:scale(1.8);opacity:0} }
+    .summary-scroll{ flex:1; overflow-y:auto; padding:18px 18px 24px; }
+    .summary-scroll::-webkit-scrollbar{ width:6px; }
+    .summary-scroll::-webkit-scrollbar-thumb{ background:rgba(100,116,139,.18); border-radius:999px; }
+
+    .summary-empty{ text-align:center; color:var(--text-subtle); padding:36px 16px; }
+    .summary-empty .se-ico{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; margin:0 auto 14px; background:var(--border-light); color:var(--text-disabled); }
+    .summary-empty h3{ font-size:14px; font-weight:700; color:var(--text-muted); margin-bottom:6px; }
+    .summary-empty p{ font-size:12.5px; line-height:1.55; max-width:230px; margin:0 auto; }
+
+    .summary-progress{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .prog-track{ flex:1; height:6px; border-radius:999px; background:var(--border); overflow:hidden; }
+    .prog-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,var(--primary),var(--primary-dark)); transition:width .5s ease; }
+    .prog-fill.full{ background:linear-gradient(90deg,var(--success),var(--success-dark)); }
+    .prog-label{ font-size:12px; font-weight:700; color:var(--text-muted); }
+
+    .summary-sections{ display:flex; flex-direction:column; }
+    .sm-sec{ padding:13px 0; border-top:1px solid var(--border-light); }
+    .sm-sec:first-child{ border-top:none; padding-top:0; }
+    .sm-sec-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .sm-ico{ width:20px; height:20px; border-radius:6px; flex-shrink:0; display:grid; place-items:center; }
+    .sm-ico svg{ display:block; }
+    .sm-ico.ok{ background:rgba(54,179,126,.14); color:var(--success-dark); }
+    .sm-ico.active{ background:var(--accent); color:var(--primary); }
+    .sm-ico.empty{ background:var(--border-light); color:var(--text-disabled); }
+    .sm-name{ font-size:12.5px; font-weight:700; color:var(--text); flex:1; }
+    .sm-state{ font-size:10.5px; font-weight:700; }
+    .sm-state.ok{ color:var(--success-dark); }
+    .sm-state.active{ color:var(--primary); }
+    .sm-body{ font-size:12.5px; line-height:1.55; color:var(--text-muted); padding-left:28px; }
+    .sm-body.empty{ color:var(--text-disabled); font-style:italic; }
+    .sm-sec.is-active{ background:var(--accent); margin:0 -12px; padding:13px 12px; border-radius:var(--radius-md); border-top:none; box-shadow:inset 3px 0 0 var(--primary); }
+    .sm-sec.is-active + .sm-sec{ border-top:none; }
+
+    @media(max-width:1180px){ .summary-panel{ display:none; } }
   </style>
 <script>NS_CSM_td=1204248045;NS_CSM_pd=275116667;NS_CSM_u="/clm10";NS_CSM_col="AAAAAAWQai672+0eUF2J8bdnjjZmuCDmJlPmWOGnRRY0EbwkKEgbTtIcWPCJTLtftA7oP2yYwHGHsLx4OgjeUJ6xBNw+";</script><script type="text/javascript">function sendTimingInfoInit(){setTimeout(sendTimingInfo,0)}function sendTimingInfo(){var wp=window.performance;if(wp){var c1,c2,t;c1=wp.timing;if(c1){var cm={};cm.ns=c1.navigationStart;if((t=c1.unloadEventStart)>0)cm.us=t;if((t=c1.unloadEventEnd)>0)cm.ue=t;if((t=c1.redirectStart)>0)cm.rs=t;if((t=c1.redirectEnd)>0)cm.re=t;cm.fs=c1.fetchStart;cm.dls=c1.domainLookupStart;cm.dle=c1.domainLookupEnd;cm.cs=c1.connectStart;cm.ce=c1.connectEnd;if((t=c1.secureConnectionStart)>0)cm.scs=t;cm.rqs=c1.requestStart;cm.rss=c1.responseStart;cm.rse=c1.responseEnd;cm.dl=c1.domLoading;cm.di=c1.domInteractive;cm.dcls=c1.domContentLoadedEventStart;cm.dcle=c1.domContentLoadedEventEnd;cm.dc=c1.domComplete;if((t=c1.loadEventStart)>0)cm.ls=t;if((t=c1.loadEventEnd)>0)cm.le=t;cm.tid=NS_CSM_td;cm.pid=NS_CSM_pd;cm.ac=NS_CSM_col;var xhttp=new XMLHttpRequest();if(xhttp){var JSON=JSON||{};JSON.stringify=JSON.stringify||function(ob){var t=typeof(ob);if(t!="object"||ob===null){if(t=="string")ob='"'+ob+'"';return String(ob);}else{var n,v,json=[],arr=(ob&&ob.constructor==Array);for(n in ob){v=ob[n];t=typeof(v);if(t=="string")v='"'+v+'"';else if(t=="object"&&v!==null)v=JSON.stringify(v);json.push((arr?"":'"'+n+'":')+String(v));}return(arr?"[":"{")+String(json)+(arr?"]":"}");}};xhttp.open("POST",NS_CSM_u,true);xhttp.send(JSON.stringify(cm));}}}}if(window.addEventListener)window.addEventListener("load",sendTimingInfoInit,false);else if(window.attachEvent)window.attachEvent("onload",sendTimingInfoInit);else window.onload=sendTimingInfoInit;</script></head>
 
@@ -2983,6 +3057,10 @@
           </button>
         </div>
       </header>
+
+      <div class="idea-stepper-wrap" id="ideaStepperWrap" hidden>
+        <div class="idea-stepper" id="ideaStepper" role="list" aria-label="Fikir olgunlaşma adımları"></div>
+      </div>
 
       <div class="chat-wrap" id="chatWrap">
         <div class="chat" id="chat"></div>
@@ -3037,6 +3115,29 @@
         </div>
       </div>
     </main>
+
+    <!-- Canlı Fikir Özeti (sağ panel) -->
+    <aside class="summary-panel" id="summaryPanel" aria-label="Canlı Fikir Özeti">
+      <div class="summary-head">
+        <span class="summary-eyebrow"><span class="live-dot"></span>Canlı Fikir Özeti</span>
+      </div>
+      <div class="summary-scroll" id="summaryScroll">
+        <div class="summary-empty" id="summaryEmpty">
+          <div class="se-ico">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>
+          </div>
+          <h3>Fikrin burada şekillenecek</h3>
+          <p>Sohbet ilerledikçe topladığımız bilgiler adım adım burada gerçek zamanlı görünecek.</p>
+        </div>
+        <div class="summary-live" id="summaryLive" hidden>
+          <div class="summary-progress">
+            <div class="prog-track"><div class="prog-fill" id="summaryProgFill" style="width:0%"></div></div>
+            <span class="prog-label" id="summaryProgLabel">0/6</span>
+          </div>
+          <div class="summary-sections" id="summarySections"></div>
+        </div>
+      </div>
+    </aside>
 
     <!-- Calls panel -->
     <div class="calls-overlay" id="callsOverlay" aria-hidden="true"></div>
@@ -6508,6 +6609,7 @@ function renderMarkdown(text) {
       if(!convo) return;
       applyComposerState(convo);
       renderPendingAttachmentUI(convo.pendingAttachment || null);
+      renderProgressUI(convo.lastProgress || null);
       // Fresh conversation: show full welcome screen instead of a bubble
       if(convo.messages.length === 1 && convo.messages[0].role === 'assistant'){
         renderWelcomeScreen();
@@ -6516,6 +6618,96 @@ function renderMarkdown(text) {
       convo.messages.forEach(m => addMessageToDom(m));
       refreshApprovalButtons();
       scrollToBottom();
+    }
+
+    // ===== Canlı Fikir Özeti + stepper (backend `progress` nesnesinden) =====
+    // progress: { steps:[{key,label,filled,value}], filled, total, currentKey }
+    const _SM_CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg>';
+    const _SM_DOT = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg>';
+    const _SM_EMPTY = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>';
+
+    // Aktif konuşmaya progress kaydet, kalıcılaştır ve UI'ı güncelle.
+    function applyProgress(convo, progress){
+      if(!convo) return;
+      if(progress && Array.isArray(progress.steps) && progress.steps.length){
+        convo.lastProgress = progress;
+        saveState();
+      }
+      if(convo.id === activeConversationId) renderProgressUI(convo.lastProgress || null);
+    }
+
+    function renderProgressUI(progress){
+      renderStepper(progress);
+      renderSummary(progress);
+    }
+
+    function renderStepper(progress){
+      const wrap = document.getElementById('ideaStepperWrap');
+      const strip = document.getElementById('ideaStepper');
+      if(!wrap || !strip) return;
+      if(!progress || !Array.isArray(progress.steps) || !progress.steps.length){
+        wrap.hidden = true; strip.innerHTML = ''; return;
+      }
+      wrap.hidden = false;
+      strip.innerHTML = '';
+      progress.steps.forEach((s, i) => {
+        const isActive = progress.currentKey ? (s.key === progress.currentKey) : false;
+        const step = document.createElement('div');
+        step.className = 'st-step' + (s.filled ? ' done' : (isActive ? ' active' : ''));
+        step.setAttribute('role','listitem');
+        const num = document.createElement('div');
+        num.className = 'st-num';
+        num.innerHTML = s.filled ? _SM_CHECK : String(i + 1);
+        const label = document.createElement('span');
+        label.className = 'st-label';
+        label.textContent = s.label;
+        step.appendChild(num); step.appendChild(label);
+        strip.appendChild(step);
+        if(i < progress.steps.length - 1){
+          const line = document.createElement('div');
+          line.className = 'st-line' + (s.filled ? ' done' : '');
+          strip.appendChild(line);
+        }
+      });
+    }
+
+    function renderSummary(progress){
+      const empty = document.getElementById('summaryEmpty');
+      const live = document.getElementById('summaryLive');
+      const sections = document.getElementById('summarySections');
+      const fill = document.getElementById('summaryProgFill');
+      const label = document.getElementById('summaryProgLabel');
+      if(!empty || !live || !sections) return;
+      const hasData = progress && Array.isArray(progress.steps) && progress.filled > 0;
+      if(!hasData){
+        empty.hidden = false; live.hidden = true; sections.innerHTML = ''; return;
+      }
+      empty.hidden = true; live.hidden = false;
+      const total = progress.total || progress.steps.length;
+      const filled = progress.filled || 0;
+      const isDone = filled >= total;
+      if(fill){ fill.style.width = Math.round((filled/total)*100) + '%'; fill.classList.toggle('full', isDone); }
+      if(label) label.textContent = filled + '/' + total;
+      sections.innerHTML = '';
+      progress.steps.forEach(s => {
+        const isActive = !s.filled && progress.currentKey && s.key === progress.currentKey;
+        const sec = document.createElement('div');
+        sec.className = 'sm-sec' + (isActive ? ' is-active' : '');
+        const head = document.createElement('div'); head.className = 'sm-sec-head';
+        const ico = document.createElement('span');
+        ico.className = 'sm-ico ' + (s.filled ? 'ok' : (isActive ? 'active' : 'empty'));
+        ico.innerHTML = s.filled ? _SM_CHECK : (isActive ? _SM_DOT : _SM_EMPTY);
+        const name = document.createElement('span'); name.className = 'sm-name'; name.textContent = s.label;
+        head.appendChild(ico); head.appendChild(name);
+        if(s.filled){ const st = document.createElement('span'); st.className = 'sm-state ok'; st.textContent = 'Tamamlandı'; head.appendChild(st); }
+        else if(isActive){ const st = document.createElement('span'); st.className = 'sm-state active'; st.textContent = 'Konuşuluyor'; head.appendChild(st); }
+        const body = document.createElement('div');
+        const val = (s.value || '').trim();
+        body.className = 'sm-body' + (val ? '' : ' empty');
+        body.textContent = val || 'Henüz belirtilmedi';
+        sec.appendChild(head); sec.appendChild(body);
+        sections.appendChild(sec);
+      });
     }
     /**
      * extractExamples(rawText)
@@ -7005,7 +7197,8 @@ function renderMarkdown(text) {
       const state = (json && typeof json.state === 'string') ? json.state : '';
       const mode = (json && typeof json.mode === 'string') ? json.mode : '';
       const promptKey = (json && typeof json.prompt_key === 'string') ? json.prompt_key : '';
-      if(answer.trim()) return { answer, threadId: nextThreadId||threadId, state, mode, promptKey };
+      const progress = (json && json.progress && typeof json.progress === 'object') ? json.progress : null;
+      if(answer.trim()) return { answer, threadId: nextThreadId||threadId, state, mode, promptKey, progress };
       throw new Error('Cevap beklenen formatta değil: ' + JSON.stringify(json).slice(0,500));
     }
 
@@ -7027,6 +7220,7 @@ function renderMarkdown(text) {
           saveState();
         }
         addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
+        applyProgress(convo, res?.progress || null);
         if(res?.state === 'COMPLETED'){
           loadCalls();
         }
@@ -7090,6 +7284,7 @@ function renderMarkdown(text) {
           saveState();
         }
         addMessage(reply, 'assistant', { state: res?.state || '', mode: res?.mode || '', promptKey: res?.promptKey || '' });
+        applyProgress(convo, res?.progress || null);
         clearPendingAttachment(convo);
         if(res?.state === 'COMPLETED'){
           loadCalls();
