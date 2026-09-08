@@ -54,91 +54,71 @@
       text-rendering:optimizeLegibility;
     }
 
-    .app{display:flex;height:100%}
+    .app{display:flex; flex-direction:column; height:100%}
+
+    /* ===== Üst bar (tam genişlik — artifact) ===== */
+    .topbar{
+      height:60px; flex:0 0 60px;
+      display:flex; align-items:center; gap:18px;
+      padding:0 20px;
+      background:var(--surface); border-bottom:1px solid var(--border);
+    }
+    .topbar-brand{ flex-shrink:0; }
+    .topbar-brand strong{ font-size:16px; font-weight:750; color:var(--text); letter-spacing:-0.01em; }
+    .topnav{ margin-left:6px; display:flex; gap:4px; }
+    .topbar-right{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+
+    /* Workspace: 3 kolon (sidebar / merkez / özet) */
+    .workspace{ flex:1; display:flex; min-height:0; }
 
     /* ===== Sidebar ===== */
     .sidebar{
-      width:260px;
+      flex:0 0 264px; width:264px;
       background:var(--sidebar-bg);
       display:flex;
       flex-direction:column;
       padding:0;
       gap:0;
       overflow:hidden;
-      flex-shrink:0;
       position:relative;
-    }
-    /* Border sadece header altından başlar, mavi alanda görünmez */
-    .sidebar::after{
-      content:'';
-      position:absolute;
-      top:65px;
-      right:0;
-      bottom:0;
-      width:1px;
-      background:var(--border);
-      pointer-events:none;
+      border-right:1px solid var(--border);
     }
 
-    .sb-top{
-      display:flex;
-      align-items:center;
-      padding:0 12px;
-      height:65px;
-      background:var(--surface);
-      border-bottom:1px solid var(--border);
-      gap:8px;
+    .ideas-top{
+      display:flex; flex-direction:column; gap:12px;
+      padding:16px 14px 12px;
     }
 
-    .sb-brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex:1;
+    .ideas-search{ position:relative; display:flex; align-items:center; }
+    .ideas-search svg{ position:absolute; left:12px; color:var(--text-disabled); pointer-events:none; }
+    .ideas-search input{
+      width:100%; height:38px; border:1px solid var(--border); border-radius:var(--radius);
+      background:var(--surface); padding:0 12px 0 34px; font-size:13.5px; color:var(--text);
+      font-family:inherit; cursor:pointer;
     }
-    .sb-brand strong{
-      font-size:15px;
-      font-weight:750;
-      color:var(--text);
-      letter-spacing:-0.01em;
-    }
-
-    .sb-btn{
-      width:34px;height:34px;
-      border-radius:var(--radius);
-      border:1px solid var(--border);
-      background:var(--surface);
-      display:grid;place-items:center;
-      cursor:pointer;
-      color:var(--text-subtle);
-      flex-shrink:0;
-      transition:background .15s, border-color .15s, color .15s;
-    }
-    .sb-btn:hover{
-      background:var(--border-light);
-      border-color:var(--border);
-      color:var(--text);
-    }
+    .ideas-search input::placeholder{ color:var(--text-disabled); }
+    .ideas-search input:focus{ outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px var(--focus-ring); }
 
     .sb-new-btn{
       display:flex;
       align-items:center;
-      gap:6px;
-      height:34px;
-      padding:0 12px;
-      border-radius:var(--radius);
+      justify-content:center;
+      gap:8px;
+      height:42px;
+      padding:0 14px;
+      border-radius:var(--radius-md);
       border:none;
       background:linear-gradient(150deg,var(--primary),var(--primary-dark));
       color:#ffffff;
       cursor:pointer;
-      font-size:13px;
+      font-size:14px;
       font-weight:650;
-      box-shadow:0 2px 8px rgba(31,95,191,0.26);
+      box-shadow:0 3px 10px rgba(31,95,191,0.28);
       transition:transform .12s, box-shadow .12s;
     }
     .sb-new-btn:hover{
       transform:translateY(-1px);
-      box-shadow:0 5px 14px rgba(31,95,191,0.32);
+      box-shadow:0 6px 16px rgba(31,95,191,0.34);
     }
     .sb-new-btn svg{ flex-shrink:0; }
 
@@ -3025,11 +3005,27 @@
     .st-line.done{ background:var(--success); }
 
     /* ===== Canlı Fikir Özeti (sağ panel) ===== */
+    .topbar-avatar{
+      width:34px; height:34px; border-radius:50%; display:grid; place-items:center; cursor:default;
+      background:linear-gradient(150deg,#5B6B8C,#3C4A66); color:#fff; font-size:13px; font-weight:700;
+      overflow:hidden; flex-shrink:0;
+    }
+    .topbar-avatar img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
+
+    /* Composer context pill (artifact) */
+    .ctx-bar{ max-width:860px; margin:0 auto; display:flex; align-items:center; gap:9px; padding:0 4px 9px; }
+    .ctx-pill{
+      font-size:11.5px; font-weight:700; color:var(--primary); background:var(--accent);
+      padding:4px 10px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;
+    }
+    .ctx-hint{ font-size:12.5px; color:var(--text-subtle); }
+
     .summary-panel{
-      flex:0 0 340px; width:340px;
+      flex:0 0 360px; width:360px;
       background:var(--surface); border-left:1px solid var(--border);
       display:flex; flex-direction:column; min-height:0;
     }
+    .summary-eyebrow{ margin-bottom:14px; }
     .summary-head{
       height:65px; flex:0 0 65px; display:flex; align-items:center;
       padding:0 20px; background:var(--surface); border-bottom:1px solid var(--border);
@@ -3080,42 +3076,43 @@
 
 <body>
   <div class="app">
+    <!-- TOP BAR (tam genişlik — artifact) -->
+    <header class="topbar">
+      <div class="topbar-brand" id="sbBrand"></div>
+      <nav class="topnav">
+        <a class="tiny-btn" id="btnHome" href="https://atlas.fibabanka.local/jira/rest/scriptrunner/latest/custom/navigationHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"/></svg>
+          <span>Anasayfa</span>
+        </a>
+        <button class="tiny-btn primary" id="btnCalls" onclick="openCallsPanel()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.2 1 2.5h6c0-1.3.5-2 1-2.5A6 6 0 0 0 12 3z"/></svg>
+          <span>Fikirlerim</span>
+        </button>
+      </nav>
+      <div class="topbar-right" id="sbUserArea"></div>
+    </header>
+
+    <div class="workspace">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="sb-top">
-        <div class="sb-brand" id="sbBrand"></div>
+      <div class="ideas-top">
         <button class="sb-new-btn" id="btnNew" type="button" title="Yeni sohbet başlat">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12h14"/>
           </svg>
-          Yeni
+          Yeni Fikir
         </button>
-        <button class="sb-btn" id="btnSearch" title="Ara" aria-label="Ara">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="11" cy="11" r="6.5"/><path d="M16.2 16.2L21 21"/>
-          </svg>
-        </button>
+        <div class="ideas-search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16.2 16.2L21 21"/></svg>
+          <input id="btnSearch" type="text" placeholder="Fikirlerde ara…" autocomplete="off" readonly />
+        </div>
       </div>
 
       <div class="conversation-list" id="conversationList"></div>
-      <div class="sb-bottom"><div id="sbUserArea"></div></div>
     </aside>
 
     <!-- MAIN -->
     <main class="main">
-      <header class="header">
-        <div class="header-right">
-          <a class="tiny-btn" id="btnHome" href="https://atlas.fibabanka.local/jira/rest/scriptrunner/latest/custom/navigationHub">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"/></svg>
-            <span>Anasayfa</span>
-          </a>
-          <button class="tiny-btn primary" id="btnCalls" onclick="openCallsPanel()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.2 1 2.5h6c0-1.3.5-2 1-2.5A6 6 0 0 0 12 3z"/></svg>
-            <span>Fikirlerim</span>
-          </button>
-        </div>
-      </header>
-
       <div class="idea-stepper-wrap" id="ideaStepperWrap" hidden>
         <div class="idea-stepper" id="ideaStepper" role="list" aria-label="Fikir olgunlaşma adımları"></div>
       </div>
@@ -3126,6 +3123,10 @@
       </div>
 
       <div class="composer-wrap">
+        <div class="ctx-bar" id="ctxBar">
+          <span class="ctx-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>Şimdi senden beklenen</span>
+          <span class="ctx-hint" id="ctxHint">Fikrini kendi cümlelerinle anlat</span>
+        </div>
         <div class="composer">
           <textarea id="input" placeholder="Fikrinden bahset, birlikte olgunlaştıralım…"></textarea>
           <input id="chatAttachmentInput" type="file" hidden accept=".txt,.md,.csv,.json,.log,text/plain,text/csv,application/json,text/markdown"/>
@@ -3160,26 +3161,20 @@
           <button class="composer-attachment-remove" id="composerAttachmentRemove" type="button" title="Eki kaldır">Kaldır</button>
         </div>
         <div class="hint">
-          Enter = gönder &nbsp;•&nbsp; Shift+Enter = yeni satır &nbsp;•&nbsp; Esc = kapat
-          &nbsp;•&nbsp;
           <button class="tts-toggle" id="ttsToggle" type="button" title="Asistan yanıtlarını sesli oku">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path id="ttsWaveOuter" d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path id="ttsWaveInner" d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
             </svg>
             <span id="ttsToggleLabel">Sesli Okuma</span>
           </button>
-          <br>
-          <span class="hint-strong">Her bir sohbet ekranında yalnızca tek bir fikir girişi yapılmalıdır.</span>
         </div>
       </div>
     </main>
 
     <!-- Canlı Fikir Özeti (sağ panel) -->
     <aside class="summary-panel" id="summaryPanel" aria-label="Canlı Fikir Özeti">
-      <div class="summary-head">
-        <span class="summary-eyebrow"><span class="live-dot"></span>Canlı Fikir Özeti</span>
-      </div>
       <div class="summary-scroll" id="summaryScroll">
+        <div class="summary-eyebrow"><span class="live-dot"></span>Canlı Fikir Özeti</div>
         <div class="summary-empty" id="summaryEmpty">
           <div class="se-ico">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>
@@ -3196,6 +3191,7 @@
         </div>
       </div>
     </aside>
+    </div><!-- /workspace -->
 
     <!-- Calls panel -->
     <div class="calls-overlay" id="callsOverlay" aria-hidden="true"></div>
@@ -6710,6 +6706,16 @@ function renderMarkdown(text) {
     function renderProgressUI(progress){
       renderStepper(progress);
       renderSummary(progress);
+      // Composer context pill ipucunu aktif adıma göre güncelle.
+      const ctxHint = document.getElementById('ctxHint');
+      if(ctxHint){
+        let label = '';
+        if(progress && Array.isArray(progress.steps) && progress.currentKey){
+          const cur = progress.steps.find(s => s.key === progress.currentKey);
+          if(cur) label = cur.label;
+        }
+        ctxHint.textContent = label ? (label + ' hakkında yaz') : 'Fikrini kendi cümlelerinle anlat';
+      }
     }
 
     function renderStepper(progress){
@@ -8471,15 +8477,9 @@ function renderMarkdown(text) {
       if(!el || !_jiraUser) return;
       const avatarInner = _jiraUser.avatarUrl
         ? `<img src="${_jiraUser.avatarUrl}" alt="" />`
-        : _jiraUser.initials;
-      el.innerHTML = `
-        <div class="sb-user">
-          <div class="sb-user-avatar">${avatarInner}</div>
-          <div class="sb-user-info">
-            <div class="sb-user-name">${_jiraUser.displayName}</div>
-            <div class="sb-user-email">${_jiraUser.emailAddress}</div>
-          </div>
-        </div>`;
+        : (_jiraUser.initials || '?');
+      const label = [_jiraUser.displayName, _jiraUser.emailAddress].filter(Boolean).join(' · ');
+      el.innerHTML = `<div class="topbar-avatar" title="${label}">${avatarInner}</div>`;
     }
 
     function renderBrand(){
