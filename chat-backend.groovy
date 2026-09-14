@@ -378,6 +378,41 @@ Map buildIdeaProgressLocal(Map idea, String promptKey, String state) {
     return [steps: steps, filled: filled, total: steps.size(), currentKey: currentKey]
 }
 
+// Toplama (COLLECTING) turlarında LLM sadece soru sorar; submit_idea_form'u çağırmaz.
+// Canlı Fikir Özeti/stepper'ın ilerleyebilmesi için, sohbette KULLANICININ ŞU ANA KADAR
+// AÇIKÇA verdiği alanları hafif bir çıkarım çağrısıyla toplarız. Tahmin/uydurma yasak —
+// bilinmeyen alanlar boş kalır, böylece progress yalnızca gerçekten verilen bilgiyle dolar.
+// Hata/boş sonuçta [:] döner ve progress boş kalır (regresyon yok).
+@TypeChecked(TypeCheckingMode.SKIP)
+@CompileDynamic
+Map extractCollectedFieldsLocal(def chatHistory, String question, def submitFunctions) {
+    try {
+        String extractionPrompt = '''Sen bir alan çıkarım motorusun. Aşağıdaki sohbette kullanıcının ŞU ANA KADAR AÇIKÇA verdiği bilgileri submit_idea_form fonksiyonuna yaz.
+Kurallar:
+- Sadece kullanıcının net biçimde belirttiği alanları doldur.
+- Kullanıcının vermediği, belirsiz bıraktığı veya emin olmadığın alanları BOŞ STRING ("") olarak bırak. ASLA tahmin etme, uydurma, varsayma.
+- Yalnızca submit_idea_form fonksiyonunu çağır; başka metin yazma.'''
+        Map extract = oaiCallLocal([
+            messages: buildMessagesLocal(extractionPrompt, chatHistory, question),
+            temperature: 0.0,
+            top_p: 1.0,
+            max_tokens: 900,
+            tools: submitFunctions,
+            tool_choice: [type: "function", function: [name: "submit_idea_form"]]
+        ], OAI_COMPLEXITY_DEPLOYMENT)
+        List choices = asList(extract["choices"])
+        Map choice0 = (!choices.isEmpty()) ? asMap(choices[0]) : [:]
+        Map msg = asMap(choice0["message"])
+        def toolCalls = msg["tool_calls"]
+        Map fn = (toolCalls instanceof List && !((List)toolCalls).isEmpty()) ? asMap(asMap(((List)toolCalls)[0])["function"]) : [:]
+        if (fn.isEmpty()) return [:]
+        Map idea = parseJsonMapLocal(fn["arguments"]?.toString())
+        return (idea instanceof Map) ? idea : [:]
+    } catch (Throwable t) {
+        return [:]
+    }
+}
+
 String buildTalepTipiPromptLocal() {
     return """Sohbete başlamadan önce ilk olarak talep tipini belirlememiz gerekiyor. Aşağıdaki talep tiplerinden senin fikrine en uygun tipini seçebilir misin? Bunun üzerine fikrini oluşturmak için gerekli yönlendirmeleri yapacağım.
 [Örnek]: Yazılım Geliştirme
@@ -1014,7 +1049,10 @@ Yukarıdaki kurallara göre talebi değerlendir ve score_complexity fonksiyonunu
                 String promptKey = missingFields.isEmpty() ? null : promptKeyForMissingFieldLocal(missingFields[0])
                 return [status: 200, body: [ok: true, answer: missingAnswer, prompt_key: promptKey, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK", idea: partialIdea]]
             }
-            return [status: 200, body: [ok: true, answer: content, prompt_key: null, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK"]]
+            // Soru turu: LLM submit çağırmadı. Canlı ilerleme için o ana kadar
+            // açıkça verilen alanları çıkar ve progress'i besle.
+            Map liveIdea = extractCollectedFieldsLocal(chatHistory, question, submitFunctions)
+            return [status: 200, body: [ok: true, answer: content, prompt_key: null, isDone: false, args: null, complexity: null, state: "COLLECTING", mode: "ASK", idea: liveIdea]]
         }
 
         String fnName = asTrimmedString(functionCall["name"])
