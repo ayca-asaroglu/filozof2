@@ -3126,6 +3126,24 @@
     .sm-sec.is-active{ background:var(--accent); margin:0 -12px; padding:13px 12px; border-radius:var(--radius-md); border-top:none; box-shadow:inset 3px 0 0 var(--primary); }
     .sm-sec.is-active + .sm-sec{ border-top:none; }
 
+    /* Sağ panel ayağı — Önizle / Fikri Gönder (artifact) */
+    .summary-foot{ padding:16px 20px; border-top:1px solid var(--border); background:var(--surface-2); flex:0 0 auto; }
+    .summary-foot[hidden]{ display:none; }
+    .foot-note{ font-size:12px; color:var(--text-subtle); line-height:1.5; margin-bottom:12px; display:flex; gap:8px; }
+    .foot-note svg{ flex-shrink:0; color:var(--primary); margin-top:1px; }
+    .foot-note.ready{ color:var(--success-dark); }
+    .foot-note.ready svg{ color:var(--success-dark); }
+    .foot-actions{ display:flex; gap:8px; }
+    .btn-ghost{ flex:1; height:38px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted);
+      border-radius:var(--radius); font-size:13px; font-weight:650; cursor:pointer; transition:.14s; font-family:inherit; }
+    .btn-ghost:hover{ background:var(--border-light); color:var(--text); }
+    .btn-ghost:disabled{ opacity:.5; cursor:not-allowed; }
+    .btn-primary-sm{ flex:1.4; height:38px; border:none; cursor:pointer; border-radius:var(--radius);
+      background:linear-gradient(150deg,var(--primary),var(--primary-dark)); color:#fff; font-size:13px; font-weight:700;
+      display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(31,95,191,.28); transition:transform .12s; font-family:inherit; }
+    .btn-primary-sm:hover:not([disabled]){ transform:translateY(-1px); }
+    .btn-primary-sm[disabled]{ opacity:.5; cursor:not-allowed; box-shadow:none; }
+
     @media(max-width:1180px){ .summary-panel{ display:none; } }
   </style>
 <script>NS_CSM_td=1204248045;NS_CSM_pd=275116667;NS_CSM_u="/clm10";NS_CSM_col="AAAAAAWQai672+0eUF2J8bdnjjZmuCDmJlPmWOGnRRY0EbwkKEgbTtIcWPCJTLtftA7oP2yYwHGHsLx4OgjeUJ6xBNw+";</script><script type="text/javascript">function sendTimingInfoInit(){setTimeout(sendTimingInfo,0)}function sendTimingInfo(){var wp=window.performance;if(wp){var c1,c2,t;c1=wp.timing;if(c1){var cm={};cm.ns=c1.navigationStart;if((t=c1.unloadEventStart)>0)cm.us=t;if((t=c1.unloadEventEnd)>0)cm.ue=t;if((t=c1.redirectStart)>0)cm.rs=t;if((t=c1.redirectEnd)>0)cm.re=t;cm.fs=c1.fetchStart;cm.dls=c1.domainLookupStart;cm.dle=c1.domainLookupEnd;cm.cs=c1.connectStart;cm.ce=c1.connectEnd;if((t=c1.secureConnectionStart)>0)cm.scs=t;cm.rqs=c1.requestStart;cm.rss=c1.responseStart;cm.rse=c1.responseEnd;cm.dl=c1.domLoading;cm.di=c1.domInteractive;cm.dcls=c1.domContentLoadedEventStart;cm.dcle=c1.domContentLoadedEventEnd;cm.dc=c1.domComplete;if((t=c1.loadEventStart)>0)cm.ls=t;if((t=c1.loadEventEnd)>0)cm.le=t;cm.tid=NS_CSM_td;cm.pid=NS_CSM_pd;cm.ac=NS_CSM_col;var xhttp=new XMLHttpRequest();if(xhttp){var JSON=JSON||{};JSON.stringify=JSON.stringify||function(ob){var t=typeof(ob);if(t!="object"||ob===null){if(t=="string")ob='"'+ob+'"';return String(ob);}else{var n,v,json=[],arr=(ob&&ob.constructor==Array);for(n in ob){v=ob[n];t=typeof(v);if(t=="string")v='"'+v+'"';else if(t=="object"&&v!==null)v=JSON.stringify(v);json.push((arr?"":'"'+n+'":')+String(v));}return(arr?"[":"{")+String(json)+(arr?"]":"}");}};xhttp.open("POST",NS_CSM_u,true);xhttp.send(JSON.stringify(cm));}}}}if(window.addEventListener)window.addEventListener("load",sendTimingInfoInit,false);else if(window.attachEvent)window.attachEvent("onload",sendTimingInfoInit);else window.onload=sendTimingInfoInit;</script></head>
@@ -3254,6 +3272,19 @@
             <span class="prog-label" id="summaryProgLabel">0/6</span>
           </div>
           <div class="summary-sections" id="summarySections"></div>
+        </div>
+      </div>
+      <div class="summary-foot" id="summaryFoot" hidden>
+        <div class="foot-note" id="summaryFootNote">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>
+          <span id="summaryFootNoteText">Adımlar tamamlanınca fikrini önizleyip gönderebileceksin.</span>
+        </div>
+        <div class="foot-actions">
+          <button class="btn-ghost" id="summaryBtnPreview" type="button">Önizle</button>
+          <button class="btn-primary-sm" id="summaryBtnSend" type="button" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+            Fikri Gönder
+          </button>
         </div>
       </div>
     </aside>
@@ -4048,6 +4079,8 @@
     // Attachment state is conversation-scoped: convo.pendingAttachment
     const OPEN_NEW_ON_LOAD = false;
     const ATTACHMENT_FEATURE_ENABLED = false;
+    // Onay artık sağ panel ayağından (Önizle / Fikri Gönder) yürüyor; chat içi buton gizli.
+    const SHOW_INLINE_APPROVAL = false;
 
     const WELCOME_MESSAGE =
       `👋 Merhaba!\n\nFikrini net, değerlendirilebilir bir hale getirmek için\nsana birkaç kısa soru soracağım.\n\nCevaplarını analiz edip formu birlikte dolduracağız.\nEn sonda özetleyip onayını isteyeceğim.\n\nHazırsan başlayalım mı? 🙂`;
@@ -6790,6 +6823,7 @@ function renderMarkdown(text) {
     function renderProgressUI(progress){
       renderStepper(progress);
       renderSummary(progress);
+      renderSummaryFooter(progress);
       // Composer context pill ipucunu aktif adıma göre güncelle.
       const ctxHint = document.getElementById('ctxHint');
       if(ctxHint){
@@ -6801,6 +6835,80 @@ function renderMarkdown(text) {
         ctxHint.textContent = label ? (label + ' hakkında yaz') : 'Fikrini kendi cümlelerinle anlat';
       }
     }
+
+    // Aktif sohbetin son asistan mesajı onay bekliyor mu? (backend state)
+    function isConversationReadyForApproval(convo){
+      if(!convo || !Array.isArray(convo.messages)) return false;
+      if(isConversationCompleted(convo) && convo.allowMessaging !== true) return false;
+      const lastAssistant = [...convo.messages].reverse().find(m => m?.role === 'assistant');
+      return (lastAssistant?.meta?.state || '') === 'READY_FOR_APPROVAL';
+    }
+
+    // Sağ panel ayağı: Önizle / Fikri Gönder — chat onay akışının panel karşılığı.
+    function renderSummaryFooter(progress){
+      const foot = document.getElementById('summaryFoot');
+      const note = document.getElementById('summaryFootNote');
+      const noteTxt = document.getElementById('summaryFootNoteText');
+      const btnSend = document.getElementById('summaryBtnSend');
+      const btnPrev = document.getElementById('summaryBtnPreview');
+      if(!foot || !btnSend) return;
+      const convo = getActiveConversation();
+      const isWelcome = !convo || (convo.messages.length === 1 && convo.messages[0].role === 'assistant');
+      if(isWelcome){ foot.hidden = true; return; }
+      foot.hidden = false;
+
+      const completed = isConversationCompleted(convo);
+      const ready = isConversationReadyForApproval(convo);
+      note.classList.toggle('ready', ready || completed);
+
+      if(completed){
+        if(noteTxt) noteTxt.textContent = 'Fikrin yönetici onayına gönderildi.';
+        btnSend.disabled = true;
+        btnSend.querySelector('svg')?.remove();
+        btnSend.textContent = '✓ Gönderildi';
+      } else if(ready){
+        if(noteTxt) noteTxt.textContent = 'Fikrin gönderilmeye hazır. Göndermeden önce özeti kontrol edebilirsin.';
+        btnSend.disabled = false;
+      } else {
+        const total = progress?.total || 6;
+        const filled = progress?.filled || 0;
+        const remaining = Math.max(0, total - filled);
+        if(noteTxt) noteTxt.textContent = remaining > 0
+          ? (remaining + ' adım daha tamamlanınca fikrini önizleyip gönderebileceksin.')
+          : 'Fikrini önizleyip gönderebilirsin.';
+        btnSend.disabled = true;
+      }
+      if(btnPrev) btnPrev.disabled = false;
+    }
+
+    // Footer buton bağlantıları (bir kez).
+    (function wireSummaryFooter(){
+      const btnSend = document.getElementById('summaryBtnSend');
+      const btnPrev = document.getElementById('summaryBtnPreview');
+      if(btnSend){
+        btnSend.addEventListener('click', async () => {
+          if(btnSend.disabled) return;
+          const original = btnSend.innerHTML;
+          btnSend.disabled = true; btnSend.textContent = 'Gönderiliyor...';
+          try{ await submitApproval(); }
+          finally{
+            const convo = getActiveConversation();
+            if(!isConversationCompleted(convo)){ btnSend.innerHTML = original; renderSummaryFooter(convo?.lastProgress || null); }
+            else renderSummaryFooter(convo?.lastProgress || null);
+          }
+        });
+      }
+      if(btnPrev){
+        btnPrev.addEventListener('click', () => {
+          // Önizleme = özet mesajına götür (backend READY'de özeti chat'e basıyor).
+          scrollToBottom();
+          const convo = getActiveConversation();
+          if(!isConversationReadyForApproval(convo) && !isConversationCompleted(convo)){
+            showToast('Önizleme, tüm adımlar tamamlanınca hazır olur.', 'info');
+          }
+        });
+      }
+    })();
 
     function renderStepper(progress){
       const wrap = document.getElementById('ideaStepperWrap');
@@ -7208,7 +7316,7 @@ function renderMarkdown(text) {
         wrap.appendChild(bubble);
       }
 
-      if(isApprovalPendingMessage(message)){
+      if(SHOW_INLINE_APPROVAL && isApprovalPendingMessage(message)){
         const approvalActions = document.createElement('div');
         approvalActions.className = 'approval-actions';
 
