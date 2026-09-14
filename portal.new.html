@@ -6566,10 +6566,10 @@ function renderMarkdown(text) {
     // ===== Grouping =====
     function groupLabelFor(ts){
       const n = new Date(), today = startOfDayMs(n), yesterday = today - 86400000, prev7 = today - 7*86400000;
-      if(ts >= today) return 'Today';
-      if(ts >= yesterday) return 'Yesterday';
-      if(ts >= prev7) return 'Previous 7 days';
-      return 'Older';
+      if(ts >= today) return 'Bugün';
+      if(ts >= yesterday) return 'Dün';
+      if(ts >= prev7) return 'Son 7 Gün';
+      return 'Öncekiler';
     }
     function groupedConversations(){
       const sorted = [...conversations]
@@ -6580,7 +6580,7 @@ function renderMarkdown(text) {
           return c.messages?.some(m => m.role === 'user');
         })
         .sort((a,b) => (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt));
-      const buckets = { 'Today':[], 'Yesterday':[], 'Previous 7 days':[], 'Older':[] };
+      const buckets = { 'Bugün':[], 'Dün':[], 'Son 7 Gün':[], 'Öncekiler':[] };
       sorted.forEach(c => buckets[groupLabelFor(c.updatedAt||c.createdAt||0)].push(c));
       return buckets;
     }
@@ -6629,7 +6629,7 @@ function renderMarkdown(text) {
     function renderConversationList(){
       conversationListEl.innerHTML = '';
       const buckets = groupedConversations();
-      const order = ['Today','Yesterday','Previous 7 days','Older'];
+      const order = ['Bugün','Dün','Son 7 Gün','Öncekiler'];
       const hasAny = order.some(l => buckets[l]?.length);
       if(!hasAny){
         const empty = document.createElement('div');
