@@ -9,6 +9,21 @@
 
   <style>
 
+    /* ============================================================
+       Inter fontu — Jira ekinden (same-origin) yüklenir.
+       KURULUM: InterVariable.woff2 dosyasını bir Jira issue'suna ekle,
+       ekin gerçek URL'siyle aşağıdaki src'yi değiştir (attachment id).
+       URL yanlış/erişilemezse font-display:swap ile sistem fontuna düşer;
+       sayfa yine sorunsuz çalışır.
+       ============================================================ */
+    @font-face{
+      font-family:'InterEmbed';
+      src:url('https://atlas.fibabanka.local/jira/secure/attachment/REPLACE_ID/InterVariable.woff2') format('woff2');
+      font-weight:100 900;
+      font-style:normal;
+      font-display:swap;
+    }
+
     :root {
       /* Artifact tasarımı: mavi-nötr zemin, Fibabanka lacivert-mavisi accent */
       --primary:      #1F5FBF;
@@ -46,7 +61,7 @@
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%; font-size:14px;}
     body{
-      font-family:"Inter var","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      font-family:'InterEmbed',"Inter var","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
       overflow:hidden;
