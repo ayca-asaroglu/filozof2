@@ -1,4 +1,4 @@
-package Filozof.chat
+package Filozof.test
 
 import com.onresolve.scriptrunner.runner.rest.common.CustomEndpointDelegate
 import com.onresolve.scriptrunner.db.DatabaseUtil
@@ -12,6 +12,7 @@ import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
 import org.apache.log4j.Logger
 import com.atlassian.jira.component.ComponentAccessor
+
 import javax.ws.rs.core.MultivaluedMap
 import javax.ws.rs.core.Response
 import java.net.URL
@@ -1329,11 +1330,11 @@ Response handlePromptflowchat(MultivaluedMap qp, String body) {
     }
 }
 
-promptflowchat(httpMethod: "POST") { MultivaluedMap qp, String body ->
+promptflowchat2(httpMethod: "POST") { MultivaluedMap qp, String body ->
     handlePromptflowchat(qp, body)
 }
 
-fibarprSpeechToken(httpMethod: "GET") { MultivaluedMap qp ->
+fibarprSpeechToken2(httpMethod: "GET") { MultivaluedMap qp ->
     try {
         if (!SPEECH_ENABLED) {
             return jsonUtf8(503, [ok: false, error: "SPEECH_DISABLED"])
@@ -1345,7 +1346,7 @@ fibarprSpeechToken(httpMethod: "GET") { MultivaluedMap qp ->
     }
 }
 
-fibarprSpeechTts(httpMethod: "POST") { MultivaluedMap qp, String body ->
+fibarprSpeechTts2(httpMethod: "POST") { MultivaluedMap qp, String body ->
     try {
         if (!SPEECH_ENABLED) {
             return jsonUtf8(503, [ok: false, error: "SPEECH_DISABLED"])
