@@ -4089,7 +4089,7 @@
     const SR_BASE = (USE_LOCAL || location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')
       ? 'http://localhost:8000'
       : (getJiraBaseOrigin() + '/jira/rest/scriptrunner/latest/custom');
-    const SR_CHAT_URL = SR_BASE + '/promptflowchat';
+    const SR_CHAT_URL = SR_BASE + '/promptflowchat2';
     const SR_THREADS_URL = SR_BASE + '/fibarprChatThreads';
     const SR_MESSAGES_URL = SR_BASE + '/fibarprChatMessages';
     const CHAT_CATEGORY = 'filozof';
@@ -4100,8 +4100,8 @@
     const SR_APPROVE_URL = SR_BASE + '/fibarprIdeaApprove';
     const SR_FEEDBACK_URL = SR_BASE + '/fibarprFeedback';
     const SR_SUPPORT_URL = SR_BASE + '/fibarprSupportTeams';
-    const SR_SPEECH_TOKEN_URL = SR_BASE + '/fibarprSpeechToken';
-    const SR_SPEECH_TTS_URL = SR_BASE + '/fibarprSpeechTts';
+    const SR_SPEECH_TOKEN_URL = SR_BASE + '/fibarprSpeechToken2';
+    const SR_SPEECH_TTS_URL = SR_BASE + '/fibarprSpeechTts2';
     // kill-switch: false => Azure Speech tamamen kapali, browser STT/TTS kullanilir
     const AZURE_SPEECH_ENABLED = true;
     const FILOZOF_AVATAR = 'https://atlas.fibabanka.local/jira/secure/attachment/198597/fi.png?dowload=1';
