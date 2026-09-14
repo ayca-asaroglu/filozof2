@@ -477,13 +477,13 @@
       border-radius:16px 16px 4px 16px;
       box-shadow:0 2px 8px rgba(31,95,191,.22);
     }
-    /* Assistant — tam genişlik yumuşak kart */
+    /* Assistant — kartsız, düz metin (artifact) */
     .bubble.assistant{
-      background:var(--assistant-bubble);
+      background:transparent;
       color:var(--text);
-      border-radius:14px;
-      padding:16px 20px;
-      border:1px solid var(--border);
+      border-radius:0;
+      padding:0;
+      border:none;
       box-shadow:none;
       width:100%;
       font-size:15.5px;
@@ -2500,15 +2500,15 @@
     /* ===== Typing indicator ===== */
     .typing-row{ display:flex; gap:10px; align-items:flex-start; padding:0; margin-top:28px; }
     .typing-avatar{
-      width:28px; height:28px; border-radius:50%;
-      background:var(--primary); display:grid; place-items:center;
+      width:30px; height:30px; border-radius:9px;
+      background:linear-gradient(150deg,var(--primary),var(--primary-dark)); display:grid; place-items:center;
       color:#fff; font-size:12px; font-weight:700; flex-shrink:0;
       margin-top:2px; overflow:hidden;
     }
-    .typing-avatar img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .typing-avatar img{ width:100%; height:100%; object-fit:cover; border-radius:9px; }
     .typing-bubble{
-      background:#EEF2FB; border:1px solid #DDE6F5;
-      border-radius:12px; padding:14px 18px;
+      background:transparent; border:none;
+      border-radius:0; padding:6px 0 0;
       display:flex; gap:5px; align-items:center;
     }
     .typing-dot{
@@ -3212,7 +3212,7 @@
           <span class="ctx-hint" id="ctxHint">Fikrini kendi cümlelerinle anlat</span>
         </div>
         <div class="composer">
-          <textarea id="input" placeholder="Fikrinden bahset, birlikte olgunlaştıralım…"></textarea>
+          <textarea id="input" placeholder="Cevabını yaz veya yukarıdaki önerilerden birini seç…"></textarea>
           <input id="chatAttachmentInput" type="file" hidden accept=".txt,.md,.csv,.json,.log,text/plain,text/csv,application/json,text/markdown"/>
           <button class="attach-btn" id="attachBtn" type="button" title="Dosya ekle (hassas içerik kontrolü yapılır)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -7068,7 +7068,7 @@ function renderMarkdown(text) {
       if(attachBtn) attachBtn.disabled = !editable || !ATTACHMENT_FEATURE_ENABLED;
       if(composerAttachmentRemove) composerAttachmentRemove.disabled = !ATTACHMENT_FEATURE_ENABLED;
       input.placeholder = editable
-        ? 'Fikrinden bahset, birlikte olgunlaştıralım…'
+        ? 'Cevabını yaz veya yukarıdaki önerilerden birini seç…'
         : (blockedByRequestType
             ? 'Yazılım Geliştirme dışındaki fikirlerin iletilen link üzerinden süreci ilerletilmektedir. Yazılım geliştirme fikirleriniz için yeni sohbet başlatabilirsiniz.'
             : 'Bu sohbet tamamlandı. Güncelleme için Fikir Geliştirme ekranından Chat ile Güncelle seçin.');
