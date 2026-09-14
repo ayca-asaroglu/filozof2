@@ -1,0 +1,91 @@
+Ürün fikriniz hangi ihtiyacı karşılamayı veya hangi sorunu çözmeyi hedefliyor?
+
+19:16
+⎘ Kopyala
+🔊 Oku
+Sen
+“Şube çalışanı X ekranında başvuru kaydederken aynı müşteri için mükerrer kayıt oluşuyor; işlem süresi uzuyor ve müşteri bekliyor.”
+19:16
+⎘ Kopyala
+
+
+FilozoF
+Mükerrer kayıt riskinde sistemin nasıl davranmasını bekliyorsunuz?
+
+19:16
+⎘ Kopyala
+🔊 Oku
+Sen
+mükker kayıt oluşamasın
+19:18
+⎘ Kopyala
+
+
+FilozoF
+Hangi başvuru türlerinde aynı müşteri için mükerrer kayıt engellenmeli?
+
+19:18
+⎘ Kopyala
+🔊 Oku
+Sen
+tüm başvuru türleri
+19:18
+⎘ Kopyala
+
+
+FilozoF
+Bu ihtiyacı karşılamak için beklediğiniz çözüm yaklaşımı nedir?
+
+19:18
+⎘ Kopyala
+🔊 Oku
+Önerilen cevaplar
+Önerileri gizle
+
+Başvuru kaydı sırasında sistem kontrolü yapıp mükerrer kayda izin vermemesi
+
+Mevcut başvuru kaydını bulup çalışana yönlendirmesi
+Sen
+Başvuru kaydı sırasında sistem kontrolü yapıp mükerrer kayda izin vermemesi
+19:18
+⎘ Kopyala
+
+
+FilozoF
+Aynı müşteri için hangi durumdaki mevcut başvuru kaydı mükerrer kabul edilerek yeni kayıt engellenmeli?
+
+19:18
+⎘ Kopyala
+🔊 Oku
+Sen
+tüm durumlardaki
+19:19
+⎘ Kopyala
+
+
+FilozoF
+Bu kontrolü doğrudan kim kullanacak? (Örneğin şube çalışanı.)
+
+19:19
+⎘ Kopyala
+🔊 Oku
+Sen
+şube çalışanı
+19:19
+⎘ Kopyala
+
+
+FilozoF
+Talep Tipi : Yazılım Geliştirme
+Fikrin Adı : X ekranında tüm başvuru türleri için mükerrer başvuru kaydının engellenmesi
+Problem : Şube çalışanı X ekranında başvuru kaydı oluştururken aynı müşteri için mükerrer kayıt oluşmaktadır. Bu durum işlem süresini uzatmakta ve müşterinin beklemesine neden olmaktadır.
+Mevcut Durum : X ekranında şube çalışanı başvuru kaydı oluştururken aynı müşteri için mükerrer başvuru kaydı oluşabilmektedir. Mevcut durumda tüm başvuru türleri ve mevcut başvuru kayıtlarının tüm durumları için mükerrer kayıt oluşumunu engelleyen bir kontrol bulunmamaktadır.
+Açıklama : Şube çalışanı X ekranında başvuru kaydı oluştururken sistem, aynı müşteri için mevcut bir başvuru kaydı bulunup bulunmadığını kontrol etmelidir. Mevcut kayıt hangi durumda olursa olsun ve başvuru türü ne olursa olsun, aynı müşteri için yeni başvuru kaydı oluşturulmasına izin verilmemelidir. Kabul kriterleri:
+Şube çalışanı X ekranında herhangi bir başvuru türü için başvuru kaydı oluşturmak istediğinde, aynı müşteriye ait mevcut başvuru kaydı varsa sistem yeni kaydın oluşmasını engeller.
+Mevcut başvuru kaydının durumu ne olursa olsun, aynı müşteri için yeni başvuru kaydı oluşturulamaz.
+Aynı müşteri için farklı başvuru türünde kayıt oluşturulmak istendiğinde de sistem yeni kaydın oluşmasını engeller.
+Kontrol sonucunda mevcut kayıt bulunmayan müşteri için başvuru kaydı oluşturulabilir.
+Çözüm Tipi : Başvuru kaydı sırasında sistem kontrolü yaparak mükerrer kayda izin verilmemesi
+Hedef Kitle : Doğrudan kullanıcı: X ekranını kullanan şube çalışanları. Dolaylı etkilenen: Başvuru işlemi sırasında bekleyen müşteriler.
+KPI : Belirtilmedi
+Bu özeti onaylıyor musunuz? Değişiklik yapmak istiyorsanız hangi alanı güncellemek istediğinizi belirtin.
