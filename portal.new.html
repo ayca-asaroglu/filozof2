@@ -563,6 +563,37 @@
       margin-bottom:4px;
     }
 
+    /* ===== Önerilen cevaplar (artifact formatı) ===== */
+    .suggest{ margin-top:16px; }
+    .suggest-h{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .suggest-h .lbl{ font-size:12px; font-weight:700; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px; }
+    .suggest-h .lbl svg{ color:var(--primary); }
+    .suggest-h .hide{ font-size:12px; color:var(--text-subtle); background:none; border:none; cursor:pointer; font-weight:600; font-family:inherit; }
+    .suggest-h .hide:hover{ color:var(--text); }
+    .suggest-grid{ display:flex; flex-direction:column; gap:8px; }
+    .suggest-grid[hidden]{ display:none; }
+    .sugg{
+      text-align:left; font-family:inherit; cursor:pointer;
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md);
+      padding:12px 14px; font-size:14px; color:var(--text-muted); line-height:1.45;
+      display:flex; align-items:center; gap:11px; transition:.14s;
+    }
+    .sugg:hover{ border-color:var(--primary-light); background:var(--accent); color:var(--text); transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+    .sugg-ico{
+      width:22px; height:22px; border-radius:6px; flex-shrink:0; display:grid; place-items:center;
+      background:var(--accent); color:var(--primary); transition:.14s;
+    }
+    .sugg:hover .sugg-ico{ background:var(--primary); color:#fff; }
+    .sugg-txt{ flex:1; }
+
+    /* Asistan balonu: yeşil onay satırı + "why" bilgi kutusu (artifact) */
+    .bubble.assistant p.lead-line{ color:var(--success); font-weight:600; }
+    .bubble.assistant blockquote{
+      font-size:13px; color:var(--text-muted); background:var(--surface);
+      border:1px solid var(--border-light); border-left:1px solid var(--border-light);
+      border-radius:var(--radius); padding:9px 12px; margin:12px 0; font-style:normal; line-height:1.55;
+    }
+
     /* ===== Örnek cevaplar — isteğe bağlı, açılır tetikleyici ===== */
     .examples{ margin-top:12px; }
     .examples-toggle{
@@ -6980,55 +7011,61 @@ function renderMarkdown(text) {
     const EX_BULB_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg>';
     const EX_CHEVRON_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
+    const SUGG_STAR_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-3.5 3 1 4.7L12 14.3 8 16.7l1-4.7L5.5 9l4.6-1.4z"/></svg>';
+    const SUGG_CHECK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/></svg>';
+
+    // Önerilen cevaplar (artifact formatı): ✨ başlık + "Önerileri gizle" + ✓ ikonlu kartlar.
     function buildExamplesComponent(examples){
       const box = document.createElement('div');
-      box.className = 'examples';
-      const startOpen = getExamplesPref();
-      if(startOpen) box.classList.add('open');
+      box.className = 'suggest';
+      // Varsayılan açık (artifact); yalnızca kullanıcı açıkça gizlediyse ('0') kapalı.
+      let _pref = null; try{ _pref = localStorage.getItem(EXAMPLES_PREF_KEY); }catch(e){}
+      const startOpen = _pref !== '0';
 
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'examples-toggle';
-      toggle.setAttribute('aria-expanded', String(startOpen));
-      toggle.innerHTML =
-        '<span class="examples-toggle-icon" aria-hidden="true">' + EX_BULB_SVG + '</span>'
-        + '<span class="examples-toggle-label">' + (startOpen ? 'Örnekleri gizle' : 'Örnek cevaplar') + '</span>'
-        + '<span class="examples-toggle-count">' + examples.length + '</span>'
-        + '<span class="examples-toggle-chevron" aria-hidden="true">' + EX_CHEVRON_SVG + '</span>';
+      const head = document.createElement('div');
+      head.className = 'suggest-h';
+      const lbl = document.createElement('span');
+      lbl.className = 'lbl';
+      lbl.innerHTML = SUGG_STAR_SVG + '<span>Önerilen cevaplar</span>';
+      const hide = document.createElement('button');
+      hide.type = 'button';
+      hide.className = 'hide';
+      hide.textContent = startOpen ? 'Önerileri gizle' : 'Önerileri göster';
+      head.appendChild(lbl); head.appendChild(hide);
 
-      const panel = document.createElement('div');
-      panel.className = 'examples-panel';
-      const inner = document.createElement('div');
-      inner.className = 'examples-panel-inner';
-      const cards = document.createElement('div');
-      cards.className = 'example-cards';
+      const grid = document.createElement('div');
+      grid.className = 'suggest-grid';
+      grid.hidden = !startOpen;
       examples.forEach(ex => {
         const card = document.createElement('button');
-        card.className = 'example-card';
+        card.className = 'sugg';
         card.type = 'button';
-        card.textContent = ex;
         card.title = 'Tıklayarak kullan';
+        const ico = document.createElement('span');
+        ico.className = 'sugg-ico';
+        ico.innerHTML = SUGG_CHECK_SVG;
+        const txt = document.createElement('span');
+        txt.className = 'sugg-txt';
+        txt.textContent = ex;
+        card.appendChild(ico); card.appendChild(txt);
         card.addEventListener('click', () => {
           const inputEl = document.getElementById('input');
           inputEl.value = ex;
           autoResizeComposerInput();
           inputEl.focus();
         });
-        cards.appendChild(card);
+        grid.appendChild(card);
       });
-      inner.appendChild(cards);
-      panel.appendChild(inner);
 
-      toggle.addEventListener('click', () => {
-        const nowOpen = !box.classList.contains('open');
-        box.classList.toggle('open', nowOpen);
-        toggle.setAttribute('aria-expanded', String(nowOpen));
-        toggle.querySelector('.examples-toggle-label').textContent = nowOpen ? 'Örnekleri gizle' : 'Örnek cevaplar';
+      hide.addEventListener('click', () => {
+        const nowOpen = grid.hidden; // gizliyse aç
+        grid.hidden = !nowOpen;
+        hide.textContent = nowOpen ? 'Önerileri gizle' : 'Önerileri göster';
         setExamplesPref(nowOpen);
       });
 
-      box.appendChild(toggle);
-      box.appendChild(panel);
+      box.appendChild(head);
+      box.appendChild(grid);
       return box;
     }
 
@@ -7108,6 +7145,9 @@ function renderMarkdown(text) {
         bubble.querySelectorAll('a').forEach(a => {
           if((a.textContent || '').trim() === MATURATION_CTA_LABEL) a.classList.add('cta-link-btn');
         });
+        // Artifact: ✓ ile başlayan ilk satır yeşil onay satırı olarak vurgulanır.
+        const firstP = bubble.querySelector('p');
+        if(firstP && /^\s*[✓✅]/.test(firstP.textContent || '')) firstP.classList.add('lead-line');
       }
 
       const ts = document.createElement('div');
